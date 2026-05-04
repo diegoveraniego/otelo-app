@@ -25,7 +25,12 @@ export default function RootLayout({
       <body className={`${inter.className} bg-[#FAFAFA] dark:bg-[#242424] text-[#1E1E1E] dark:text-white pb-20 md:pb-0 min-h-screen transition-colors`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <header className="sticky top-0 z-40 bg-white dark:bg-[#303030] border-b border-[#E5E6E6] dark:border-[#3D3D3D] p-4 flex justify-between items-center max-w-7xl mx-auto w-full transition-colors">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <img
+                src="/logo_otelo.png"
+                alt="Logo Otelo"
+                className="w-8 h-8 dark:invert"
+              />
               <h1 className="text-3xl text-[#1E1E1E] dark:text-white" style={{ fontFamily: "var(--font-bagnard)" }}>
                 Otelo
               </h1>

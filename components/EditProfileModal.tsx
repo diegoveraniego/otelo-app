@@ -258,7 +258,7 @@ export default function EditProfileModal({ isOpen, onClose, onUpdated }: EditPro
 
           <div className="border-t border-[#E5E6E6] dark:border-[#3D3D3D] pt-6 transition-colors">
             <h3 className="text-sm font-semibold text-[#1E1E1E] dark:text-white mb-3">Cambiar PIN</h3>
-            <div className="flex gap-2">
+            <div className="flex flex-col gap-2">
               <input
                 type="password"
                 value={newPin}
@@ -267,12 +267,12 @@ export default function EditProfileModal({ isOpen, onClose, onUpdated }: EditPro
                 pattern="[0-9]*"
                 inputMode="numeric"
                 placeholder="Nuevo PIN"
-                className="flex-1 text-center tracking-widest text-lg text-[#1E1E1E] dark:text-white dark:bg-[#242424] px-4 py-2 rounded-lg border border-[#E5E6E6] dark:border-[#3D3D3D] focus:outline-none focus:border-[#3584E4] focus:ring-1 focus:ring-[#3584E4] transition-colors"
+                className="w-full text-center tracking-widest text-lg text-[#1E1E1E] dark:text-white dark:bg-[#242424] px-4 py-2 rounded-lg border border-[#E5E6E6] dark:border-[#3D3D3D] focus:outline-none focus:border-[#3584E4] focus:ring-1 focus:ring-[#3584E4] transition-colors"
               />
               <button
                 onClick={handlePinChange}
                 disabled={newPin.length !== 4 || isChangingPin}
-                className="bg-[#3584E4] hover:bg-[#1C71D8] text-white px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
+                className="w-full bg-[#3584E4] hover:bg-[#1C71D8] text-white px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
               >
                 {isChangingPin ? '...' : 'Guardar'}
               </button>
