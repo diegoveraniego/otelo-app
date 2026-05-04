@@ -16,6 +16,10 @@ export const metadata: Metadata = {
   description: "App para registrar tareas del hogar",
   manifest: "/manifest.json",
   viewport: "width=device-width, initial-scale=0.8, viewport-fit=cover",
+  icons: {
+    icon: "/logo_otelo.png",
+    apple: "/logo_otelo.png",
+  },
 };
 
 export default function RootLayout({

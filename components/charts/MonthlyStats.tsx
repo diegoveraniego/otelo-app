@@ -100,7 +100,7 @@ export default function MonthlyStats() {
                       key={idx}
                       className="w-4 h-4 rounded-sm"
                       style={{ 
-                        backgroundColor: count > 0 ? row.member.color : '#3D3D3D',
+                        backgroundColor: count > 0 ? row.member.color : (isDark ? '#3D3D3D' : '#E5E6E6'),
                         opacity: count > 0 ? Math.min(0.4 + (count * 0.2), 1) : 1
                       }}
                       title={`Día ${idx + 1}: ${count} tareas`}
