@@ -54,6 +54,7 @@ Una aplicación web mobile-first para registrar las tareas del hogar, diseñada 
 
 ## Roadmap (Próximamente)
 
+- [ ] **Página de administración**: Panel para gestionar miembros, tareas y ver logs detallados.
 - [ ] **Soporte para Docker**: Facilitar el despliegue en servidores hogareños (Home Servers, NAS, Raspberry Pi).
 - [ ] **App Nativa Android**: Desarrollar una versión para Android con notificaciones push.
 - [ ] **App Nativa iOS**: Desarrollar una versión para iOS.
