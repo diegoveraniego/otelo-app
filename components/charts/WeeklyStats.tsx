@@ -7,6 +7,7 @@ import { Heart } from 'lucide-react';
 import { startOfWeek, endOfWeek } from 'date-fns';
 import { Member } from '@/lib/types';
 import ChartTooltip from './ChartTooltip';
+import ThanksRankingCard, { ThanksRankingEntry } from './ThanksRankingCard';
 import { useTheme } from 'next-themes';
 import Avatar from '@/components/Avatar';
 
@@ -20,6 +21,7 @@ type StatsData = {
 
 export default function WeeklyStats() {
   const [data, setData] = useState<StatsData[]>([]);
+  const [thanksRanking, setThanksRanking] = useState<ThanksRankingEntry[]>([]);
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
 
@@ -49,6 +51,14 @@ export default function WeeklyStats() {
       })).sort((a, b) => b.total - a.total);
       
       setData(stats);
+
+      // Build thanks ranking
+      setThanksRanking(
+        members.map((m: Member) => ({
+          member: m,
+          count: thanks?.filter(t => t.to_member_id === m.id).length ?? 0,
+        }))
+      );
     }
   };
 
@@ -100,6 +110,7 @@ export default function WeeklyStats() {
           ))}
         </div>
       </div>
+      <ThanksRankingCard data={thanksRanking} />
     </div>
   );
 }

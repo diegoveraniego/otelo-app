@@ -6,12 +6,14 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 
 import { startOfYear, endOfYear } from 'date-fns';
 import { Member, Chore } from '@/lib/types';
 import ChartTooltip from './ChartTooltip';
+import ThanksRankingCard, { ThanksRankingEntry } from './ThanksRankingCard';
 import { useTheme } from 'next-themes';
 import Avatar from '@/components/Avatar';
 
 export default function YearlyStats() {
   const [data, setData] = useState<any[]>([]);
   const [topChores, setTopChores] = useState<any[]>([]);
+  const [thanksRanking, setThanksRanking] = useState<ThanksRankingEntry[]>([]);
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
 
@@ -27,11 +29,18 @@ export default function YearlyStats() {
     const { data: chores } = await supabase.from('chores').select('*');
     if (!members || !chores) return;
 
-    const { data: logs } = await supabase
-      .from('logs')
-      .select('*')
-      .gte('done_at', start)
-      .lte('done_at', end);
+    const [{ data: logs }, { data: thanks }] = await Promise.all([
+      supabase.from('logs').select('*').gte('done_at', start).lte('done_at', end),
+      supabase.from('thanks').select('to_member_id').gte('created_at', start).lte('created_at', end),
+    ]);
+
+    // Build thanks ranking
+    setThanksRanking(
+      members.map((m: Member) => ({
+        member: m,
+        count: thanks?.filter(t => t.to_member_id === m.id).length ?? 0,
+      }))
+    );
 
     if (logs) {
       // Total per person
@@ -100,6 +109,7 @@ export default function YearlyStats() {
           ))}
         </div>
       </div>
+      <ThanksRankingCard data={thanksRanking} />
     </div>
   );
 }

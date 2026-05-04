@@ -6,6 +6,7 @@ import { BarChart, Bar, LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContai
 import { startOfMonth, endOfMonth, getDaysInMonth, format } from 'date-fns';
 import { Member, Chore, Log } from '@/lib/types';
 import ChartTooltip from './ChartTooltip';
+import ThanksRankingCard, { ThanksRankingEntry } from './ThanksRankingCard';
 import { useTheme } from 'next-themes';
 
 export default function MonthlyStats() {
@@ -13,6 +14,7 @@ export default function MonthlyStats() {
   const [heatmapData, setHeatmapData] = useState<any[]>([]);
   const [lineData, setLineData] = useState<any[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
+  const [thanksRanking, setThanksRanking] = useState<ThanksRankingEntry[]>([]);
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
 
@@ -29,11 +31,18 @@ export default function MonthlyStats() {
     if (!mData || !cData) return;
     setMembers(mData);
 
-    const { data: logs } = await supabase
-      .from('logs')
-      .select('*')
-      .gte('done_at', start.toISOString())
-      .lte('done_at', end.toISOString());
+    const [{ data: logs }, { data: thanks }] = await Promise.all([
+      supabase.from('logs').select('*').gte('done_at', start.toISOString()).lte('done_at', end.toISOString()),
+      supabase.from('thanks').select('to_member_id').gte('created_at', start.toISOString()).lte('created_at', end.toISOString()),
+    ]);
+
+    // Build thanks ranking
+    setThanksRanking(
+      mData.map((m: Member) => ({
+        member: m,
+        count: thanks?.filter(t => t.to_member_id === m.id).length ?? 0,
+      }))
+    );
 
     if (logs) {
       // Per-chore breakdown (stacked bar)
@@ -145,6 +154,7 @@ export default function MonthlyStats() {
           </ResponsiveContainer>
         </div>
       </div>
+      <ThanksRankingCard data={thanksRanking} />
     </div>
   );
 }
