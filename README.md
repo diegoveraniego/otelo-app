@@ -26,7 +26,7 @@ Una aplicación web mobile-first para registrar las tareas del hogar, diseñada 
    ```env
    NEXT_PUBLIC_SUPABASE_URL=tu-project-url
    NEXT_PUBLIC_SUPABASE_ANON_KEY=tu-anon-key
-   HOME_PASSWORD=otelo123
+   HOME_PASSWORD=una-contrasena-segura
    ```
 4. Inicia el servidor de desarrollo:
    ```bash
@@ -47,7 +47,7 @@ Una aplicación web mobile-first para registrar las tareas del hogar, diseñada 
 
 ## Uso
 
-- **Contraseña de Casa**: Al ingresar, se te pedirá la contraseña de casa (por defecto `otelo123` según tu `.env.local`).
-- **PIN de Usuario**: Al seleccionar tu nombre, ingresa el PIN de 4 dígitos (por defecto `1234` para todos, según el archivo `.sql`).
+- **Contraseña de Casa**: Al ingresar, se te pedirá la contraseña de casa definida en `HOME_PASSWORD`.
+- **PIN de Usuario**: Al seleccionar tu nombre, ingresa el PIN de 4 dígitos configurado en la base de datos (puedes ver o cambiar los PINs en `supabase/migrations/001_init.sql`).
 - **Registrar Tareas**: Toca una tarea en la pantalla de inicio y confirma. Si registras la misma tarea dos veces en menos de una hora, la app te avisará.
 - **Estadísticas**: Revisa la actividad semanal, mensual y anual en la pestaña de Estadísticas.

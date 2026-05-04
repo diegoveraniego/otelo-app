@@ -5,7 +5,12 @@ import { redirect } from 'next/navigation';
 
 export async function loginWithHomePassword(formData: FormData) {
   const password = formData.get('password') as string;
-  const correctPassword = process.env.HOME_PASSWORD || 'otelo123';
+  const correctPassword = process.env.HOME_PASSWORD;
+
+  if (!correctPassword) {
+    console.error('HOME_PASSWORD environment variable is not set');
+    return { error: 'Error de configuración del servidor' };
+  }
 
   if (password === correctPassword) {
     (await cookies()).set('home_auth_token', 'authenticated', {
