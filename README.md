@@ -2,7 +2,15 @@
 
 Una aplicación web mobile-first para registrar las tareas del hogar, diseñada para la familia. Creada con Next.js 14, Tailwind CSS, Recharts y Supabase.
 
+<img width="1434" height="921" alt="image" src="https://github.com/user-attachments/assets/8e61b220-3ee0-466a-a312-33bc9b7d34c5" />
+<img width="1420" height="910" alt="image" src="https://github.com/user-attachments/assets/47b653ee-cf35-4655-a6b0-2fc19fa08fb6" />
+<img width="1423" height="920" alt="image" src="https://github.com/user-attachments/assets/7058f11f-efe3-4245-a41f-bce028a12e6f" />
+
+
+
 Advertencia: *Hecho con IA con el propósito de solucionar y aprender / Made with AI for learning and solution purposes*
+
+[Videocaptura de pantalla_20260504_124347.webm](https://github.com/user-attachments/assets/82932b62-64ea-4c05-9832-130fd242ccb6)
 
 ## Requisitos Previos
 
