@@ -51,3 +51,9 @@ Una aplicación web mobile-first para registrar las tareas del hogar, diseñada 
 - **PIN de Usuario**: Al seleccionar tu nombre, ingresa el PIN de 4 dígitos configurado en la base de datos (puedes ver o cambiar los PINs en `supabase/migrations/001_init.sql`).
 - **Registrar Tareas**: Toca una tarea en la pantalla de inicio y confirma. Si registras la misma tarea dos veces en menos de una hora, la app te avisará.
 - **Estadísticas**: Revisa la actividad semanal, mensual y anual en la pestaña de Estadísticas.
+
+## Roadmap (Próximamente)
+
+- [ ] **Soporte para Docker**: Facilitar el despliegue en servidores hogareños (Home Servers, NAS, Raspberry Pi).
+- [ ] **App Nativa Android**: Desarrollar una versión para Android con notificaciones push.
+- [ ] **App Nativa iOS**: Desarrollar una versión para iOS.
