@@ -25,3 +25,16 @@ export type LogWithDetails = Log & {
   member: Member;
   chore: Chore;
 };
+
+export type Thanks = {
+  id: string;
+  log_id: string;
+  from_member_id: string;
+  to_member_id: string;
+  created_at: string;
+};
+
+export type ThanksWithDetails = Thanks & {
+  from_member: Member;
+  log: Log & { chore: Chore };
+};

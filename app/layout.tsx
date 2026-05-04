@@ -5,6 +5,7 @@ import "./globals.css";
 import UserSelectModal, { OpenUserModalButton } from "@/components/UserSelectModal";
 import BottomNav from "@/components/BottomNav";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import NotificationBell from "@/components/NotificationBell";
 
 const inter = Inter({ subsets: ["latin"] });
 const bagnard = localFont({ src: "../public/fonts/Bagnard.otf", variable: "--font-bagnard" });
@@ -35,7 +36,10 @@ export default function RootLayout({
                 Otelo
               </h1>
             </div>
-            <OpenUserModalButton />
+            <div className="flex items-center gap-2">
+              <NotificationBell />
+              <OpenUserModalButton />
+            </div>
           </header>
           
           <main className="max-w-7xl mx-auto w-full p-4">
