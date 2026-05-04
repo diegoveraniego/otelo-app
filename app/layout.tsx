@@ -23,21 +23,28 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" suppressHydrationWarning className={bagnard.variable}>
+    <html lang="es" suppressHydrationWarning className={`${bagnard.variable} w-screen overflow-x-hidden`}>
       <head>
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       </head>
-      <body className={`${inter.className} bg-[#FAFAFA] dark:bg-[#242424] text-[#1E1E1E] dark:text-white pb-20 md:pb-0 min-h-screen transition-colors overflow-x-hidden w-screen`}>
+      <body
+        className={`${inter.className} bg-[#FAFAFA] dark:bg-[#242424] text-[#1E1E1E] dark:text-white pb-[4rem] min-h-screen transition-colors`}
+      >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <header className="sticky top-0 z-40 bg-white dark:bg-[#303030] border-b border-[#E5E6E6] dark:border-[#3D3D3D] px-4 py-3 flex justify-between items-center w-screen transition-colors">
+          <header
+            className="sticky top-0 z-40 bg-white dark:bg-[#303030] border-b border-[#E5E6E6] dark:border-[#3D3D3D] px-3 py-2 md:px-4 md:py-3 flex justify-between items-center w-screen"
+          >
             <div className="flex items-center gap-2">
               <img
                 src="/logo_otelo.png"
                 alt="Logo Otelo"
-                className="w-8 h-8 dark:invert"
+                className="w-6 h-6 md:w-8 md:h-8 dark:invert"
               />
-              <h1 className="text-3xl text-[#1E1E1E] dark:text-white" style={{ fontFamily: "var(--font-bagnard)" }}>
+              <h1
+                className="text-xl md:text-3xl text-[#1E1E1E] dark:text-white"
+                style={{ fontFamily: "var(--font-bagnard)" }}
+              >
                 Otelo
               </h1>
             </div>
@@ -46,8 +53,8 @@ export default function RootLayout({
               <OpenUserModalButton />
             </div>
           </header>
-          
-          <main className="max-w-7xl mx-auto w-full px-3 py-4 md:p-4">
+
+          <main className="w-full px-3 py-2 md:p-4 max-w-[1024px] mx-auto">
             {children}
           </main>
 
