@@ -6,6 +6,7 @@ import UserSelectModal, { OpenUserModalButton } from "@/components/UserSelectMod
 import BottomNav from "@/components/BottomNav";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import NotificationBell from "@/components/NotificationBell";
+import Image from "next/image";
 
 const inter = Inter({ subsets: ["latin"] });
 const bagnard = localFont({ src: "../public/fonts/Bagnard.otf", variable: "--font-bagnard" });
@@ -36,10 +37,14 @@ export default function RootLayout({
             className="sticky top-0 z-40 bg-white dark:bg-[#303030] border-b border-[#E5E6E6] dark:border-[#3D3D3D] px-2 py-1 md:px-4 md:py-3 flex justify-between items-center w-screen"
           >
             <div className="flex items-center gap-2">
-              <img
+              <Image
                 src="/logo_otelo.png"
                 alt="Logo Otelo"
+                width={32}
+                height={32}
                 className="w-5 h-5 md:w-8 md:h-8 dark:invert"
+                priority
+                unoptimized={true}
               />
               <h1
                 className="text-lg md:text-3xl text-[#1E1E1E] dark:text-white"

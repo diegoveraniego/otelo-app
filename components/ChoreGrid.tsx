@@ -35,10 +35,10 @@ export default function ChoreGrid() {
           <button
             key={chore.id}
             onClick={() => handleChoreClick(chore)}
-            className="flex flex-col items-center justify-center p-4 bg-white dark:bg-[#303030] rounded-xl shadow-sm border border-[#E5E6E6] dark:border-[#3D3D3D] hover:bg-[#FAFAFA] dark:hover:bg-[#3D3D3D] transition-colors aspect-square"
+            className="flex flex-col items-center justify-center p-3 sm:p-4 bg-white dark:bg-[#303030] rounded-xl shadow-sm border border-[#E5E6E6] dark:border-[#3D3D3D] hover:bg-[#FAFAFA] dark:hover:bg-[#3D3D3D] transition-colors aspect-square w-full min-w-0"
           >
-            <span className="text-4xl mb-3">{chore.emoji}</span>
-            <span className="text-sm font-medium text-[#1E1E1E] dark:text-white text-center leading-tight">
+            <span className="text-3xl sm:text-4xl mb-2 sm:mb-3">{chore.emoji}</span>
+            <span className="text-xs sm:text-sm font-medium text-[#1E1E1E] dark:text-white text-center leading-tight w-full truncate px-1">
               {chore.name}
             </span>
           </button>

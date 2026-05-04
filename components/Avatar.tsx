@@ -5,6 +5,8 @@ interface AvatarProps {
   className?: string;
 }
 
+import Image from 'next/image';
+
 export default function Avatar({ member, className = '' }: AvatarProps) {
   if (member.avatar_url) {
     return (
@@ -12,10 +14,14 @@ export default function Avatar({ member, className = '' }: AvatarProps) {
         className={`relative rounded-full overflow-hidden shrink-0 shadow-sm border border-black/5 ${className}`}
         style={{ backgroundColor: member.color }}
       >
-        <img
+        <Image
           src={member.avatar_url}
           alt={`Avatar de ${member.name}`}
-          className="w-full h-full object-cover"
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          className="object-cover"
+          priority
+          unoptimized={true}
         />
       </div>
     );

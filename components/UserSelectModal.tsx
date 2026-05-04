@@ -12,7 +12,7 @@ import EditProfileModal from './EditProfileModal';
 
   export default function UserSelectModal() {
     const pathname = usePathname();
-    const { currentUser, setCurrentUser } = useUserStore();
+    const { currentUser, setCurrentUser, hasDismissedUserModal, setHasDismissedUserModal } = useUserStore();
     const [members, setMembers] = useState<Member[]>([]);
     const [isOpen, setIsOpen] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
@@ -28,7 +28,7 @@ import EditProfileModal from './EditProfileModal';
     }, [pathname]);
 
   useEffect(() => {
-    if (!currentUser) {
+    if (!currentUser && !hasDismissedUserModal) {
       setIsOpen(true);
     }
     
@@ -65,7 +65,7 @@ import EditProfileModal from './EditProfileModal';
 
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-sm bg-white dark:bg-[#303030] rounded-xl shadow-lg border border-[#E5E6E6] dark:border-[#3D3D3D] overflow-hidden animate-in fade-in zoom-in duration-200 transition-colors">
+      <div className="w-full max-w-sm max-h-[90vh] flex flex-col bg-white dark:bg-[#303030] rounded-xl shadow-lg border border-[#E5E6E6] dark:border-[#3D3D3D] overflow-hidden animate-in fade-in zoom-in duration-200 transition-colors">
         <div className="p-6 text-center border-b border-[#E5E6E6] dark:border-[#3D3D3D] bg-[#FAFAFA] dark:bg-[#2A2A2A] transition-colors">
           <h2 className="text-xl font-bold text-[#1E1E1E] dark:text-white">
             {selectedMember ? 'Ingresa tu PIN' : '¿Quién eres?'}
@@ -86,9 +86,23 @@ import EditProfileModal from './EditProfileModal';
               </button>
             </div>
           )}
+          {!currentUser && !selectedMember && (
+             <div className="absolute top-4 right-4 flex gap-2">
+                <button 
+                  onClick={() => {
+                    setHasDismissedUserModal(true);
+                    setIsOpen(false);
+                  }}
+                  className="p-1.5 text-[#1E1E1E] dark:text-white hover:bg-[#E5E6E6] dark:hover:bg-[#3D3D3D] rounded-lg transition-colors"
+                  aria-label="Cerrar modal"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+             </div>
+          )}
         </div>
 
-        <div className="p-6">
+        <div className="flex-1 overflow-y-auto p-6">
           {!selectedMember ? (
             members.length === 0 ? (
               <div className="text-center p-4">
@@ -171,12 +185,13 @@ import EditProfileModal from './EditProfileModal';
 export function OpenUserModalButton() {
   const { currentUser } = useUserStore();
   const [isClient, setIsClient] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  if (!isClient || !currentUser) return null;
+  if (!isClient || pathname === '/login') return null;
 
   return (
     <button
@@ -185,10 +200,17 @@ export function OpenUserModalButton() {
         // For simplicity, we just dispatch a custom event.
         window.dispatchEvent(new CustomEvent('open-user-modal'));
       }}
-      className="flex items-center gap-2 bg-white dark:bg-[#303030] rounded-full p-1 pr-3 shadow-sm border border-[#E5E6E6] dark:border-[#3D3D3D] hover:bg-[#FAFAFA] dark:hover:bg-[#3D3D3D] transition-colors"
+      className="flex items-center gap-2 bg-white dark:bg-[#303030] rounded-full p-1 shadow-sm border border-[#E5E6E6] dark:border-[#3D3D3D] hover:bg-[#FAFAFA] dark:hover:bg-[#3D3D3D] transition-colors"
+      style={currentUser ? { paddingRight: '0.75rem' } : { paddingRight: '0.25rem', paddingLeft: '0.75rem', padding: '0.5rem 1rem' }}
     >
-      <Avatar member={currentUser} className="w-8 h-8 text-sm" />
-      <span className="font-medium text-sm text-[#1E1E1E] dark:text-white">{currentUser.name}</span>
+      {currentUser ? (
+        <>
+          <Avatar member={currentUser} className="w-8 h-8 text-sm" />
+          <span className="font-medium text-sm text-[#1E1E1E] dark:text-white">{currentUser.name}</span>
+        </>
+      ) : (
+        <span className="font-medium text-sm text-[#1E1E1E] dark:text-white">Iniciar Sesión</span>
+      )}
     </button>
   );
 }

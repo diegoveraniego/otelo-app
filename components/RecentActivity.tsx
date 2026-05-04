@@ -109,7 +109,7 @@ export default function RecentActivity() {
                 <div className="flex-1 min-w-0">
                   <p className="text-sm text-[#1E1E1E] dark:text-white truncate">
                     <span className="font-semibold">{log.member.name}</span> hizo{' '}
-                    <span className="font-medium">{log.chore.name}</span> {log.chore.emoji}
+                    <span className="font-medium truncate inline-block max-w-[120px] sm:max-w-xs align-bottom">{log.chore.name}</span> {log.chore.emoji}
                   </p>
                   <p className="text-xs text-[#1E1E1E]/70 dark:text-white/70 mt-0.5">
                     Hace {formatDistanceToNow(new Date(log.done_at), { locale: es })}

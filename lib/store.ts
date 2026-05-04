@@ -7,6 +7,8 @@ type UserState = {
   setCurrentUser: (user: Member | null) => void;
   lastSeenNotifications: string | null;
   setLastSeenNotifications: (ts: string) => void;
+  hasDismissedUserModal: boolean;
+  setHasDismissedUserModal: (dismissed: boolean) => void;
 };
 
 export const useUserStore = create<UserState>()(
@@ -16,6 +18,8 @@ export const useUserStore = create<UserState>()(
       setCurrentUser: (user) => set({ currentUser: user }),
       lastSeenNotifications: null,
       setLastSeenNotifications: (ts) => set({ lastSeenNotifications: ts }),
+      hasDismissedUserModal: false,
+      setHasDismissedUserModal: (dismissed) => set({ hasDismissedUserModal: dismissed }),
     }),
     {
       name: 'otelo-user-storage',

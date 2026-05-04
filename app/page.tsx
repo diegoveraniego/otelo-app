@@ -9,7 +9,7 @@ export default function Home() {
     <div className="animate-in fade-in duration-500 pb-8 mt-2">
       <div className="grid md:grid-cols-[1fr_300px] gap-6 items-start">
         {/* Columna principal */}
-        <div>
+        <div className="min-w-0">
           <DateHeader />
           {/* SummaryCard solo en móvil — en desktop va en la sidebar */}
           <div className="md:hidden">
