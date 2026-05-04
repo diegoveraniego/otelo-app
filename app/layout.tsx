@@ -14,6 +14,7 @@ export const metadata: Metadata = {
   title: "Otelo - Family Chores",
   description: "App para registrar tareas del hogar",
   manifest: "/manifest.json",
+  viewport: "width=device-width, initial-scale=1, viewport-fit=cover",
 };
 
 export default function RootLayout({
@@ -23,9 +24,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" suppressHydrationWarning className={bagnard.variable}>
-      <body className={`${inter.className} bg-[#FAFAFA] dark:bg-[#242424] text-[#1E1E1E] dark:text-white pb-20 md:pb-0 min-h-screen transition-colors`}>
+      <body className={`${inter.className} bg-[#FAFAFA] dark:bg-[#242424] text-[#1E1E1E] dark:text-white pb-20 md:pb-0 min-h-screen transition-colors overflow-x-hidden w-full`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <header className="sticky top-0 z-40 bg-white dark:bg-[#303030] border-b border-[#E5E6E6] dark:border-[#3D3D3D] p-4 flex justify-between items-center max-w-7xl mx-auto w-full transition-colors">
+          <header className="sticky top-0 z-40 bg-white dark:bg-[#303030] border-b border-[#E5E6E6] dark:border-[#3D3D3D] p-4 flex justify-between items-center max-w-7xl mx-auto w-full transition-[...]">
             <div className="flex items-center gap-2">
               <img
                 src="/logo_otelo.png"
@@ -42,7 +43,7 @@ export default function RootLayout({
             </div>
           </header>
           
-          <main className="max-w-7xl mx-auto w-full p-4">
+          <main className="max-w-7xl mx-auto w-full px-3 py-4 md:p-4">
             {children}
           </main>
 
