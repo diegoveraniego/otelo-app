@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   title: "Otelo - Family Chores",
   description: "App para registrar tareas del hogar",
   manifest: "/manifest.json",
-  viewport: "width=device-width, initial-scale=1, viewport-fit=cover",
+  viewport: "width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no",
 };
 
 export default function RootLayout({
@@ -24,9 +24,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" suppressHydrationWarning className={bagnard.variable}>
-      <body className={`${inter.className} bg-[#FAFAFA] dark:bg-[#242424] text-[#1E1E1E] dark:text-white pb-20 md:pb-0 min-h-screen transition-colors overflow-x-hidden w-full`}>
+      <head>
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+      </head>
+      <body className={`${inter.className} bg-[#FAFAFA] dark:bg-[#242424] text-[#1E1E1E] dark:text-white pb-20 md:pb-0 min-h-screen transition-colors overflow-x-hidden w-screen`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <header className="sticky top-0 z-40 bg-white dark:bg-[#303030] border-b border-[#E5E6E6] dark:border-[#3D3D3D] p-4 flex justify-between items-center max-w-7xl mx-auto w-full transition-[...]">
+          <header className="sticky top-0 z-40 bg-white dark:bg-[#303030] border-b border-[#E5E6E6] dark:border-[#3D3D3D] px-4 py-3 flex justify-between items-center w-screen transition-colors">
             <div className="flex items-center gap-2">
               <img
                 src="/logo_otelo.png"
