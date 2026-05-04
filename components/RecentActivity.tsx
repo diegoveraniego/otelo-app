@@ -68,7 +68,10 @@ export default function RecentActivity() {
   const handleThank = async (log: LogWithDetails) => {
     if (!currentUser || myThanks.includes(log.id)) return;
 
+    // Optimistic update: marcar inmediatamente antes de esperar respuesta de DB
+    setMyThanks((prev) => [...prev, log.id]);
     setThankingId(log.id);
+
     const { error } = await supabase.from('thanks').insert({
       log_id: log.id,
       from_member_id: currentUser.id,
@@ -76,8 +79,11 @@ export default function RecentActivity() {
     });
 
     if (!error) {
-      setMyThanks((prev) => [...prev, log.id]);
       window.dispatchEvent(new CustomEvent('thanks-updated'));
+    } else {
+      // Revertir si falló (ej: tabla no existe aún)
+      setMyThanks((prev) => prev.filter((id) => id !== log.id));
+      console.error('Error al registrar agradecimiento:', error.message);
     }
     setThankingId(null);
   };
