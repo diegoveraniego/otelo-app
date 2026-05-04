@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   title: "Otelo - Family Chores",
   description: "App para registrar tareas del hogar",
   manifest: "/manifest.json",
-  viewport: "width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no",
+  viewport: "width=device-width, initial-scale=0.8, viewport-fit=cover",
 };
 
 export default function RootLayout({
@@ -33,16 +33,16 @@ export default function RootLayout({
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <header
-            className="sticky top-0 z-40 bg-white dark:bg-[#303030] border-b border-[#E5E6E6] dark:border-[#3D3D3D] px-3 py-2 md:px-4 md:py-3 flex justify-between items-center w-screen"
+            className="sticky top-0 z-40 bg-white dark:bg-[#303030] border-b border-[#E5E6E6] dark:border-[#3D3D3D] px-2 py-1 md:px-4 md:py-3 flex justify-between items-center w-screen"
           >
             <div className="flex items-center gap-2">
               <img
                 src="/logo_otelo.png"
                 alt="Logo Otelo"
-                className="w-6 h-6 md:w-8 md:h-8 dark:invert"
+                className="w-5 h-5 md:w-8 md:h-8 dark:invert"
               />
               <h1
-                className="text-xl md:text-3xl text-[#1E1E1E] dark:text-white"
+                className="text-lg md:text-3xl text-[#1E1E1E] dark:text-white"
                 style={{ fontFamily: "var(--font-bagnard)" }}
               >
                 Otelo
@@ -54,7 +54,7 @@ export default function RootLayout({
             </div>
           </header>
 
-          <main className="w-full px-3 py-2 md:p-4 max-w-[1024px] mx-auto">
+          <main className="w-full px-2 py-2 md:p-4 max-w-[1024px] mx-auto text-sm">
             {children}
           </main>
 
