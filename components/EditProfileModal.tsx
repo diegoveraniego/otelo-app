@@ -3,9 +3,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import { useUserStore } from '@/lib/store';
-import { X, Upload, Camera, Loader2, Moon, Sun, Monitor } from 'lucide-react';
+import { X, Upload, Camera, Loader2, Moon, Sun, Monitor, RefreshCw } from 'lucide-react';
 import Avatar from './Avatar';
 import { useTheme } from 'next-themes';
+import { Member, ColorTrade } from '@/lib/types';
 
 interface EditProfileModalProps {
   isOpen: boolean;
@@ -20,13 +21,124 @@ export default function EditProfileModal({ isOpen, onClose, onUpdated }: EditPro
   const [newPin, setNewPin] = useState('');
   const [isChangingPin, setIsChangingPin] = useState(false);
   const [pinMessage, setPinMessage] = useState('');
+  const [usedColors, setUsedColors] = useState<Record<string, Member>>({});
+  const [isChangingColor, setIsChangingColor] = useState(false);
+  const [pendingTrade, setPendingTrade] = useState<ColorTrade | null>(null);
+  const [selectedUsedColor, setSelectedUsedColor] = useState<string | null>(null);
   
+  const PALETTE = [
+    '#F04B4B', // Rojo
+    '#F2742A', // Naranja
+    '#E8B000', // Mostaza
+    '#26A96C', // Verde
+    '#00AABB', // Teal
+    '#1C84D4', // Azul
+    '#7B4FBE', // Violeta
+    '#E0408A', // Rosa
+    '#986030', // Siena
+    '#6E7A8A'  // Gris azulado
+  ];
+
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    if (isOpen) {
+      fetchUsedColors();
+    }
+  }, [isOpen]);
+
+  const fetchUsedColors = async () => {
+    if (!currentUser) return;
+    const { data: membersData } = await supabase.from('members').select('*');
+    const { data: tradesData } = await supabase
+      .from('color_trades')
+      .select('*')
+      .eq('from_member_id', currentUser.id)
+      .eq('status', 'pending');
+
+    if (membersData) {
+      const othersColors: Record<string, Member> = {};
+      membersData
+        .filter(m => m.id !== currentUser.id)
+        .forEach(m => {
+          othersColors[m.color.toLowerCase()] = m;
+        });
+      setUsedColors(othersColors);
+    }
+    setPendingTrade(tradesData?.[0] || null);
+  };
+
+  const handleColorChange = async (color: string) => {
+    if (!currentUser || isChangingColor) return;
+    setIsChangingColor(true);
+    setError('');
+
+    try {
+      const { error: updateError } = await supabase
+        .from('members')
+        .update({ color })
+        .eq('id', currentUser.id);
+
+      if (updateError) throw updateError;
+      
+      setCurrentUser({ ...currentUser, color });
+      onUpdated();
+    } catch (err: any) {
+      console.error(err);
+      setError('Error al actualizar el color.');
+    } finally {
+      setIsChangingColor(false);
+    }
+  };
+
+  const handleRequestTrade = async (targetMember: Member) => {
+    if (!currentUser || isChangingColor || pendingTrade) return;
+    setIsChangingColor(true);
+    setError('');
+
+    try {
+      const { data, error: tradeError } = await supabase
+        .from('color_trades')
+        .insert({
+          from_member_id: currentUser.id,
+          to_member_id: targetMember.id,
+          status: 'pending'
+        })
+        .select()
+        .single();
+
+      if (tradeError) throw tradeError;
+      
+      setPendingTrade(data);
+      setPinMessage(`Solicitud enviada a ${targetMember.name}`);
+      setSelectedUsedColor(null);
+      setTimeout(() => setPinMessage(''), 3000);
+      window.dispatchEvent(new CustomEvent('trade-updated'));
+    } catch (err: any) {
+      console.error(err);
+      setError('Error al enviar solicitud de intercambio.');
+    } finally {
+      setIsChangingColor(false);
+    }
+  };
+
+  const handleCancelTrade = async () => {
+    if (!pendingTrade || isChangingColor) return;
+    setIsChangingColor(true);
+    try {
+      await supabase.from('color_trades').delete().eq('id', pendingTrade.id);
+      setPendingTrade(null);
+      setPinMessage('Solicitud cancelada');
+      setTimeout(() => setPinMessage(''), 3000);
+      window.dispatchEvent(new CustomEvent('trade-updated'));
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsChangingColor(false);
+    }
+  };
   
   // Camera state
   const [isCameraOpen, setIsCameraOpen] = useState(false);
@@ -278,6 +390,76 @@ export default function EditProfileModal({ isOpen, onClose, onUpdated }: EditPro
               </button>
             </div>
             {pinMessage && <p className="text-xs text-[#2EC27E] dark:text-[#57E389] text-center mt-2">{pinMessage}</p>}
+          </div>
+
+          <div className="border-t border-[#E5E6E6] dark:border-[#3D3D3D] pt-6 transition-colors">
+            <h3 className="text-sm font-semibold text-[#1E1E1E] dark:text-white mb-3 flex items-center justify-between">
+              Color de Perfil
+              {pendingTrade && (
+                <button 
+                  onClick={handleCancelTrade}
+                  className="text-[10px] text-[#E01B24] hover:underline"
+                >
+                  Cancelar solicitud pendiente
+                </button>
+              )}
+            </h3>
+            <div className="grid grid-cols-5 gap-3">
+              {PALETTE.map((color) => {
+                const owner = usedColors[color.toLowerCase()];
+                const isUsed = !!owner;
+                const isSelected = currentUser.color?.toLowerCase() === color.toLowerCase();
+                const isTarget = selectedUsedColor === color;
+                
+                return (
+                  <div key={color} className="relative group">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (isUsed) {
+                          if (pendingTrade) return;
+                          setSelectedUsedColor(isTarget ? null : color);
+                        } else {
+                          handleColorChange(color);
+                        }
+                      }}
+                      disabled={(isUsed && !!pendingTrade) || isChangingColor}
+                      className={`
+                        relative w-full aspect-square rounded-full transition-all
+                        ${isUsed ? 'opacity-40 grayscale-[0.5]' : 'hover:scale-110 active:scale-95 shadow-sm'}
+                        ${isSelected ? 'ring-2 ring-offset-2 ring-[#3584E4] dark:ring-offset-[#303030]' : ''}
+                        ${isTarget ? 'ring-2 ring-offset-2 ring-amber-500' : ''}
+                      `}
+                      style={{ backgroundColor: color }}
+                    >
+                      {isSelected && (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="w-1.5 h-1.5 bg-white rounded-full shadow-sm" />
+                        </div>
+                      )}
+                      {isUsed && (
+                        <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full border border-white dark:border-[#303030] overflow-hidden bg-white dark:bg-[#303030]">
+                          <Avatar member={owner} className="w-full h-full text-[6px]" />
+                        </div>
+                      )}
+                    </button>
+                    
+                    {isTarget && owner && (
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-24 z-10 animate-in fade-in zoom-in duration-200">
+                        <button
+                          type="button"
+                          onClick={() => handleRequestTrade(owner)}
+                          className="w-full bg-white dark:bg-[#242424] border border-[#E5E6E6] dark:border-[#3D3D3D] rounded-lg py-1 px-2 text-[10px] font-bold text-[#3584E4] shadow-xl hover:bg-[#F5F5F7] dark:hover:bg-[#333333]"
+                        >
+                          Solicitar color
+                        </button>
+                        <div className="w-2 h-2 bg-white dark:bg-[#242424] border-r border-b border-[#E5E6E6] dark:border-[#3D3D3D] rotate-45 mx-auto -mt-1" />
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
           {/* Theme Toggle */}

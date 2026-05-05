@@ -77,8 +77,17 @@ export default function YearlyStats() {
         <h3 className="text-sm font-semibold text-[#1E1E1E]/60 dark:text-white/60 mb-6">Total Anual por Persona</h3>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={data} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
-              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#71717a', fontSize: 12 }} />
+            <BarChart data={data} margin={{ top: 0, right: 0, left: -20, bottom: 40 }}>
+              <XAxis 
+                dataKey="name" 
+                axisLine={false} 
+                tickLine={false} 
+                tick={{ fill: isDark ? '#A1A1AA' : '#71717a', fontSize: 12 }} 
+                angle={-30} 
+                textAnchor="end" 
+                height={70} 
+                interval={0}
+              />
               <YAxis hide />
               <Tooltip content={<ChartTooltip />} cursor={{ fill: isDark ? '#3D3D3D40' : '#E5E6E640' }} />
               <Bar dataKey="total" radius={[4, 4, 0, 0]}>

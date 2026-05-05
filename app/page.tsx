@@ -3,6 +3,8 @@ import ChoreGrid from '@/components/ChoreGrid';
 import RecentActivity from '@/components/RecentActivity';
 import DateHeader from '@/components/DateHeader';
 import DesktopSidebarStats from '@/components/DesktopSidebarStats';
+import WeeklySummaryBanner from '@/components/WeeklySummaryBanner';
+import ProposalsSection from '@/components/ProposalsSection';
 
 export default function Home() {
   return (
@@ -11,11 +13,13 @@ export default function Home() {
         {/* Columna principal */}
         <div className="min-w-0">
           <DateHeader />
+          <WeeklySummaryBanner />
           {/* SummaryCard solo en móvil — en desktop va en la sidebar */}
           <div className="md:hidden">
             <SummaryCard />
           </div>
           <ChoreGrid />
+          <ProposalsSection />
           <RecentActivity />
         </div>
 

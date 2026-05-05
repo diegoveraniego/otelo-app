@@ -10,16 +10,19 @@ import { Trash2, Heart } from 'lucide-react';
 import Avatar from './Avatar';
 
 export default function RecentActivity() {
+  const PAGE_SIZE = 10;
   const [logs, setLogs] = useState<LogWithDetails[]>([]);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [thankingId, setThankingId] = useState<string | null>(null);
-  const [myThanks, setMyThanks] = useState<string[]>([]); // log_ids already thanked by currentUser
+  const [myThanks, setMyThanks] = useState<string[]>([]);
   const { currentUser } = useUserStore();
 
   useEffect(() => {
-    fetchLogs();
+    fetchLogs(0, true);
 
-    const handleRefresh = () => fetchLogs();
+    const handleRefresh = () => fetchLogs(0, true);
     window.addEventListener('chore-logged', handleRefresh);
     window.addEventListener('thanks-updated', handleRefresh);
     return () => {
@@ -28,19 +31,26 @@ export default function RecentActivity() {
     };
   }, [currentUser]);
 
-  const fetchLogs = async () => {
+  const fetchLogs = async (pageNum: number, reset = false) => {
+    const from = pageNum * PAGE_SIZE;
+    const to = from + PAGE_SIZE - 1;
+
     const { data } = await supabase
       .from('logs')
       .select('*, member:members(*), chore:chores(*)')
       .order('done_at', { ascending: false })
-      .limit(15);
+      .range(from, to);
 
     if (data) {
-      setLogs(data as unknown as LogWithDetails[]);
+      if (data.length < PAGE_SIZE) setHasMore(false);
+      else setHasMore(true);
 
-      // Fetch which logs the current user has already thanked
+      const newData = reset ? data : [...logs, ...data];
+      setLogs(newData as unknown as LogWithDetails[]);
+      setPage(pageNum);
+
       if (currentUser) {
-        const logIds = data.map((l) => l.id);
+        const logIds = newData.map((l) => l.id);
         const { data: thanksData } = await supabase
           .from('thanks')
           .select('log_id')
@@ -52,6 +62,8 @@ export default function RecentActivity() {
     }
   };
 
+  const handleLoadMore = () => fetchLogs(page + 1);
+
   const handleDelete = async (logId: string) => {
     if (!confirm('¿Seguro que quieres deshacer esta tarea?')) return;
 
@@ -59,7 +71,7 @@ export default function RecentActivity() {
     const { error } = await supabase.from('logs').delete().eq('id', logId);
 
     if (!error) {
-      fetchLogs();
+      fetchLogs(0, true);
       window.dispatchEvent(new CustomEvent('chore-logged'));
     }
     setDeletingId(null);
@@ -68,7 +80,6 @@ export default function RecentActivity() {
   const handleThank = async (log: LogWithDetails) => {
     if (!currentUser || myThanks.includes(log.id)) return;
 
-    // Optimistic update: marcar inmediatamente antes de esperar respuesta de DB
     setMyThanks((prev) => [...prev, log.id]);
     setThankingId(log.id);
 
@@ -81,7 +92,6 @@ export default function RecentActivity() {
     if (!error) {
       window.dispatchEvent(new CustomEvent('thanks-updated'));
     } else {
-      // Revertir si falló (ej: tabla no existe aún)
       setMyThanks((prev) => prev.filter((id) => id !== log.id));
       console.error('Error al registrar agradecimiento:', error.message);
     }
@@ -117,7 +127,6 @@ export default function RecentActivity() {
                 </div>
 
                 <div className="flex items-center gap-1 shrink-0">
-                  {/* Botón de agradecimiento */}
                   {canThank && (
                     <button
                       onClick={() => handleThank(log)}
@@ -136,7 +145,6 @@ export default function RecentActivity() {
                     </button>
                   )}
 
-                  {/* Botón de deshacer (solo tus propias tareas) */}
                   {isOwnLog && (
                     <button
                       onClick={() => handleDelete(log.id)}
@@ -152,6 +160,16 @@ export default function RecentActivity() {
             );
           })}
         </div>
+        {hasMore && (
+          <div className="p-3 border-t border-[#E5E6E6] dark:border-[#3D3D3D]">
+            <button
+              onClick={handleLoadMore}
+              className="w-full py-2 text-sm font-medium text-[#3584E4] dark:text-[#62A0EA] hover:bg-[#3584E4]/10 dark:hover:bg-[#62A0EA]/10 rounded-lg transition-colors"
+            >
+              Cargar más actividad
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

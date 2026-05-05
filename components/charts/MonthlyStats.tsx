@@ -3,16 +3,33 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { startOfMonth, endOfMonth, getDaysInMonth, format } from 'date-fns';
+import { startOfMonth, endOfMonth, getDaysInMonth, format, subDays } from 'date-fns';
 import { Member, Chore, Log } from '@/lib/types';
 import ChartTooltip from './ChartTooltip';
 import ThanksRankingCard, { ThanksRankingEntry } from './ThanksRankingCard';
 import { useTheme } from 'next-themes';
+import { Flame } from 'lucide-react';
+
+function calcStreak(doneDates: string[]): number {
+  if (doneDates.length === 0) return 0;
+  const uniqueDays = new Set(doneDates.map((d) => d.slice(0, 10)));
+  let streak = 0;
+  let cursor = new Date();
+  if (!uniqueDays.has(format(cursor, 'yyyy-MM-dd'))) {
+    cursor = subDays(cursor, 1);
+  }
+  while (uniqueDays.has(format(cursor, 'yyyy-MM-dd'))) {
+    streak++;
+    cursor = subDays(cursor, 1);
+  }
+  return streak;
+}
 
 export default function MonthlyStats() {
   const [choreData, setChoreData] = useState<any[]>([]);
   const [heatmapData, setHeatmapData] = useState<any[]>([]);
   const [lineData, setLineData] = useState<any[]>([]);
+  const [memberStreaks, setMemberStreaks] = useState<Record<string, number>>({});
   const [members, setMembers] = useState<Member[]>([]);
   const [thanksRanking, setThanksRanking] = useState<ThanksRankingEntry[]>([]);
   const { resolvedTheme } = useTheme();
@@ -31,12 +48,21 @@ export default function MonthlyStats() {
     if (!mData || !cData) return;
     setMembers(mData);
 
-    const [{ data: logs }, { data: thanks }] = await Promise.all([
+    const [{ data: logs }, { data: thanks }, { data: allLogs }] = await Promise.all([
       supabase.from('logs').select('*').gte('done_at', start.toISOString()).lte('done_at', end.toISOString()),
       supabase.from('thanks').select('to_member_id').gte('created_at', start.toISOString()).lte('created_at', end.toISOString()),
+      supabase.from('logs').select('done_at,member_id').gte('done_at', subDays(new Date(), 60).toISOString()),
     ]);
 
-    // Build thanks ranking
+    if (allLogs) {
+      const streaks: Record<string, number> = {};
+      mData.forEach(m => {
+        const memberLogs = allLogs.filter(l => l.member_id === m.id).map(l => l.done_at);
+        streaks[m.id] = calcStreak(memberLogs);
+      });
+      setMemberStreaks(streaks);
+    }
+
     setThanksRanking(
       mData.map((m: Member) => ({
         member: m,
@@ -45,7 +71,6 @@ export default function MonthlyStats() {
     );
 
     if (logs) {
-      // Per-chore breakdown (stacked bar)
       const cStats = cData.map(chore => {
         const item: any = { name: chore.name, emoji: chore.emoji };
         let total = 0;
@@ -56,11 +81,10 @@ export default function MonthlyStats() {
         });
         item.total = total;
         return item;
-      }).sort((a, b) => b.total - a.total).slice(0, 5); // top 5 chores
+      }).sort((a, b) => b.total - a.total).slice(0, 5);
       
       setChoreData(cStats);
 
-      // Heatmap Data (Days x Members)
       const days = getDaysInMonth(start);
       const hData = mData.map(m => {
         const activity = Array.from({ length: days }, (_, i) => {
@@ -72,7 +96,6 @@ export default function MonthlyStats() {
       });
       setHeatmapData(hData);
 
-      // Line Chart Data (Days)
       const lData = Array.from({ length: days }, (_, i) => {
         const dayString = format(new Date(start.getFullYear(), start.getMonth(), i + 1), 'yyyy-MM-dd');
         const dayItem: any = { day: (i + 1).toString() };
@@ -89,26 +112,42 @@ export default function MonthlyStats() {
     <div className="space-y-6 animate-in fade-in zoom-in duration-300">
       <div className="bg-white dark:bg-[#303030] p-6 rounded-xl shadow-sm border border-[#E5E6E6] dark:border-[#3D3D3D] overflow-hidden text-xs transition-colors">
         <h3 className="text-sm font-semibold text-[#1E1E1E]/60 dark:text-white/60 mb-6">Mapa de calor (Mes actual)</h3>
-        <div className="overflow-x-auto pb-2 -mx-2 px-2">
-          <div className="min-w-max space-y-2">
-            {heatmapData.map((row) => (
-              <div key={row.member.id} className="flex items-center gap-2">
-                <div className="w-16 truncate font-medium text-[#1E1E1E]/70 dark:text-white/70">{row.member.name}</div>
-                <div className="flex gap-1">
-                  {row.activity.map((count: number, idx: number) => (
-                    <div 
-                      key={idx}
-                      className="w-4 h-4 rounded-sm"
-                      style={{ 
-                        backgroundColor: count > 0 ? row.member.color : (isDark ? '#3D3D3D' : '#E5E6E6'),
-                        opacity: count > 0 ? Math.min(0.4 + (count * 0.2), 1) : 1
-                      }}
-                      title={`Día ${idx + 1}: ${count} tareas`}
-                    />
-                  ))}
+        {heatmapData.length > 0 && (
+          <div className="mb-4 text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 p-2 rounded-lg border border-amber-200 dark:border-amber-800/50">
+            La familia lleva {Math.max(...heatmapData.map(r => r.activity.filter((c: number) => c > 0).length))} días activa este mes.
+          </div>
+        )}
+        <div className="overflow-x-auto pb-2 -mx-2 px-2 max-w-full">
+          <div className="min-w-max space-y-1.5 sm:space-y-2">
+            {heatmapData.map((row) => {
+              const streak = memberStreaks[row.member.id] || 0;
+              return (
+                <div key={row.member.id} className="flex items-center gap-1.5 sm:gap-2">
+                  <div className="flex flex-col w-20">
+                    <div className="truncate font-medium text-[#1E1E1E]/70 dark:text-white/70">{row.member.name}</div>
+                    {streak >= 2 && (
+                      <div className="flex items-center gap-0.5 text-[10px] text-orange-500 dark:text-orange-400">
+                        <Flame className="w-3 h-3" />
+                        <span>{streak} días</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex gap-0.5 sm:gap-1">
+                    {row.activity.map((count: number, idx: number) => (
+                      <div 
+                        key={idx}
+                        className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 xl:w-7 xl:h-7 2xl:w-8 2xl:h-8 rounded-sm transition-all"
+                        style={{ 
+                          backgroundColor: count > 0 ? row.member.color : (isDark ? '#3D3D3D' : '#E5E6E6'),
+                          opacity: count > 0 ? Math.min(0.4 + (count * 0.2), 1) : 1
+                        }}
+                        title={`Día ${idx + 1}: ${count} tareas`}
+                      />
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
