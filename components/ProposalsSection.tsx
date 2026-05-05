@@ -8,6 +8,7 @@ import { Plus, Check, MessageSquare, ThumbsUp, Clock, Tag, Smile } from 'lucide-
 import Avatar from './Avatar';
 import EmojiPicker, { Theme as EmojiTheme } from 'emoji-picker-react';
 import { useTheme } from 'next-themes';
+import { subDays, differenceInDays } from 'date-fns';
 
 export default function ProposalsSection() {
   const { currentUser } = useUserStore();
@@ -37,13 +38,18 @@ export default function ProposalsSection() {
   }, []);
 
   const fetchData = async () => {
+    const sevenDaysAgo = subDays(new Date(), 7).toISOString();
+    
     const [
       { data: propData }, 
       { data: voteData }, 
       { data: memData }, 
       { data: choreData }
     ] = await Promise.all([
-      supabase.from('proposals').select('*').eq('status', 'pending'),
+      supabase.from('proposals')
+        .select('*')
+        .eq('status', 'pending')
+        .gte('created_at', sevenDaysAgo),
       supabase.from('proposal_votes').select('*'),
       supabase.from('members').select('id'),
       supabase.from('chores').select('emoji, category')
@@ -130,7 +136,7 @@ export default function ProposalsSection() {
     });
 
     if (submitError) {
-      setError('Error al enviar propuesta');
+      setError(`Error al enviar propuesta: ${submitError.message}`);
     } else {
       setName('');
       setEmoji('');
@@ -261,6 +267,7 @@ export default function ProposalsSection() {
         {proposals.map(proposal => {
           const proposalVotes = votes.filter(v => v.proposal_id === proposal.id);
           const hasVoted = votes.some(v => v.proposal_id === proposal.id && v.member_id === currentUser?.id);
+          const daysLeft = 7 - differenceInDays(new Date(), new Date(proposal.created_at));
           
           return (
             <div key={proposal.id} className="bg-white dark:bg-[#303030] p-4 rounded-2xl shadow-sm border border-[#E5E6E6] dark:border-[#3D3D3D] flex items-center gap-4 transition-colors">
@@ -270,14 +277,17 @@ export default function ProposalsSection() {
               
               <div className="flex-1 min-w-0">
                 <h4 className="font-bold text-[#1E1E1E] dark:text-white truncate">{proposal.name}</h4>
-                <div className="flex items-center gap-3 mt-1">
+                <div className="flex items-center gap-3 mt-1 flex-wrap">
                   <span className="flex items-center gap-1 text-[10px] font-bold text-[#1E1E1E]/40 dark:text-white/40 uppercase">
                     <Tag className="w-3 h-3" />
                     {proposal.category}
                   </span>
                   <span className="flex items-center gap-1 text-[10px] font-bold text-[#1E1E1E]/40 dark:text-white/40 uppercase">
                     <Clock className="w-3 h-3" />
-                    {proposal.threshold_days} días
+                    {proposal.threshold_days} d.
+                  </span>
+                  <span className={`flex items-center gap-1 text-[10px] font-bold uppercase ${daysLeft <= 1 ? 'text-[#E01B24]' : 'text-amber-500'}`}>
+                    Expira en {daysLeft} {daysLeft === 1 ? 'día' : 'días'}
                   </span>
                 </div>
               </div>

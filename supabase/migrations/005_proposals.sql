@@ -29,7 +29,7 @@ CREATE TABLE public.proposal_votes (
 
 -- RLS for proposals
 ALTER TABLE public.proposals ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow all read on proposals" ON public.proposals FOR SELECT USING (true);
+CREATE POLICY "Allow all read on proposals" ON public.proposals FOR SELECT USING (created_at > now() - interval '7 days');
 CREATE POLICY "Allow members to insert proposals" ON public.proposals FOR INSERT WITH CHECK (true);
 CREATE POLICY "Allow members to update proposals" ON public.proposals FOR UPDATE USING (true);
 
