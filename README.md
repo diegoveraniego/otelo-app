@@ -1,7 +1,9 @@
 # Otelo - App de Tareas del Hogar
 
 Una aplicación web mobile-first para registrar las tareas del hogar, diseñada para la familia. Creada con Next.js 14, Tailwind CSS, Recharts y Supabase. 
-Advertencia: *Software hecho con IA con el propósito de solucionar y aprender / Software made with AI for learning and solution purposes*
+
+
+**Advertencia: *Software hecho con IA con el propósito de solucionar y aprender / Software made with AI for learning and solution purposes***
 
 <img width="1434" height="921" alt="image" src="https://github.com/user-attachments/assets/8e61b220-3ee0-466a-a312-33bc9b7d34c5" />
 
