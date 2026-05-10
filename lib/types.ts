@@ -75,3 +75,12 @@ export type ColorTradeWithDetails = ColorTrade & {
 export type NotificationType = 
   | { type: 'thanks', data: ThanksWithDetails }
   | { type: 'trade', data: ColorTradeWithDetails };
+
+export type PushSubscriptionType = {
+  id: string;
+  member_id: string;
+  endpoint: string;
+  p256dh: string;
+  auth: string;
+  created_at: string;
+};

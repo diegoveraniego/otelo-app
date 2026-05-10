@@ -8,6 +8,7 @@ import { ThanksWithDetails, ColorTradeWithDetails, NotificationType } from '@/li
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 import Avatar from './Avatar';
+import PushNotificationBanner from './PushNotificationBanner';
 
 export default function NotificationBell() {
   const { currentUser, lastSeenNotifications, setLastSeenNotifications } = useUserStore();
@@ -150,6 +151,7 @@ export default function NotificationBell() {
               </span>
             )}
           </div>
+          <PushNotificationBanner memberId={currentUser.id} />
 
           <div className="max-h-80 overflow-y-auto">
             {notifications.length === 0 ? (
