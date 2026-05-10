@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { startOfMonth, endOfMonth, getDaysInMonth, format, subDays } from 'date-fns';
+import { es } from 'date-fns/locale';
 import { Member, Chore, Log } from '@/lib/types';
 import ChartTooltip from './ChartTooltip';
 import ThanksRankingCard, { ThanksRankingEntry } from './ThanksRankingCard';
@@ -25,7 +26,7 @@ function calcStreak(doneDates: string[]): number {
   return streak;
 }
 
-export default function MonthlyStats() {
+export default function MonthlyStats({ currentDate }: { currentDate: Date }) {
   const [choreData, setChoreData] = useState<any[]>([]);
   const [heatmapData, setHeatmapData] = useState<any[]>([]);
   const [lineData, setLineData] = useState<any[]>([]);
@@ -37,11 +38,12 @@ export default function MonthlyStats() {
 
   useEffect(() => {
     fetchStats();
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentDate]);
 
   const fetchStats = async () => {
-    const start = startOfMonth(new Date());
-    const end = endOfMonth(new Date());
+    const start = startOfMonth(currentDate);
+    const end = endOfMonth(currentDate);
 
     const { data: mData } = await supabase.from('members').select('*');
     const { data: cData } = await supabase.from('chores').select('*');
@@ -111,7 +113,11 @@ export default function MonthlyStats() {
   return (
     <div className="space-y-6 animate-in fade-in zoom-in duration-300">
       <div className="bg-white dark:bg-[#303030] p-6 rounded-xl shadow-sm border border-[#E5E6E6] dark:border-[#3D3D3D] overflow-hidden text-xs transition-colors">
-        <h3 className="text-sm font-semibold text-[#1E1E1E]/60 dark:text-white/60 mb-6">Mapa de calor (Mes actual)</h3>
+        <div className="mb-6">
+          <h3 className="text-sm font-semibold text-[#1E1E1E]/60 dark:text-white/60 capitalize">
+            Mapa de calor ({format(currentDate, 'MMMM yyyy', { locale: es })})
+          </h3>
+        </div>
         {heatmapData.length > 0 && (
           <div className="mb-4 text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 p-2 rounded-lg border border-amber-200 dark:border-amber-800/50">
             La familia lleva {Math.max(...heatmapData.map(r => r.activity.filter((c: number) => c > 0).length))} días activa este mes.
