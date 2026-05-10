@@ -94,7 +94,8 @@ export default function RecentActivity() {
       triggerPushNotification({
         title: '¡Alguien te ha agradecido! ❤️',
         body: `${currentUser.name} te dio las gracias por ${log.chore.name} ${log.chore.emoji}`,
-        targetMemberId: log.member_id
+        targetMemberId: log.member_id,
+        eventType: 'thanks'
       });
       window.dispatchEvent(new CustomEvent('thanks-updated'));
     } else {

@@ -34,10 +34,22 @@ export async function GET(request: Request) {
     const completedCount = logs?.length || 0;
     const summaryText = `Hoy se completaron ${completedCount} tareas en la casa. ${completedCount > 0 ? '¡Gran trabajo en equipo! 👏' : 'Recuerden avanzar con las tareas pendientes. 💪'}`;
 
-    const { data: subscriptions } = await supabase.from('push_subscriptions').select('*');
+    const { data: subscriptions } = await supabase.from('push_subscriptions').select('*, member:members(notification_prefs)');
 
     if (!subscriptions || subscriptions.length === 0) {
       return NextResponse.json({ success: true, message: 'No active subscriptions' });
+    }
+
+    const filteredSubscriptions = subscriptions.filter(sub => {
+      const member = Array.isArray(sub.member) ? sub.member[0] : sub.member;
+      const prefs = member?.notification_prefs;
+      if (!prefs) return true;
+      if (prefs.summary === false) return false;
+      return true;
+    });
+
+    if (filteredSubscriptions.length === 0) {
+      return NextResponse.json({ success: true, message: 'No subscriptions after preference filtering' });
     }
 
     const payload = JSON.stringify({
@@ -45,7 +57,7 @@ export async function GET(request: Request) {
       body: summaryText,
     });
 
-    const sendPromises = subscriptions.map((sub) => {
+    const sendPromises = filteredSubscriptions.map((sub) => {
       const pushSubscription = {
         endpoint: sub.endpoint,
         keys: {

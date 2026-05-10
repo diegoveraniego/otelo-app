@@ -1,3 +1,10 @@
+export type NotificationPrefs = {
+  thanks: boolean;
+  chores: boolean;
+  summary: boolean;
+  trade: boolean;
+};
+
 export type Member = {
   id: string;
   name: string;
@@ -5,6 +12,7 @@ export type Member = {
   pin: string;
   role: 'admin' | 'member';
   avatar_url?: string | null;
+  notification_prefs: NotificationPrefs;
 };
 
 export type Chore = {

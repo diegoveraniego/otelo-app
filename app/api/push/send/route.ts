@@ -10,17 +10,17 @@ webpush.setVapidDetails(
 
 export async function POST(request: Request) {
   try {
-    const { title, body, targetMemberId, sourceMemberId } = await request.json();
+    const { title, body, targetMemberId, sourceMemberId, eventType } = await request.json();
 
-    if (!title || !body) {
-      return NextResponse.json({ error: 'Missing title or body' }, { status: 400 });
+    if (!title || !body || !eventType) {
+      return NextResponse.json({ error: 'Missing title, body or eventType' }, { status: 400 });
     }
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
     const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    let query = supabase.from('push_subscriptions').select('*');
+    let query = supabase.from('push_subscriptions').select('*, member:members(notification_prefs)');
 
     if (targetMemberId) {
       query = query.eq('member_id', targetMemberId);
@@ -34,9 +34,26 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true, message: 'No subscriptions found' });
     }
 
+    const filteredSubscriptions = subscriptions.filter(sub => {
+      // Handle array or object since foreign key could return array in some setups
+      const member = Array.isArray(sub.member) ? sub.member[0] : sub.member;
+      const prefs = member?.notification_prefs;
+      if (!prefs) return true;
+      
+      if (eventType === 'thanks' && prefs.thanks === false) return false;
+      if (eventType === 'chore' && prefs.chores === false) return false;
+      if (eventType === 'trade' && prefs.trade === false) return false;
+      
+      return true;
+    });
+
+    if (filteredSubscriptions.length === 0) {
+      return NextResponse.json({ success: true, message: 'No subscriptions after preference filtering' });
+    }
+
     const payload = JSON.stringify({ title, body });
 
-    const sendPromises = subscriptions.map((sub) => {
+    const sendPromises = filteredSubscriptions.map((sub) => {
       const pushSubscription = {
         endpoint: sub.endpoint,
         keys: {

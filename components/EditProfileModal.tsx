@@ -26,6 +26,34 @@ export default function EditProfileModal({ isOpen, onClose, onUpdated }: EditPro
   const [isChangingColor, setIsChangingColor] = useState(false);
   const [pendingTrade, setPendingTrade] = useState<ColorTrade | null>(null);
   const [selectedUsedColor, setSelectedUsedColor] = useState<string | null>(null);
+  const [hasPushSubscription, setHasPushSubscription] = useState(false);
+  const [isLoadingPush, setIsLoadingPush] = useState(false);
+  const [prefs, setPrefs] = useState({ thanks: true, chores: true, summary: true, trade: true });
+
+  useEffect(() => {
+    if (currentUser?.notification_prefs) {
+      setPrefs({
+        thanks: currentUser.notification_prefs.thanks ?? true,
+        chores: currentUser.notification_prefs.chores ?? true,
+        summary: currentUser.notification_prefs.summary ?? true,
+        trade: currentUser.notification_prefs.trade ?? true,
+      });
+    }
+  }, [currentUser]);
+
+  const handleTogglePref = async (key: keyof typeof prefs) => {
+    if (!currentUser) return;
+    const newPrefs = { ...prefs, [key]: !prefs[key] };
+    setPrefs(newPrefs);
+    
+    try {
+      await supabase.from('members').update({ notification_prefs: newPrefs }).eq('id', currentUser.id);
+      setCurrentUser({ ...currentUser, notification_prefs: newPrefs });
+    } catch (e) {
+      console.error(e);
+      setPrefs(prefs);
+    }
+  };
   
   const PALETTE = [
     '#F04B4B', // Rojo
@@ -47,8 +75,41 @@ export default function EditProfileModal({ isOpen, onClose, onUpdated }: EditPro
     setMounted(true);
     if (isOpen) {
       fetchUsedColors();
+      checkPushSubscription();
     }
   }, [isOpen]);
+
+  const checkPushSubscription = async () => {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+    try {
+      const registration = await navigator.serviceWorker.ready;
+      const sub = await registration.pushManager.getSubscription();
+      setHasPushSubscription(!!sub);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleDisablePush = async () => {
+    if (!currentUser) return;
+    setIsLoadingPush(true);
+    try {
+      const registration = await navigator.serviceWorker.ready;
+      const sub = await registration.pushManager.getSubscription();
+      if (sub) {
+        await sub.unsubscribe();
+        await supabase.from('push_subscriptions').delete().eq('member_id', currentUser.id);
+        setHasPushSubscription(false);
+        setPinMessage('Notificaciones desactivadas en este dispositivo');
+        setTimeout(() => setPinMessage(''), 3000);
+      }
+    } catch (e) {
+      console.error('Error unsubscribing', e);
+      setError('Error al desactivar notificaciones');
+    } finally {
+      setIsLoadingPush(false);
+    }
+  };
 
   const fetchUsedColors = async () => {
     if (!currentUser) return;
@@ -115,7 +176,8 @@ export default function EditProfileModal({ isOpen, onClose, onUpdated }: EditPro
       triggerPushNotification({
         title: '¡Intercambio de Color! 🔄',
         body: `${currentUser.name} quiere intercambiar su color contigo.`,
-        targetMemberId: targetMember.id
+        targetMemberId: targetMember.id,
+        eventType: 'trade'
       });
       
       setPendingTrade(data);
@@ -496,6 +558,49 @@ export default function EditProfileModal({ isOpen, onClose, onUpdated }: EditPro
                   Auto
                 </button>
               </div>
+            </div>
+          )}
+
+          {hasPushSubscription && (
+            <div className="border-t border-[#E5E6E6] dark:border-[#3D3D3D] pt-6 transition-colors">
+              <h3 className="text-sm font-semibold text-[#1E1E1E] dark:text-white mb-3">Notificaciones Push</h3>
+              
+              <div className="flex flex-col gap-3 mb-4">
+                <label className="flex items-center justify-between cursor-pointer group">
+                  <span className="text-sm text-[#1E1E1E]/80 dark:text-white/80">Agradecimientos</span>
+                  <div className="relative">
+                    <input type="checkbox" className="sr-only" checked={prefs.thanks} onChange={() => handleTogglePref('thanks')} />
+                    <div className={`block w-10 h-6 rounded-full transition-colors ${prefs.thanks ? 'bg-[#3584E4]' : 'bg-[#E5E6E6] dark:bg-[#3D3D3D]'}`}></div>
+                    <div className={`dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${prefs.thanks ? 'transform translate-x-4' : ''}`}></div>
+                  </div>
+                </label>
+                
+                <label className="flex items-center justify-between cursor-pointer group">
+                  <span className="text-sm text-[#1E1E1E]/80 dark:text-white/80">Tareas Completadas</span>
+                  <div className="relative">
+                    <input type="checkbox" className="sr-only" checked={prefs.chores} onChange={() => handleTogglePref('chores')} />
+                    <div className={`block w-10 h-6 rounded-full transition-colors ${prefs.chores ? 'bg-[#3584E4]' : 'bg-[#E5E6E6] dark:bg-[#3D3D3D]'}`}></div>
+                    <div className={`dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${prefs.chores ? 'transform translate-x-4' : ''}`}></div>
+                  </div>
+                </label>
+
+                <label className="flex items-center justify-between cursor-pointer group">
+                  <span className="text-sm text-[#1E1E1E]/80 dark:text-white/80">Resumen Diario</span>
+                  <div className="relative">
+                    <input type="checkbox" className="sr-only" checked={prefs.summary} onChange={() => handleTogglePref('summary')} />
+                    <div className={`block w-10 h-6 rounded-full transition-colors ${prefs.summary ? 'bg-[#3584E4]' : 'bg-[#E5E6E6] dark:bg-[#3D3D3D]'}`}></div>
+                    <div className={`dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${prefs.summary ? 'transform translate-x-4' : ''}`}></div>
+                  </div>
+                </label>
+              </div>
+
+              <button
+                onClick={handleDisablePush}
+                disabled={isLoadingPush}
+                className="w-full bg-[#E5E6E6] dark:bg-[#3D3D3D] hover:bg-[#D4D4D4] dark:hover:bg-[#474747] text-[#E01B24] dark:text-[#FF7B63] px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 text-sm"
+              >
+                {isLoadingPush ? 'Desactivando...' : 'Desactivar en este dispositivo'}
+              </button>
             </div>
           )}
 

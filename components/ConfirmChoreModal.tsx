@@ -63,7 +63,8 @@ export default function ConfirmChoreModal({ chore, isOpen, onClose }: Props) {
       triggerPushNotification({
         title: '¡Nueva Tarea Completada! 🎉',
         body: `${currentUser.name} ha completado: ${chore.name} ${chore.emoji}`,
-        sourceMemberId: currentUser.id
+        sourceMemberId: currentUser.id,
+        eventType: 'chore'
       });
       setTimeout(() => {
         onClose();
