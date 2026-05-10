@@ -358,8 +358,8 @@ export default function EditProfileModal({ isOpen, onClose, onUpdated }: EditPro
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-sm bg-white dark:bg-[#303030] rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200 border border-[#E5E6E6] dark:border-[#3D3D3D] transition-colors">
-        <div className="flex items-center justify-between p-4 border-b border-[#E5E6E6] dark:border-[#3D3D3D] bg-[#FAFAFA] dark:bg-[#2A2A2A] transition-colors">
+      <div className="w-full max-w-sm bg-white dark:bg-[#303030] rounded-xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden animate-in fade-in zoom-in duration-200 border border-[#E5E6E6] dark:border-[#3D3D3D] transition-colors">
+        <div className="flex items-center justify-between p-4 border-b border-[#E5E6E6] dark:border-[#3D3D3D] bg-[#FAFAFA] dark:bg-[#2A2A2A] transition-colors shrink-0">
           <h2 className="text-lg font-bold text-[#1E1E1E] dark:text-white">Editar Perfil</h2>
           <button 
             onClick={onClose}
@@ -369,7 +369,7 @@ export default function EditProfileModal({ isOpen, onClose, onUpdated }: EditPro
           </button>
         </div>
 
-        <div className="p-6 flex flex-col gap-6">
+        <div className="p-6 flex flex-col gap-6 overflow-y-auto">
           <div className="flex flex-col items-center gap-4">
             {isCameraOpen ? (
               <div className="relative w-full max-w-[200px] aspect-square rounded-full overflow-hidden bg-black border border-[#E5E6E6] dark:border-[#3D3D3D]">
@@ -590,6 +590,15 @@ export default function EditProfileModal({ isOpen, onClose, onUpdated }: EditPro
                     <input type="checkbox" className="sr-only" checked={prefs.summary} onChange={() => handleTogglePref('summary')} />
                     <div className={`block w-10 h-6 rounded-full transition-colors ${prefs.summary ? 'bg-[#3584E4]' : 'bg-[#E5E6E6] dark:bg-[#3D3D3D]'}`}></div>
                     <div className={`dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${prefs.summary ? 'transform translate-x-4' : ''}`}></div>
+                  </div>
+                </label>
+
+                <label className="flex items-center justify-between cursor-pointer group">
+                  <span className="text-sm text-[#1E1E1E]/80 dark:text-white/80">Intercambio de Color</span>
+                  <div className="relative">
+                    <input type="checkbox" className="sr-only" checked={prefs.trade} onChange={() => handleTogglePref('trade')} />
+                    <div className={`block w-10 h-6 rounded-full transition-colors ${prefs.trade ? 'bg-[#3584E4]' : 'bg-[#E5E6E6] dark:bg-[#3D3D3D]'}`}></div>
+                    <div className={`dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${prefs.trade ? 'transform translate-x-4' : ''}`}></div>
                   </div>
                 </label>
               </div>
