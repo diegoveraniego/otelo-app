@@ -6,6 +6,7 @@ import { Chore } from '@/lib/types';
 import { useUserStore } from '@/lib/store';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
 import { subHours } from 'date-fns';
+import { triggerPushNotification } from '@/lib/pushUtils';
 
 type Props = {
   chore: Chore | null;
@@ -59,6 +60,11 @@ export default function ConfirmChoreModal({ chore, isOpen, onClose }: Props) {
     
     if (!error) {
       setSuccess(true);
+      triggerPushNotification({
+        title: '¡Nueva Tarea Completada! 🎉',
+        body: `${currentUser.name} ha completado: ${chore.name} ${chore.emoji}`,
+        sourceMemberId: currentUser.id
+      });
       setTimeout(() => {
         onClose();
         // Trigger a refresh event for recent activity/stats

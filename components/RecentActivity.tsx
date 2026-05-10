@@ -8,6 +8,7 @@ import { es } from 'date-fns/locale';
 import { useUserStore } from '@/lib/store';
 import { Trash2, Heart } from 'lucide-react';
 import Avatar from './Avatar';
+import { triggerPushNotification } from '@/lib/pushUtils';
 
 export default function RecentActivity() {
   const PAGE_SIZE = 10;
@@ -90,6 +91,11 @@ export default function RecentActivity() {
     });
 
     if (!error) {
+      triggerPushNotification({
+        title: '¡Alguien te ha agradecido! ❤️',
+        body: `${currentUser.name} te dio las gracias por ${log.chore.name} ${log.chore.emoji}`,
+        targetMemberId: log.member_id
+      });
       window.dispatchEvent(new CustomEvent('thanks-updated'));
     } else {
       setMyThanks((prev) => prev.filter((id) => id !== log.id));

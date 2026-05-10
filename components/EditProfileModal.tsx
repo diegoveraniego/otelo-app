@@ -7,6 +7,7 @@ import { X, Upload, Camera, Loader2, Moon, Sun, Monitor, RefreshCw } from 'lucid
 import Avatar from './Avatar';
 import { useTheme } from 'next-themes';
 import { Member, ColorTrade } from '@/lib/types';
+import { triggerPushNotification } from '@/lib/pushUtils';
 
 interface EditProfileModalProps {
   isOpen: boolean;
@@ -110,6 +111,12 @@ export default function EditProfileModal({ isOpen, onClose, onUpdated }: EditPro
         .single();
 
       if (tradeError) throw tradeError;
+      
+      triggerPushNotification({
+        title: '¡Intercambio de Color! 🔄',
+        body: `${currentUser.name} quiere intercambiar su color contigo.`,
+        targetMemberId: targetMember.id
+      });
       
       setPendingTrade(data);
       setPinMessage(`Solicitud enviada a ${targetMember.name}`);

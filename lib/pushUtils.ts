@@ -1,0 +1,21 @@
+export async function triggerPushNotification({
+  title,
+  body,
+  targetMemberId,
+  sourceMemberId
+}: {
+  title: string;
+  body: string;
+  targetMemberId?: string;
+  sourceMemberId?: string;
+}) {
+  try {
+    await fetch('/api/push/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, body, targetMemberId, sourceMemberId })
+    });
+  } catch (error) {
+    console.error('Error triggering push:', error);
+  }
+}
