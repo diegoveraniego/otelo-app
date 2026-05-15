@@ -119,3 +119,13 @@ export function getTodayDayOfWeek(): number {
   const dow = new Date().getDay();
   return dow === 0 ? 6 : dow - 1;
 }
+
+/**
+ * Returns the current slot type based on the hour of the day.
+ */
+export function getCurrentSlot(): 'morning' | 'evening' | null {
+  const hour = new Date().getHours();
+  if (hour >= SLOT_HOURS.morning.start && hour < SLOT_HOURS.morning.end) return 'morning';
+  if (hour >= SLOT_HOURS.evening.start && hour < SLOT_HOURS.evening.end) return 'evening';
+  return null;
+}
