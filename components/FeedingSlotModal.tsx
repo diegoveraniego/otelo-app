@@ -2,18 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase/client';
-import { FeedingSlotWithDetails } from '@/lib/types';
-import { useUserStore } from '@/lib/store';
-import {
-  CheckCircle2, X, UserPlus, AlertTriangle, Clock,
-  ArrowLeftRight, Trash2
-} from 'lucide-react';
-import Avatar from './Avatar';
-import {
-  DAY_NAMES_FULL, SLOT_LABELS, isSlotOverdue,
-  wasFedLate, formatFedTime, getWeekStart, isSlotNow
-} from '@/lib/feedingUtils';
-import { Member } from '@/lib/types';
+import { FeedingSlotWithDetails, Member, Pet } from '@/lib/types';
 
 type Props = {
   slot: FeedingSlotWithDetails | null;
