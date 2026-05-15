@@ -98,3 +98,16 @@ export function formatWeekRange(weekStart: string): string {
   }
   return `${format(start, 'd MMM')} - ${format(end, 'd MMM')}`;
 }
+
+/**
+ * Calculates how many slots each member has assigned in a list of slots.
+ */
+export function getWeeklyAssignmentCount(slots: FeedingSlotWithDetails[]) {
+  const counts: Record<string, number> = {};
+  slots.forEach(s => {
+    if (s.assigned_to) {
+      counts[s.assigned_to] = (counts[s.assigned_to] || 0) + 1;
+    }
+  });
+  return counts;
+}
