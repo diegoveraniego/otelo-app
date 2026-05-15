@@ -39,7 +39,6 @@ export const proposalService = {
    * Toggles a vote on a proposal (adds if missing, removes if exists)
    */
   async toggleVote(proposalId: string, memberId: string) {
-    // Check if vote exists
     const { data: existing } = await supabase
       .from('proposal_votes')
       .select('id')
@@ -48,24 +47,51 @@ export const proposalService = {
       .single();
 
     if (existing) {
-      // Remove it
-      const { error } = await supabase
-        .from('proposal_votes')
-        .delete()
-        .eq('id', existing.id);
+      const { error } = await supabase.from('proposal_votes').delete().eq('id', existing.id);
       if (error) throw error;
-      return false; // Not voted anymore
+      return false;
     } else {
-      // Add it
-      const { error } = await supabase
-        .from('proposal_votes')
-        .insert({
-          proposal_id: proposalId,
-          member_id: memberId
-        });
+      const { error } = await supabase.from('proposal_votes').insert({
+        proposal_id: proposalId,
+        member_id: memberId
+      });
       if (error) throw error;
-      return true; // Voted
+      return true;
     }
+  },
+
+  /**
+   * Approves a proposal: marks as approved and creates a corresponding chore.
+   */
+  async approveProposal(proposal: Proposal) {
+    // 1. Mark as approved
+    const { error: updateError } = await supabase
+      .from('proposals')
+      .update({ status: 'approved' })
+      .eq('id', proposal.id);
+    if (updateError) throw updateError;
+
+    // 2. Create the chore
+    const { error: choreError } = await supabase
+      .from('chores')
+      .insert({
+        name: proposal.name,
+        emoji: proposal.emoji,
+        category: proposal.category,
+        threshold_days: proposal.threshold_days
+      });
+    if (choreError) throw choreError;
+  },
+
+  /**
+   * Rejects a proposal (expired)
+   */
+  async rejectProposal(proposalId: string) {
+    const { error } = await supabase
+      .from('proposals')
+      .update({ status: 'rejected' })
+      .eq('id', proposalId);
+    if (error) throw error;
   },
 
   /**

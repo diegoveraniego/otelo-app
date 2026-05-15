@@ -10,7 +10,8 @@ import { Plus, MessageSquare, ThumbsUp, Clock, Tag, Smile, X } from 'lucide-reac
 import Avatar from './Avatar';
 import EmojiPicker, { Theme as EmojiTheme } from 'emoji-picker-react';
 import { useTheme } from 'next-themes';
-import { differenceInDays } from 'date-fns';
+import { feedingService } from '@/lib/services/feedingService';
+import { differenceInDays, addDays, isBefore } from 'date-fns';
 
 export default function ProposalsSection() {
   const { currentUser } = useUserStore();
@@ -40,23 +41,47 @@ export default function ProposalsSection() {
   const fetchData = useCallback(async () => {
     setIsLoading(true);
     try {
-      const [propData, memData, choreData] = await Promise.all([
-        proposalService.getActiveProposals(),
-        supabase.from('members').select('id'), // Simple enough to keep or move later
+      // 1. Parallel fetch for base data
+      const [allMembers, choreData] = await Promise.all([
+        feedingService.getMembers(),
         choreService.getChores()
       ]);
-
-      setProposals(propData);
-      setMembersCount(memData.data?.length || 0);
       
+      setMembersCount(allMembers.length);
       if (choreData) {
         setExistingEmojis(choreData.map(c => c.emoji));
         setCategories(Array.from(new Set(choreData.map(c => c.category).filter(Boolean))));
       }
 
-      if (propData.length > 0) {
-        const voteData = await proposalService.getVotes(propData.map(p => p.id));
-        setVotes(voteData);
+      // 2. Fetch active proposals and their votes
+      const props = await proposalService.getActiveProposals();
+      const allVotes = await proposalService.getVotes(props.map(p => p.id));
+      
+      // 3. Auto-process: Check for approvals or expirations
+      let needsRefresh = false;
+      for (const prop of props) {
+        const propVotes = allVotes.filter(v => v.proposal_id === prop.id);
+        const deadline = addDays(new Date(prop.created_at), prop.threshold_days);
+        const isExpired = isBefore(deadline, new Date());
+
+        if (propVotes.length >= allMembers.length) {
+          await proposalService.approveProposal(prop);
+          needsRefresh = true;
+        } else if (isExpired) {
+          await proposalService.rejectProposal(prop.id);
+          needsRefresh = true;
+        }
+      }
+
+      // 4. Final state update
+      if (needsRefresh) {
+        const updatedProps = await proposalService.getActiveProposals();
+        const updatedVotes = await proposalService.getVotes(updatedProps.map(p => p.id));
+        setProposals(updatedProps);
+        setVotes(updatedVotes);
+      } else {
+        setProposals(props);
+        setVotes(allVotes);
       }
     } catch (err) {
       console.error('Error fetching proposals:', err);
