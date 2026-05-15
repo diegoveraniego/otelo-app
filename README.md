@@ -51,3 +51,9 @@ Inicia el servidor:
 ```bash
 bunx next dev
 ```
+
+## TODOS / Pendientes
+
+- [ ] Pasar la funcionalidad de coordinar horarios para otras tareas.
+- [ ] Añadir asistente de configuración para la primera database creada.
+- [ ] Clarificar el readme de configuración.
