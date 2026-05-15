@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { feedingService } from '@/lib/services/feedingService';
+import { choreService } from '@/lib/services/choreService';
 import { FeedingSlotWithDetails, Member, Pet } from '@/lib/types';
 import { useUserStore } from '@/lib/store';
 import {
@@ -12,7 +13,7 @@ import Avatar from './Avatar';
 import { triggerPushNotification } from '@/lib/pushUtils';
 import {
   DAY_NAMES_FULL, SLOT_LABELS, isSlotOverdue,
-  wasFedLate, formatFedTime, isSlotNow
+  wasFedLate, formatFedTime, isSlotNow, isSlotToday
 } from '@/lib/feedingUtils';
 
 type Props = {
@@ -46,6 +47,8 @@ export default function FeedingSlotModal({ slot, isOpen, onClose, onRefresh }: P
   const overdue = slot ? isSlotOverdue(slot) : false;
   const fedLate = slot ? wasFedLate(slot) : false;
   const slotIsNow = slot ? isSlotNow(slot) : false;
+  const isToday = slot ? isSlotToday(slot) : false;
+  const isReplacement = !!(slot?.fed_at && slot?.assigned_to && slot.fed_by !== slot.assigned_to);
   const dayName = slot ? DAY_NAMES_FULL[slot.day_of_week] : '';
   const slotLabel = slot ? SLOT_LABELS[slot.slot] : '';
 
@@ -89,7 +92,23 @@ export default function FeedingSlotModal({ slot, isOpen, onClose, onRefresh }: P
       slot: slot.slot,
       fed_by: currentUser.id
     });
+    // Also log the chore (fire-and-forget)
+    logChoreInBackground().catch(console.error);
   }, 'fed-success');
+
+  const logChoreInBackground = async () => {
+    if (!selectedPet || !currentUser) return;
+    let choreName: string | null = null;
+    if (selectedPet.type === 'dog') choreName = 'Dar comida y agua a Otelo';
+    else if (selectedPet.type === 'cat') choreName = 'Dar comida y agua a Gatos';
+    if (!choreName) return;
+    const chores = await choreService.getChores();
+    const chore = chores.find(c => c.name === choreName);
+    if (chore) {
+      await choreService.completeChore(chore.id, currentUser.id);
+      window.dispatchEvent(new CustomEvent('chore-logged'));
+    }
+  };
 
   const handleRequestTrade = (toMember: Member) => wrapAction(async () => {
     if (!currentUser || !slot.id) throw new Error('No se puede pedir trueque para un turno no guardado');
@@ -192,19 +211,28 @@ export default function FeedingSlotModal({ slot, isOpen, onClose, onRefresh }: P
         {/* Status Card */}
         <div className={`p-4 rounded-2xl border transition-colors ${
           slot.fed_at 
-            ? 'bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-800/30' 
+            ? isReplacement
+              ? 'bg-amber-50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-800/30'
+              : 'bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-800/30'
             : 'bg-[#FAFAFA] dark:bg-[#2A2A2A] border-[#E5E6E6] dark:border-[#3D3D3D]'
         }`}>
           {slot.fed_at ? (
             <div className="flex items-center gap-3">
               <Avatar member={slot.fed_member!} className="w-10 h-10" />
               <div>
-                <p className="text-sm font-bold text-[#1E1E1E] dark:text-white">Alimentado por {slot.fed_member?.name}</p>
+                <p className="text-sm font-bold text-[#1E1E1E] dark:text-white">
+                  {isReplacement ? `Reemplazado por ${slot.fed_member?.name}` : `Alimentado por ${slot.fed_member?.name}`}
+                </p>
                 <p className="text-xs text-[#1E1E1E]/50 dark:text-white/50">
                   {formatFedTime(slot.fed_at)} {fedLate && '(tarde)'}
                 </p>
+                {isReplacement && slot.assigned_member && (
+                  <p className="text-xs text-amber-600 dark:text-amber-400 font-medium mt-0.5">
+                    Turno de {slot.assigned_member.name}
+                  </p>
+                )}
               </div>
-              <CheckCircle2 className="ml-auto w-5 h-5 text-green-500" />
+              <CheckCircle2 className={`ml-auto w-5 h-5 ${isReplacement ? 'text-amber-500' : 'text-green-500'}`} />
             </div>
           ) : slot.assigned_to ? (
             <div className="flex items-center gap-3">
@@ -224,7 +252,7 @@ export default function FeedingSlotModal({ slot, isOpen, onClose, onRefresh }: P
 
         {/* Action Buttons */}
         <div className="grid gap-2">
-          {!slot.fed_at && (
+          {!slot.fed_at && isToday && (
             <button
               onClick={handleMarkFed}
               disabled={isSubmitting}

@@ -52,13 +52,18 @@ export default function FeedingWeekGrid({ slots, weekStart, petId, onOpenModal }
     const overdue = isSlotOverdue(slot);
     const now = isSlotNow(slot);
     const isMine = currentUser && slot.assigned_to === currentUser.id;
+    const isReplacement = !!(slot.fed_at && slot.assigned_to && slot.fed_by !== slot.assigned_to);
     const member = slot.assigned_member ?? slot.fed_member ?? null;
 
     let cellClass =
       'relative flex flex-col items-center justify-center rounded-xl border transition-all active:scale-95 cursor-pointer p-1.5 min-h-[64px] ';
 
     if (slot.fed_at) {
-      cellClass += 'bg-green-50 dark:bg-green-900/15 border-green-200 dark:border-green-800/40 ';
+      if (isReplacement) {
+        cellClass += 'bg-amber-50 dark:bg-amber-900/15 border-amber-300 dark:border-amber-700/40 ';
+      } else {
+        cellClass += 'bg-green-50 dark:bg-green-900/15 border-green-200 dark:border-green-800/40 ';
+      }
     } else if (overdue) {
       cellClass += 'bg-red-50 dark:bg-red-900/15 border-red-300 dark:border-red-700/40 animate-pulse ';
     } else if (now) {
@@ -81,7 +86,7 @@ export default function FeedingWeekGrid({ slots, weekStart, petId, onOpenModal }
       >
         {/* Status icon overlay */}
         {slot.fed_at ? (
-          <CheckCircle2 className="absolute top-1 right-1 w-3 h-3 text-green-500" />
+          <CheckCircle2 className={`absolute top-1 right-1 w-3 h-3 ${isReplacement ? 'text-amber-500' : 'text-green-500'}`} />
         ) : overdue ? (
           <AlertTriangle className="absolute top-1 right-1 w-3 h-3 text-red-500" />
         ) : now ? (
@@ -162,6 +167,7 @@ export default function FeedingWeekGrid({ slots, weekStart, petId, onOpenModal }
       <div className="flex flex-wrap gap-4 px-1 pt-1">
         {[
           { color: 'bg-green-500', label: 'Alimentado' },
+          { color: 'bg-amber-500', label: 'Reemplazo' },
           { color: 'bg-cyan-500 animate-pulse', label: 'Ahora' },
           { color: 'bg-red-500 animate-pulse', label: 'Atrasado' },
           { color: 'ring-2 ring-[#3584E4]', label: 'Tuyo' },

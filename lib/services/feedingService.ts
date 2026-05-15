@@ -1,5 +1,6 @@
 import { supabase } from '../supabase/client';
 import { FeedingSlotWithDetails, Member } from '../types';
+import { addDays, isSameDay } from 'date-fns';
 
 /**
  * Service to handle all pet feeding related database operations.
@@ -90,6 +91,13 @@ export const feedingService = {
     slot: string;
     fed_by: string;
   }) {
+    // Only allow marking as fed for today
+    const monday = new Date(payload.week_start + 'T00:00:00');
+    const slotDate = addDays(monday, payload.day_of_week);
+    if (!isSameDay(new Date(), slotDate)) {
+      throw new Error('Solo se puede marcar como alimentado para el día de hoy');
+    }
+
     const fed_at = new Date().toISOString();
     
     if (payload.id && payload.id.length > 10) {

@@ -22,10 +22,15 @@ export default function FeedingTodayCard({ slot, onOpenModal }: Props) {
   const isNow = slot ? isSlotNow(slot) : false;
   const overdue = slot ? isSlotOverdue(slot) : false;
   const isMine = currentUser && slot?.assigned_to === currentUser.id;
+  const isReplacement = !!(slot?.fed_at && slot?.assigned_to && slot.fed_by !== slot.assigned_to);
 
   // Status styling
   const getCardStyle = () => {
-    if (!slot || slot.fed_at) return '';
+    if (!slot) return '';
+    if (slot.fed_at) {
+      if (isReplacement) return 'ring-2 ring-amber-400 dark:ring-amber-500';
+      return '';
+    }
     if (overdue) return 'ring-2 ring-red-400 dark:ring-red-500';
     if (isNow) return 'ring-2 ring-blue-400 dark:ring-blue-500';
     return '';
@@ -44,8 +49,12 @@ export default function FeedingTodayCard({ slot, onOpenModal }: Props) {
     >
       {/* Status badge */}
       {slot?.fed_at ? (
-        <span className="absolute top-2.5 right-2.5 flex items-center gap-1 px-1.5 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full text-[10px] font-bold">
-          <CheckCircle2 className="w-3 h-3" /> Listo
+        <span className={`absolute top-2.5 right-2.5 flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
+          isReplacement
+            ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400'
+            : 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
+        }`}>
+          <CheckCircle2 className="w-3 h-3" /> {isReplacement ? 'Reemplazo' : 'Listo'}
         </span>
       ) : overdue ? (
         <span className="absolute top-2.5 right-2.5 flex items-center gap-1 px-1.5 py-0.5 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-full text-[10px] font-bold animate-pulse">
@@ -68,7 +77,9 @@ export default function FeedingTodayCard({ slot, onOpenModal }: Props) {
         {slot?.fed_at ? (
           <div className="flex flex-col items-center gap-1">
             {slot.fed_member && <Avatar member={slot.fed_member} className="w-9 h-9 text-sm" />}
-            <span className="text-xs font-medium text-green-600 dark:text-green-400 text-center leading-tight">
+            <span className={`text-xs font-medium text-center leading-tight ${
+              isReplacement ? 'text-amber-600 dark:text-amber-400' : 'text-green-600 dark:text-green-400'
+            }`}>
               {slot.fed_member?.name ?? '—'}
             </span>
           </div>

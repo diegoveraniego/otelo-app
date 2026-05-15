@@ -113,6 +113,14 @@ export function getWeeklyAssignmentCount(slots: FeedingSlotWithDetails[]) {
 }
 
 /**
+ * Checks if a slot's date is the current day.
+ */
+export function isSlotToday(slot: { week_start: string; day_of_week: number }): boolean {
+  const slotDate = getSlotDate(slot.week_start, slot.day_of_week);
+  return isSameDay(new Date(), slotDate);
+}
+
+/**
  * Gets the current day of week index (0 = Mon, 6 = Sun).
  */
 export function getTodayDayOfWeek(): number {
