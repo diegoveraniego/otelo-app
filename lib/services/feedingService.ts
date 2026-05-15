@@ -109,7 +109,22 @@ export const feedingService = {
           fed_at,
           fed_by: payload.fed_by
         }, { onConflict: 'pet_id,week_start,day_of_week,slot' });
-      if (error) throw error;
+    if (error) throw error;
     }
+  },
+
+  /**
+   * Creates a trade request for a feeding slot
+   */
+  async createTrade(slotId: string, fromId: string, toId: string) {
+    const { error } = await supabase
+      .from('feeding_trades')
+      .insert({
+        slot_id: slotId,
+        from_member_id: fromId,
+        to_member_id: toId,
+        status: 'pending'
+      });
+    if (error) throw error;
   }
 };

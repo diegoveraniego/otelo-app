@@ -9,6 +9,7 @@ import {
   ArrowLeftRight, Trash2
 } from 'lucide-react';
 import Avatar from './Avatar';
+import { triggerPushNotification } from '@/lib/pushUtils';
 import {
   DAY_NAMES_FULL, SLOT_LABELS, isSlotOverdue,
   wasFedLate, formatFedTime, isSlotNow
@@ -90,15 +91,18 @@ export default function FeedingSlotModal({ slot, isOpen, onClose, onRefresh }: P
     });
   }, 'fed-success');
 
-  const handleUnassign = () => wrapAction(async () => {
-    // Note: We could move this to feedingService too
-    const { error } = await feedingService.signUp({
-      ...slot,
-      assigned_to: null as any,
-      id: slot.id
+  const handleRequestTrade = (toMember: Member) => wrapAction(async () => {
+    if (!currentUser || !slot.id) throw new Error('No se puede pedir trueque para un turno no guardado');
+    await feedingService.createTrade(slot.id, currentUser.id, toMember.id);
+    
+    triggerPushNotification({
+      title: 'Solicitud de trueque 🔄',
+      body: `${currentUser.name} te pide cubrir el turno de ${slotLabel} del ${dayName}`,
+      targetMemberId: toMember.id,
+      eventType: 'trade'
     });
-    if (error) throw error;
-    onClose();
+    
+    setView('main');
   });
 
   // ── Render Helpers ───────────────────────────────────────────
@@ -137,7 +141,7 @@ export default function FeedingSlotModal({ slot, isOpen, onClose, onRefresh }: P
             {eligibleMembers.map((m) => (
               <button
                 key={m.id}
-                onClick={() => setView('main')} // In a real app, this would call feedingService.createTrade
+                onClick={() => handleRequestTrade(m)}
                 className="flex flex-col items-center justify-center p-4 rounded-xl border border-[#E5E6E6] dark:border-[#3D3D3D] hover:bg-[#FAFAFA] dark:hover:bg-[#3D3D3D] transition-colors"
                 style={{ borderBottomColor: m.color, borderBottomWidth: 3 }}
               >
