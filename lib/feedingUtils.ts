@@ -111,3 +111,11 @@ export function getWeeklyAssignmentCount(slots: FeedingSlotWithDetails[]) {
   });
   return counts;
 }
+
+/**
+ * Gets the current day of week index (0 = Mon, 6 = Sun).
+ */
+export function getTodayDayOfWeek(): number {
+  const dow = new Date().getDay();
+  return dow === 0 ? 6 : dow - 1;
+}
