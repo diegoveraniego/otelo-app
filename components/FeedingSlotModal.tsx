@@ -81,8 +81,16 @@ export default function FeedingSlotModal({ slot, isOpen, onClose, onRefresh }: P
         assigned_to: currentUser.id,
         assigned_at: new Date().toISOString(),
       }, { onConflict: 'pet_id,week_start,day_of_week,slot' });
+    
     setIsSubmitting(false);
-    if (!error) { setView('success'); onRefresh(); }
+    
+    if (error) {
+      console.error('Error signing up:', error);
+      alert('Error al anotarse: ' + error.message);
+    } else {
+      setView('success');
+      onRefresh();
+    }
   };
 
   const handleMarkFed = async () => {
@@ -92,29 +100,39 @@ export default function FeedingSlotModal({ slot, isOpen, onClose, onRefresh }: P
       return;
     }
     setIsSubmitting(true);
-    // If slot doesn't exist yet, we need to create it with pet_id
+    
+    const payload = {
+      pet_id: slot.pet_id,
+      week_start: slot.week_start,
+      day_of_week: slot.day_of_week,
+      slot: slot.slot,
+      fed_at: new Date().toISOString(),
+      fed_by: currentUser.id
+    };
+
+    let error;
     if (!slot.id) {
-       const { data, error } = await supabase
+       const res = await supabase
         .from('feeding_slots')
-        .upsert({
-          pet_id: slot.pet_id,
-          week_start: slot.week_start,
-          day_of_week: slot.day_of_week,
-          slot: slot.slot,
-          fed_at: new Date().toISOString(),
-          fed_by: currentUser.id
-        }, { onConflict: 'pet_id,week_start,day_of_week,slot' })
-        .select()
-        .single();
-       if (!error) { setView('fed-success'); onRefresh(); }
+        .upsert(payload, { onConflict: 'pet_id,week_start,day_of_week,slot' });
+       error = res.error;
     } else {
-      const { error } = await supabase
+      const res = await supabase
         .from('feeding_slots')
-        .update({ fed_at: new Date().toISOString(), fed_by: currentUser.id })
+        .update({ fed_at: payload.fed_at, fed_by: payload.fed_by })
         .eq('id', slot.id);
-      if (!error) { setView('fed-success'); onRefresh(); }
+      error = res.error;
     }
+
     setIsSubmitting(false);
+    
+    if (error) {
+      console.error('Error marking as fed:', error);
+      alert('Error al marcar como alimentado: ' + error.message);
+    } else {
+      setView('fed-success');
+      onRefresh();
+    }
   };
 
   const handleUnassign = async () => {
