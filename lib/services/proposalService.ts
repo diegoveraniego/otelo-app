@@ -1,5 +1,5 @@
 import { supabase } from '../supabase/client';
-import { Proposal, Vote } from '../types';
+import { Proposal, ProposalVote } from '../types';
 
 /**
  * Service for managing family proposals and voting.
@@ -17,7 +17,7 @@ export const proposalService = {
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-    return data as any[];
+    return data as Proposal[];
   },
 
   /**
@@ -27,7 +27,7 @@ export const proposalService = {
     if (proposalIds.length === 0) return [];
     
     const { data, error } = await supabase
-      .from('votes')
+      .from('proposal_votes')
       .select('*, member:members(*)')
       .in('proposal_id', proposalIds);
 
@@ -36,31 +36,46 @@ export const proposalService = {
   },
 
   /**
-   * Casts or updates a vote on a proposal
+   * Toggles a vote on a proposal (adds if missing, removes if exists)
    */
-  async castVote(proposalId: string, memberId: string, voteType: 'up' | 'down') {
-    const { error } = await supabase
-      .from('votes')
-      .upsert({
-        proposal_id: proposalId,
-        member_id: memberId,
-        vote_type: voteType,
-        updated_at: new Date().toISOString()
-      }, { onConflict: 'proposal_id,member_id' });
+  async toggleVote(proposalId: string, memberId: string) {
+    // Check if vote exists
+    const { data: existing } = await supabase
+      .from('proposal_votes')
+      .select('id')
+      .eq('proposal_id', proposalId)
+      .eq('member_id', memberId)
+      .single();
 
-    if (error) throw error;
+    if (existing) {
+      // Remove it
+      const { error } = await supabase
+        .from('proposal_votes')
+        .delete()
+        .eq('id', existing.id);
+      if (error) throw error;
+      return false; // Not voted anymore
+    } else {
+      // Add it
+      const { error } = await supabase
+        .from('proposal_votes')
+        .insert({
+          proposal_id: proposalId,
+          member_id: memberId
+        });
+      if (error) throw error;
+      return true; // Voted
+    }
   },
 
   /**
    * Creates a new proposal
    */
-  async createProposal(title: string, description: string, memberId: string) {
+  async createProposal(payload: Partial<Proposal>) {
     const { data, error } = await supabase
       .from('proposals')
       .insert({
-        title,
-        description,
-        author_id: memberId,
+        ...payload,
         status: 'pending'
       })
       .select()

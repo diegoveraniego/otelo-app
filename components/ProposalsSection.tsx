@@ -77,21 +77,10 @@ export default function ProposalsSection() {
       return;
     }
     
-    const myVote = votes.find(v => v.proposal_id === proposalId && v.member_id === currentUser.id);
-    const voteType = myVote ? (myVote.vote_type === 'up' ? 'down' : 'up') : 'up'; // Simple toggle for now
-
     try {
-      await proposalService.castVote(proposalId, currentUser.id, 'up'); // Force up for now as per current UI
+      await proposalService.toggleVote(proposalId, currentUser.id);
       
-      // Check for approval logic (should ideally be server-side or in service)
-      const currentVotes = votes.filter(v => v.proposal_id === proposalId);
-      if (currentVotes.length + 1 >= membersCount) {
-        const prop = proposals.find(p => p.id === proposalId);
-        if (prop) {
-           await choreService.completeChore(prop.id, currentUser.id); // Placeholder for approval logic
-           // In a real app, approveProposal would be called
-        }
-      }
+      // Refresh to check for approval
       fetchData();
     } catch (err) {
       console.error('Error voting:', err);
@@ -118,7 +107,13 @@ export default function ProposalsSection() {
     setIsSubmitting(true);
     try {
       const finalCategory = category === 'new' ? newCategory : category;
-      await proposalService.createProposal(name, `Nueva tarea: ${name} (${finalCategory})`, currentUser.id);
+      await proposalService.createProposal({
+        name,
+        emoji,
+        category: finalCategory,
+        threshold_days: parseInt(threshold),
+        created_by: currentUser.id
+      });
       
       setFormData({ name: '', emoji: '', category: '', newCategory: '', threshold: '3' });
       setIsAdding(false);
