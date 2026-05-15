@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { Bell, Heart, RefreshCw, Check, X as CloseIcon } from 'lucide-react';
-import { supabase } from '@/lib/supabase/client';
+import { notificationService } from '@/lib/services/notificationService';
 import { useUserStore } from '@/lib/store';
 import { ThanksWithDetails, ColorTradeWithDetails, NotificationType } from '@/lib/types';
 import { formatDistanceToNow } from 'date-fns';
@@ -15,6 +15,7 @@ export default function NotificationBell() {
   const [notifications, setNotifications] = useState<NotificationType[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isClient, setIsClient] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -23,28 +24,21 @@ export default function NotificationBell() {
 
   const fetchNotifications = useCallback(async () => {
     if (!currentUser) return;
+    setIsLoading(true);
+    try {
+      const { thanks, trades } = await notificationService.getAllNotifications(currentUser.id);
 
-    const [{ data: thanksData }, { data: tradeData }] = await Promise.all([
-      supabase
-        .from('thanks')
-        .select('*, from_member:members!thanks_from_member_id_fkey(*), log:logs(*, chore:chores(*))')
-        .eq('to_member_id', currentUser.id)
-        .order('created_at', { ascending: false })
-        .limit(10),
-      supabase
-        .from('color_trades')
-        .select('*, from_member:members!color_trades_from_member_id_fkey(*), to_member:members!color_trades_to_member_id_fkey(*)')
-        .eq('to_member_id', currentUser.id)
-        .eq('status', 'pending')
-        .order('created_at', { ascending: false })
-    ]);
+      const combined: NotificationType[] = [
+        ...thanks.map(d => ({ type: 'thanks' as const, data: d as unknown as ThanksWithDetails })),
+        ...trades.map(d => ({ type: 'trade' as const, data: d as unknown as ColorTradeWithDetails }))
+      ].sort((a, b) => new Date(b.data.created_at).getTime() - new Date(a.data.created_at).getTime());
 
-    const combined: NotificationType[] = [
-      ...(thanksData?.map(d => ({ type: 'thanks' as const, data: d as unknown as ThanksWithDetails })) || []),
-      ...(tradeData?.map(d => ({ type: 'trade' as const, data: d as unknown as ColorTradeWithDetails })) || [])
-    ].sort((a, b) => new Date(b.data.created_at).getTime() - new Date(a.data.created_at).getTime());
-
-    setNotifications(combined);
+      setNotifications(combined);
+    } catch (err) {
+      console.error('Error fetching notifications:', err);
+    } finally {
+      setIsLoading(false);
+    }
   }, [currentUser]);
 
   useEffect(() => {
@@ -73,46 +67,20 @@ export default function NotificationBell() {
   const handleOpen = () => {
     setIsOpen((prev) => !prev);
     if (!isOpen) {
-      // Mark all as seen when opening
       setLastSeenNotifications(new Date().toISOString());
     }
   };
 
   const handleTradeAction = async (trade: ColorTradeWithDetails, action: 'accepted' | 'declined') => {
     if (!currentUser) return;
-
-    if (action === 'accepted') {
-      // Perform the swap
-      const { error: swapError } = await supabase.rpc('swap_member_colors', {
-        member_a_id: trade.from_member_id,
-        member_b_id: trade.to_member_id
-      });
-
-      if (swapError) {
-        console.error('Error swapping colors:', swapError);
-        alert('Error al intercambiar colores');
-        return;
-      }
+    try {
+      await notificationService.respondToColorTrade(trade.id, action, trade.from_member_id, trade.to_member_id);
+      window.dispatchEvent(new CustomEvent('trade-updated'));
+      window.dispatchEvent(new CustomEvent('member-updated'));
+    } catch (err) {
+      console.error('Error responding to trade:', err);
+      alert('Error al procesar el intercambio');
     }
-
-    // Update trade status
-    await supabase
-      .from('color_trades')
-      .update({ status: action, updated_at: new Date().toISOString() })
-      .eq('id', trade.id);
-
-    // If accepted, decline all other pending trades for these users
-    if (action === 'accepted') {
-      await supabase
-        .from('color_trades')
-        .update({ status: 'declined', updated_at: new Date().toISOString() })
-        .neq('id', trade.id)
-        .or(`from_member_id.eq.${trade.from_member_id},to_member_id.eq.${trade.to_member_id},from_member_id.eq.${trade.to_member_id},to_member_id.eq.${trade.from_member_id}`)
-        .eq('status', 'pending');
-    }
-
-    window.dispatchEvent(new CustomEvent('trade-updated'));
-    window.dispatchEvent(new CustomEvent('member-updated'));
   };
 
   const unreadCount = notifications.filter((n) => {
@@ -128,7 +96,6 @@ export default function NotificationBell() {
         id="notification-bell-button"
         onClick={handleOpen}
         className="relative flex items-center justify-center w-10 h-10 rounded-full bg-white dark:bg-[#303030] shadow-sm border border-[#E5E6E6] dark:border-[#3D3D3D] hover:bg-[#FAFAFA] dark:hover:bg-[#3D3D3D] transition-colors"
-        title="Notificaciones"
       >
         <Bell className="w-5 h-5 text-[#1E1E1E] dark:text-white" />
         {unreadCount > 0 && (
@@ -141,23 +108,20 @@ export default function NotificationBell() {
       {isOpen && (
         <div
           id="notification-dropdown"
-          className="absolute right-0 top-12 w-80 bg-white dark:bg-[#303030] rounded-xl shadow-xl border border-[#E5E6E6] dark:border-[#3D3D3D] overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200"
+          className="absolute right-0 top-12 w-80 bg-white dark:bg-[#303030] rounded-2xl shadow-2xl border border-[#E5E6E6] dark:border-[#3D3D3D] overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-300"
         >
-          <div className="px-4 py-3 border-b border-[#E5E6E6] dark:border-[#3D3D3D] flex items-center justify-between">
-            <h3 className="font-semibold text-sm text-[#1E1E1E] dark:text-white">Notificaciones</h3>
-            {notifications.length > 0 && (
-              <span className="text-xs text-[#1E1E1E]/50 dark:text-white/50">
-                {notifications.length} notificación{notifications.length !== 1 ? 'es' : ''}
-              </span>
-            )}
+          <div className="px-5 py-4 border-b border-[#E5E6E6] dark:border-[#3D3D3D] flex items-center justify-between bg-[#FAFAFA] dark:bg-[#2A2A2A]">
+            <h3 className="font-bold text-sm text-[#1E1E1E] dark:text-white">Notificaciones</h3>
+            {isLoading && <span className="w-3 h-3 rounded-full border-2 border-[#3584E4] border-t-transparent animate-spin" />}
           </div>
+          
           <PushNotificationBanner memberId={currentUser.id} />
 
-          <div className="max-h-80 overflow-y-auto">
+          <div className="max-h-[400px] overflow-y-auto">
             {notifications.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-10 px-4 text-center">
-                <Bell className="w-8 h-8 text-[#1E1E1E]/20 dark:text-white/20 mb-2" />
-                <p className="text-sm text-[#1E1E1E]/50 dark:text-white/50">Sin notificaciones aún</p>
+              <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+                <Bell className="w-10 h-10 text-[#1E1E1E]/10 dark:text-white/10 mb-2" />
+                <p className="text-sm text-[#1E1E1E]/40 dark:text-white/40 font-medium">Sin notificaciones aún</p>
               </div>
             ) : (
               notifications.map((notif, i) => {
@@ -168,14 +132,14 @@ export default function NotificationBell() {
                 return (
                   <div
                     key={isThanks ? (data as ThanksWithDetails).id : (data as ColorTradeWithDetails).id}
-                    className={`flex flex-col px-4 py-3 ${
+                    className={`flex flex-col px-5 py-4 ${
                       i !== notifications.length - 1 ? 'border-b border-[#E5E6E6] dark:border-[#3D3D3D]' : ''
-                    } ${isNew ? 'bg-[#3584E4]/5 dark:bg-[#3584E4]/10' : ''}`}
+                    } ${isNew ? 'bg-[#3584E4]/5 dark:bg-[#3584E4]/10' : ''} hover:bg-[#FAFAFA] dark:hover:bg-[#353535] transition-colors`}
                   >
-                    <div className="flex items-start gap-3">
+                    <div className="flex items-start gap-4">
                       <div className="relative shrink-0">
-                        <Avatar member={(data as any).from_member} className="w-9 h-9 text-sm" />
-                        <span className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center ${isThanks ? 'bg-[#E01B24]' : 'bg-[#3584E4]'}`}>
+                        <Avatar member={(data as any).from_member} className="w-10 h-10 text-base" />
+                        <span className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center shadow-sm ${isThanks ? 'bg-[#E01B24]' : 'bg-[#3584E4]'}`}>
                           {isThanks ? (
                             <Heart className="w-2.5 h-2.5 text-white" fill="white" />
                           ) : (
@@ -186,45 +150,43 @@ export default function NotificationBell() {
                       <div className="flex-1 min-w-0">
                         {isThanks ? (
                           <p className="text-sm text-[#1E1E1E] dark:text-white leading-snug">
-                            <span className="font-semibold">{(data as ThanksWithDetails).from_member.name}</span> te agradeció por{' '}
-                            <span className="font-medium">{(data as ThanksWithDetails).log?.chore?.name}</span>{' '}
+                            <span className="font-bold">{(data as ThanksWithDetails).from_member.name}</span> te agradeció por{' '}
+                            <span className="font-medium text-[#3584E4]">{(data as ThanksWithDetails).log?.chore?.name}</span>{' '}
                             {(data as ThanksWithDetails).log?.chore?.emoji}
                           </p>
                         ) : (
-                          <div className="space-y-2">
+                          <div className="space-y-3">
                             <p className="text-sm text-[#1E1E1E] dark:text-white leading-snug">
-                              <span className="font-semibold">{(data as ColorTradeWithDetails).from_member.name}</span> quiere intercambiar su color contigo
+                              <span className="font-bold">{(data as ColorTradeWithDetails).from_member.name}</span> quiere intercambiar su color contigo
                             </p>
-                            <div className="flex items-center gap-2">
-                              <div className="flex items-center gap-1">
-                                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: (data as ColorTradeWithDetails).from_member.color }} />
-                                <span className="text-[10px] text-[#1E1E1E]/40 dark:text-white/40">Su color</span>
+                            <div className="flex items-center gap-3 bg-gray-50 dark:bg-black/20 p-2 rounded-xl border border-gray-100 dark:border-white/5">
+                              <div className="flex flex-col items-center gap-1 flex-1">
+                                <div className="w-4 h-4 rounded-full shadow-inner" style={{ backgroundColor: (data as ColorTradeWithDetails).from_member.color }} />
+                                <span className="text-[8px] font-black uppercase text-gray-400">Suya</span>
                               </div>
-                              <RefreshCw className="w-3 h-3 text-[#1E1E1E]/20 dark:text-white/20" />
-                              <div className="flex items-center gap-1">
-                                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: (data as ColorTradeWithDetails).to_member.color }} />
-                                <span className="text-[10px] text-[#1E1E1E]/40 dark:text-white/40">Tu color</span>
+                              <RefreshCw className="w-3 h-3 text-gray-300" />
+                              <div className="flex flex-col items-center gap-1 flex-1">
+                                <div className="w-4 h-4 rounded-full shadow-inner" style={{ backgroundColor: (data as ColorTradeWithDetails).to_member.color }} />
+                                <span className="text-[8px] font-black uppercase text-gray-400">Tuya</span>
                               </div>
                             </div>
                             <div className="flex gap-2">
                               <button
                                 onClick={() => handleTradeAction(data as ColorTradeWithDetails, 'accepted')}
-                                className="flex-1 flex items-center justify-center gap-1 py-1.5 bg-[#3584E4] hover:bg-[#1C71D8] text-white rounded-lg text-xs font-bold transition-colors"
+                                className="flex-1 py-2 bg-[#3584E4] hover:bg-[#1C71D8] text-white rounded-xl text-xs font-bold transition-all shadow-sm active:scale-95"
                               >
-                                <Check className="w-3 h-3" />
                                 Aceptar
                               </button>
                               <button
                                 onClick={() => handleTradeAction(data as ColorTradeWithDetails, 'declined')}
-                                className="flex-1 flex items-center justify-center gap-1 py-1.5 bg-[#E5E6E6] dark:bg-[#3D3D3D] hover:bg-[#D4D4D4] dark:hover:bg-[#474747] text-[#1E1E1E] dark:text-white rounded-lg text-xs font-bold transition-colors"
+                                className="flex-1 py-2 bg-gray-100 dark:bg-[#3D3D3D] text-gray-600 dark:text-gray-300 rounded-xl text-xs font-bold hover:bg-gray-200 dark:hover:bg-[#474747] transition-all active:scale-95"
                               >
-                                <CloseIcon className="w-3 h-3" />
                                 Rechazar
                               </button>
                             </div>
                           </div>
                         )}
-                        <p className="text-xs text-[#1E1E1E]/50 dark:text-white/50 mt-1">
+                        <p className="text-[10px] text-[#1E1E1E]/40 dark:text-white/30 mt-1.5 font-medium">
                           Hace {formatDistanceToNow(new Date(data.created_at), { locale: es })}
                         </p>
                       </div>

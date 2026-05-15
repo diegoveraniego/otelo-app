@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/lib/supabase/client';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { feedingService } from '@/lib/services/feedingService';
 import { FeedingSlotWithDetails, Member, Pet } from '@/lib/types';
 import {
   getWeekStart, getTodayDayOfWeek, DAY_NAMES_FULL, isSlotOverdue
@@ -9,7 +9,7 @@ import {
 import FeedingTodayCard from '@/components/FeedingTodayCard';
 import FeedingWeekGrid from '@/components/FeedingWeekGrid';
 import FeedingSlotModal from '@/components/FeedingSlotModal';
-import { CalendarDays, AlertCircle, ChevronLeft, ChevronRight, PawPrint, Plus } from 'lucide-react';
+import { CalendarDays, AlertCircle, ChevronLeft, ChevronRight, PawPrint } from 'lucide-react';
 import { addWeeks, format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -41,85 +41,60 @@ export default function PetsPage() {
   const viewedWeekStart = getOffsetWeekStart(weekOffset);
   const isCurrentWeek = weekOffset === 0;
 
-  const fetchPets = async () => {
-    const { data, error } = await supabase.from('pets').select('*').order('name');
-    if (error) {
-      console.error('Error fetching pets:', error);
-      setIsLoading(false);
-      return;
-    }
-    if (data && data.length > 0) {
-      setPets(data);
-      if (!selectedPetId) setSelectedPetId(data[0].id);
-    } else {
-      setIsLoading(false);
-    }
-  };
-
+  // Cache pets on mount
   useEffect(() => {
-    fetchPets();
+    feedingService.getPets().then(data => {
+      if (data && data.length > 0) {
+        setPets(data);
+        if (!selectedPetId) setSelectedPetId(data[0].id);
+      }
+    }).catch(console.error)
+      .finally(() => {
+        if (pets.length === 0) setIsLoading(false);
+      });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchData = useCallback(async () => {
     if (!selectedPetId) return;
     setIsLoading(true);
-    const [{ data: membersData }, { data: slotsData }] = await Promise.all([
-      supabase.from('members').select('*'),
-      supabase
-        .from('feeding_slots')
-        .select('*')
-        .eq('week_start', viewedWeekStart)
-        .eq('pet_id', selectedPetId)
-        .order('day_of_week')
-        .order('slot'),
-    ]);
-
-    const memberMap = new Map<string, Member>();
-    (membersData ?? []).forEach((m: Member) => memberMap.set(m.id, m));
-
-    const enriched: FeedingSlotWithDetails[] = (slotsData ?? []).map((s) => ({
-      ...s,
-      assigned_member: s.assigned_to ? memberMap.get(s.assigned_to) ?? null : null,
-      fed_member: s.fed_by ? memberMap.get(s.fed_by) ?? null : null,
-    }));
-
-    setSlots(enriched);
-    setIsLoading(false);
+    try {
+      const data = await feedingService.getWeeklySlots(viewedWeekStart, selectedPetId);
+      setSlots(data);
+    } catch (err) {
+      console.error('Error fetching weekly slots:', err);
+    } finally {
+      setIsLoading(false);
+    }
   }, [viewedWeekStart, selectedPetId]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
-  useEffect(() => {
-    if (selectedSlot) {
-      const updated = slots.find(
-        (s) => s.day_of_week === selectedSlot.day_of_week && s.slot === selectedSlot.slot
-      );
-      if (updated) setSelectedSlot(updated);
-    }
-  }, [slots, selectedSlot]);
+  // Performance: Memoize today's slots to avoid re-calculating on every render
+  const { todayMorning, todayEvening } = useMemo(() => {
+    if (!isCurrentWeek) return { todayMorning: undefined, todayEvening: undefined };
+    return {
+      todayMorning: slots.find((s) => s.day_of_week === todayDow && s.slot === 'morning'),
+      todayEvening: slots.find((s) => s.day_of_week === todayDow && s.slot === 'evening')
+    };
+  }, [slots, isCurrentWeek, todayDow]);
 
-  const selectedPet = pets.find(p => p.id === selectedPetId);
-
-  const todayMorning = isCurrentWeek
-    ? slots.find((s) => s.day_of_week === todayDow && s.slot === 'morning')
-    : undefined;
-  const todayEvening = isCurrentWeek
-    ? slots.find((s) => s.day_of_week === todayDow && s.slot === 'evening')
-    : undefined;
-
-  const overdueToday = [todayMorning, todayEvening].filter(
-    (s): s is FeedingSlotWithDetails => !!s && !s.fed_at && isSlotOverdue(s)
+  const overdueToday = useMemo(() => 
+    [todayMorning, todayEvening].filter(
+      (s): s is FeedingSlotWithDetails => !!s && !s.fed_at && isSlotOverdue(s)
+    ), [todayMorning, todayEvening]
   );
 
-  const openModal = (slot: FeedingSlotWithDetails) => {
-    // Ensure slot has pet_id if it's a "virtual" slot (not in DB yet)
+  const selectedPet = useMemo(() => pets.find(p => p.id === selectedPetId), [pets, selectedPetId]);
+
+  const openModal = useCallback((slot: FeedingSlotWithDetails) => {
     if (!slot.pet_id && selectedPetId) {
       slot.pet_id = selectedPetId;
     }
     setSelectedSlot(slot);
-  };
+  }, [selectedPetId]);
 
   if (pets.length === 0 && !isLoading) {
     return (
@@ -154,7 +129,10 @@ export default function PetsPage() {
             {pets.map(pet => (
               <button
                 key={pet.id}
-                onClick={() => setSelectedPetId(pet.id)}
+                onClick={() => {
+                   setSlots([]); // Clear slots to show loading state
+                   setSelectedPetId(pet.id);
+                }}
                 className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all border ${
                   selectedPetId === pet.id
                     ? 'bg-[#3584E4] text-white border-[#3584E4] shadow-sm'
@@ -229,7 +207,10 @@ export default function PetsPage() {
 
           <div className="flex items-center gap-1">
             <button
-              onClick={() => setWeekOffset((w) => Math.max(0, w - 1))}
+              onClick={() => {
+                setSlots([]);
+                setWeekOffset((w) => Math.max(0, w - 1));
+              }}
               disabled={weekOffset === 0}
               className="p-1.5 rounded-lg text-[#1E1E1E]/50 dark:text-white/50 hover:bg-[#E5E6E6] dark:hover:bg-[#3D3D3D] disabled:opacity-20 transition-colors"
               aria-label="Semana anterior"
@@ -239,7 +220,10 @@ export default function PetsPage() {
 
             {weekOffset > 0 && (
               <button
-                onClick={() => setWeekOffset(0)}
+                onClick={() => {
+                  setSlots([]);
+                  setWeekOffset(0);
+                }}
                 className="text-[10px] font-semibold px-2 py-0.5 bg-[#3584E4]/10 text-[#3584E4] rounded-full hover:bg-[#3584E4]/20 transition-colors"
               >
                 Hoy
@@ -247,7 +231,10 @@ export default function PetsPage() {
             )}
 
             <button
-              onClick={() => setWeekOffset((w) => Math.min(MAX_WEEKS_AHEAD, w + 1))}
+              onClick={() => {
+                setSlots([]);
+                setWeekOffset((w) => Math.min(MAX_WEEKS_AHEAD, w + 1));
+              }}
               disabled={weekOffset >= MAX_WEEKS_AHEAD}
               className="p-1.5 rounded-lg text-[#1E1E1E]/50 dark:text-white/50 hover:bg-[#E5E6E6] dark:hover:bg-[#3D3D3D] disabled:opacity-20 transition-colors"
               aria-label="Semana siguiente"
@@ -257,10 +244,10 @@ export default function PetsPage() {
           </div>
         </div>
 
-        {isLoading ? (
+        {isLoading && slots.length === 0 ? (
           <div className="h-40 rounded-2xl bg-[#E5E6E6] dark:bg-[#3D3D3D] animate-pulse" />
         ) : (
-          <div className="bg-white dark:bg-[#303030] rounded-2xl border border-[#E5E6E6] dark:border-[#3D3D3D] p-4 shadow-sm">
+          <div className="bg-white dark:bg-[#303030] rounded-2xl border border-[#E5E6E6] dark:border-[#3D3D3D] p-4 shadow-sm transition-opacity duration-200">
             <FeedingWeekGrid
               slots={slots}
               weekStart={viewedWeekStart}

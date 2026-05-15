@@ -1,18 +1,35 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase/client';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { choreService } from '@/lib/services/choreService';
 import { Chore } from '@/lib/types';
 import ConfirmChoreModal from './ConfirmChoreModal';
 import { useUserStore } from '@/lib/store';
-import { AlertCircle, Clock } from 'lucide-react';
+import { Clock } from 'lucide-react';
 import { differenceInDays } from 'date-fns';
 
 export default function ChoreGrid() {
   const [chores, setChores] = useState<Chore[]>([]);
-  const [lastDoneMap, setLastDoneMap] = useState<Record<string, string>>({});
+  const [lastDoneMap, setLastDoneMap] = useState<Map<string, string>>(new Map());
   const [selectedChore, setSelectedChore] = useState<Chore | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const { currentUser } = useUserStore();
+
+  const fetchData = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const [choresData, latestLogs] = await Promise.all([
+        choreService.getChores(),
+        choreService.getLatestLogs()
+      ]);
+      setChores(choresData);
+      setLastDoneMap(latestLogs);
+    } catch (err) {
+      console.error('Error fetching chores:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     fetchData();
@@ -20,29 +37,7 @@ export default function ChoreGrid() {
     const handleRefresh = () => fetchData();
     window.addEventListener('chore-logged', handleRefresh);
     return () => window.removeEventListener('chore-logged', handleRefresh);
-  }, []);
-
-  const fetchData = async () => {
-    const { data: choresData } = await supabase.from('chores').select('*').order('name');
-    
-    // Fetch last time each chore was done
-    const { data: lastLogs } = await supabase
-      .from('logs')
-      .select('chore_id, done_at')
-      .order('done_at', { ascending: false });
-
-    if (choresData) setChores(choresData);
-    
-    if (lastLogs) {
-      const map: Record<string, string> = {};
-      lastLogs.forEach(log => {
-        if (!map[log.chore_id]) {
-          map[log.chore_id] = log.done_at;
-        }
-      });
-      setLastDoneMap(map);
-    }
-  };
+  }, [fetchData]);
 
   const handleChoreClick = (chore: Chore) => {
     if (!currentUser) {
@@ -52,8 +47,21 @@ export default function ChoreGrid() {
     setSelectedChore(chore);
   };
 
-  // Group chores by category
-  const categories = Array.from(new Set(chores.map(c => c.category || 'Otros')));
+  // Performance: Memoize categories and grouped chores
+  const categories = useMemo(() => 
+    Array.from(new Set(chores.map(c => c.category || 'Otros'))),
+    [chores]
+  );
+
+  if (isLoading && chores.length === 0) {
+    return (
+      <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <div key={i} className="aspect-square bg-[#E5E6E6] dark:bg-[#3D3D3D] animate-pulse rounded-xl" />
+        ))}
+      </div>
+    );
+  }
   
   return (
     <div className="mt-8 space-y-8">
@@ -67,12 +75,9 @@ export default function ChoreGrid() {
             {chores
               .filter(c => (c.category || 'Otros') === category)
               .map((chore) => {
-                const lastDone = lastDoneMap[chore.id];
+                const lastDone = lastDoneMap.get(chore.id);
                 const daysSince = lastDone ? differenceInDays(new Date(), new Date(lastDone)) : 999;
-                
-                // Use threshold from DB
-                const threshold = chore.threshold_days || 3;
-                const isOverdue = daysSince >= threshold;
+                const isOverdue = daysSince >= (chore.threshold_days || 3);
 
                 return (
                   <button
