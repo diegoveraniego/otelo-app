@@ -42,10 +42,17 @@ export default function PetsPage() {
   const isCurrentWeek = weekOffset === 0;
 
   const fetchPets = async () => {
-    const { data } = await supabase.from('pets').select('*').order('name');
+    const { data, error } = await supabase.from('pets').select('*').order('name');
+    if (error) {
+      console.error('Error fetching pets:', error);
+      setIsLoading(false);
+      return;
+    }
     if (data && data.length > 0) {
       setPets(data);
       if (!selectedPetId) setSelectedPetId(data[0].id);
+    } else {
+      setIsLoading(false);
     }
   };
 
