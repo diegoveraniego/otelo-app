@@ -7,25 +7,26 @@ import { Member } from '@/lib/types';
 import { KeyRound, X, Settings } from 'lucide-react';
 import Avatar from './Avatar';
 import EditProfileModal from './EditProfileModal';
+import OnboardingWizard from './OnboardingWizard';
+import { usePathname } from 'next/navigation';
 
-  import { usePathname } from 'next/navigation';
+export default function UserSelectModal() {
+  const pathname = usePathname();
+  const { currentUser, setCurrentUser, hasDismissedUserModal, setHasDismissedUserModal } = useUserStore();
+  const [members, setMembers] = useState<Member[]>([]);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [selectedMember, setSelectedMember] = useState<Member | null>(null);
+  const [pin, setPin] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
 
-  export default function UserSelectModal() {
-    const pathname = usePathname();
-    const { currentUser, setCurrentUser, hasDismissedUserModal, setHasDismissedUserModal } = useUserStore();
-    const [members, setMembers] = useState<Member[]>([]);
-    const [isOpen, setIsOpen] = useState(false);
-    const [isEditOpen, setIsEditOpen] = useState(false);
-    const [selectedMember, setSelectedMember] = useState<Member | null>(null);
-    const [pin, setPin] = useState('');
-    const [error, setError] = useState('');
-    const [isLoading, setIsLoading] = useState(true);
-
-    useEffect(() => {
-      if (pathname !== '/login') {
-        fetchMembers();
-      }
-    }, [pathname]);
+  useEffect(() => {
+    if (pathname !== '/login') {
+      fetchMembers();
+    }
+  }, [pathname]);
 
   useEffect(() => {
     if (!currentUser && !hasDismissedUserModal) {
@@ -38,8 +39,17 @@ import EditProfileModal from './EditProfileModal';
   }, [currentUser]);
 
   const fetchMembers = async () => {
+    setIsLoading(true);
     const { data } = await supabase.from('members').select('*').order('name');
-    if (data) setMembers(data);
+    if (data) {
+      setMembers(data);
+      if (data.length === 0) {
+        setShowOnboarding(true);
+      } else {
+        setShowOnboarding(false);
+      }
+    }
+    setIsLoading(false);
   };
 
   const handleMemberSelect = (member: Member) => {
@@ -48,23 +58,31 @@ import EditProfileModal from './EditProfileModal';
     setError('');
   };
 
-    const handlePinSubmit = (e: React.FormEvent) => {
-      e.preventDefault();
-      if (selectedMember?.pin === pin) {
-        setCurrentUser(selectedMember);
-        setIsOpen(false);
-        setSelectedMember(null);
-        setPin('');
-      } else {
-        setError('PIN incorrecto');
-      }
-    };
+  const handlePinSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (selectedMember?.pin === pin) {
+      setCurrentUser(selectedMember);
+      setIsOpen(false);
+      setSelectedMember(null);
+      setPin('');
+    } else {
+      setError('PIN incorrecto');
+    }
+  };
 
-    if (pathname === '/login') return null;
-    if (!isOpen) return null;
+  if (pathname === '/login') return null;
+  
+  if (showOnboarding) {
+    return <OnboardingWizard onComplete={() => {
+      setShowOnboarding(false);
+      fetchMembers();
+    }} />;
+  }
 
-    return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
       <div className="w-full max-w-sm max-h-[90vh] flex flex-col bg-white dark:bg-[#303030] rounded-xl shadow-lg border border-[#E5E6E6] dark:border-[#3D3D3D] overflow-hidden animate-in fade-in zoom-in duration-200 transition-colors">
         <div className="p-6 text-center border-b border-[#E5E6E6] dark:border-[#3D3D3D] bg-[#FAFAFA] dark:bg-[#2A2A2A] transition-colors">
           <h2 className="text-xl font-bold text-[#1E1E1E] dark:text-white">
@@ -108,7 +126,7 @@ import EditProfileModal from './EditProfileModal';
               <div className="text-center p-4">
                 <p className="text-zinc-500 dark:text-zinc-400 text-sm mb-2">No hay miembros configurados.</p>
                 <p className="text-xs text-zinc-400 dark:text-zinc-500">
-                  Por favor, configura las variables de entorno de Supabase en <code>.env.local</code> y ejecuta el script <code>001_init.sql</code> en tu base de datos para cargar los datos.
+                  Cargando asistente de configuración...
                 </p>
               </div>
             ) : (
@@ -196,8 +214,6 @@ export function OpenUserModalButton() {
   return (
     <button
       onClick={() => {
-        // Find the modal and force open it, or use global state.
-        // For simplicity, we just dispatch a custom event.
         window.dispatchEvent(new CustomEvent('open-user-modal'));
       }}
       className="flex items-center gap-2 bg-white dark:bg-[#303030] rounded-full p-1 shadow-sm border border-[#E5E6E6] dark:border-[#3D3D3D] hover:bg-[#FAFAFA] dark:hover:bg-[#3D3D3D] transition-colors"

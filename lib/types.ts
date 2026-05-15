@@ -92,3 +92,45 @@ export type PushSubscriptionType = {
   auth: string;
   created_at: string;
 };
+
+// ── Pet Feeding ──────────────────────────────────────────────
+
+export type Pet = {
+  id: string;
+  name: string;
+  type?: string;
+  created_at: string;
+};
+
+export type FeedingSlot = {
+  id: string;
+  pet_id: string;
+  week_start: string;         // 'YYYY-MM-DD' always a Monday
+  day_of_week: number;        // 0 = Mon, 6 = Sun
+  slot: 'morning' | 'evening';
+  assigned_to: string | null;
+  assigned_at: string | null;
+  fed_at: string | null;
+  fed_by: string | null;
+};
+
+export type FeedingSlotWithDetails = FeedingSlot & {
+  assigned_member?: Member | null;
+  fed_member?: Member | null;
+};
+
+export type FeedingTrade = {
+  id: string;
+  slot_id: string;
+  from_member_id: string;
+  to_member_id: string;
+  status: 'pending' | 'accepted' | 'declined' | 'expired';
+  created_at: string;
+  updated_at: string;
+};
+
+export type FeedingTradeWithDetails = FeedingTrade & {
+  slot: FeedingSlot;
+  from_member: Member;
+  to_member: Member;
+};
