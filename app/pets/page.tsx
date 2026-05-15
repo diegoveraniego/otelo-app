@@ -202,14 +202,14 @@ export default function PetsPage() {
             <div className="flex gap-3">
               <FeedingTodayCard
                 slot={todayMorning ?? {
-                  id: '', pet_id: selectedPetId!, week_start: currentWeekStart, day_of_week: todayDow, slot: 'morning',
+                  id: undefined as any, pet_id: selectedPetId!, week_start: currentWeekStart, day_of_week: todayDow, slot: 'morning',
                   assigned_to: null, assigned_at: null, fed_at: null, fed_by: null,
                 }}
                 onOpenModal={openModal}
               />
               <FeedingTodayCard
                 slot={todayEvening ?? {
-                  id: '', pet_id: selectedPetId!, week_start: currentWeekStart, day_of_week: todayDow, slot: 'evening',
+                  id: undefined as any, pet_id: selectedPetId!, week_start: currentWeekStart, day_of_week: todayDow, slot: 'evening',
                   assigned_to: null, assigned_at: null, fed_at: null, fed_by: null,
                 }}
                 onOpenModal={openModal}

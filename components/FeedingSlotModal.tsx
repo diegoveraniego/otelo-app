@@ -71,16 +71,24 @@ export default function FeedingSlotModal({ slot, isOpen, onClose, onRefresh }: P
       return;
     }
     setIsSubmitting(true);
+    
+    const payload: any = {
+      pet_id: slot.pet_id,
+      week_start: slot.week_start,
+      day_of_week: slot.day_of_week,
+      slot: slot.slot,
+      assigned_to: currentUser.id,
+      assigned_at: new Date().toISOString(),
+    };
+
+    // If it's a virtual slot, it might have an empty id string
+    if (slot.id && slot.id.length > 10) {
+      payload.id = slot.id;
+    }
+
     const { error } = await supabase
       .from('feeding_slots')
-      .upsert({
-        pet_id: slot.pet_id,
-        week_start: slot.week_start,
-        day_of_week: slot.day_of_week,
-        slot: slot.slot,
-        assigned_to: currentUser.id,
-        assigned_at: new Date().toISOString(),
-      }, { onConflict: 'pet_id,week_start,day_of_week,slot' });
+      .upsert(payload, { onConflict: 'pet_id,week_start,day_of_week,slot' });
     
     setIsSubmitting(false);
     
