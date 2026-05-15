@@ -108,7 +108,10 @@ export default function FeedingSlotModal({ slot, isOpen, onClose, onRefresh }: P
   const handleUnassign = () => wrapAction(async () => {
     if (!slot) return;
     await feedingService.signUp({
-      ...slot,
+      pet_id: slot.pet_id,
+      week_start: slot.week_start,
+      day_of_week: slot.day_of_week,
+      slot: slot.slot,
       assigned_to: null as any,
       id: slot.id
     });
@@ -122,7 +125,7 @@ export default function FeedingSlotModal({ slot, isOpen, onClose, onRefresh }: P
     return (
       <ModalWrapper onClose={onClose}>
         <div className="p-8 flex flex-col items-center justify-center text-center gap-3 animate-in zoom-in duration-300">
-          <div className="text-5xl mb-2">{isFed ? '🐕' : '✅'}</div>
+          <div className="text-5xl mb-2">{isFed ? '🐕' : ''}</div>
           <CheckCircle2 className="w-10 h-10 text-green-500" />
           <h2 className="text-xl font-bold text-[#1E1E1E] dark:text-white">
             {isFed ? `¡${selectedPet?.name || 'Mascota'} alimentada!` : '¡Anotado!'}
