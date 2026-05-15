@@ -105,6 +105,16 @@ export default function FeedingSlotModal({ slot, isOpen, onClose, onRefresh }: P
     setView('main');
   });
 
+  const handleUnassign = () => wrapAction(async () => {
+    if (!slot) return;
+    await feedingService.signUp({
+      ...slot,
+      assigned_to: null as any,
+      id: slot.id
+    });
+    onClose();
+  });
+
   // ── Render Helpers ───────────────────────────────────────────
 
   if (view === 'success' || view === 'fed-success') {
