@@ -34,7 +34,8 @@ export function getWeekStart(date: Date = new Date()): string {
  * Gets the specific Date object for a slot based on week start and day of week index.
  */
 export function getSlotDate(weekStart: string, dayOfWeek: number): Date {
-  const monday = parseISO(weekStart);
+  // Use T00:00:00 to ensure local time parsing across all browsers
+  const monday = new Date(weekStart + 'T00:00:00');
   return addDays(monday, dayOfWeek);
 }
 

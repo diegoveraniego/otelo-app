@@ -62,7 +62,7 @@ export default function FeedingWeekGrid({ slots, weekStart, petId, onOpenModal }
     } else if (overdue) {
       cellClass += 'bg-red-50 dark:bg-red-900/15 border-red-300 dark:border-red-700/40 animate-pulse ';
     } else if (now) {
-      cellClass += 'bg-blue-50 dark:bg-blue-900/15 border-blue-300 dark:border-blue-600/40 ';
+      cellClass += 'bg-cyan-50 dark:bg-cyan-900/15 border-cyan-300 dark:border-cyan-500/40 animate-pulse ';
     } else if (slot.assigned_to) {
       cellClass += 'bg-white dark:bg-[#303030] border-[#E5E6E6] dark:border-[#3D3D3D] hover:bg-[#FAFAFA] dark:hover:bg-[#3A3A3A] ';
     } else {
@@ -85,7 +85,7 @@ export default function FeedingWeekGrid({ slots, weekStart, petId, onOpenModal }
         ) : overdue ? (
           <AlertTriangle className="absolute top-1 right-1 w-3 h-3 text-red-500" />
         ) : now ? (
-          <Clock className="absolute top-1 right-1 w-3 h-3 text-blue-500" />
+          <Clock className="absolute top-1 right-1 w-3 h-3 text-cyan-600 dark:text-cyan-400" />
         ) : null}
 
         {/* Avatar or empty state */}
@@ -159,16 +159,16 @@ export default function FeedingWeekGrid({ slots, weekStart, petId, onOpenModal }
       </div>
 
       {/* Legend */}
-      <div className="flex flex-wrap gap-3 px-1 pt-1">
+      <div className="flex flex-wrap gap-4 px-1 pt-1">
         {[
-          { color: 'bg-green-500', label: 'Dado' },
-          { color: 'bg-blue-400', label: 'Turno actual' },
-          { color: 'bg-red-400', label: 'Atrasado' },
-          { color: 'bg-[#3584E4] ring-2 ring-[#3584E4]', label: 'Tuyo' },
+          { color: 'bg-green-500', label: 'Alimentado' },
+          { color: 'bg-cyan-500 animate-pulse', label: 'Ahora' },
+          { color: 'bg-red-500 animate-pulse', label: 'Atrasado' },
+          { color: 'ring-2 ring-[#3584E4]', label: 'Tuyo' },
         ].map(({ color, label }) => (
-          <div key={label} className="flex items-center gap-1">
-            <span className={`w-2.5 h-2.5 rounded-full ${color}`} />
-            <span className="text-[10px] text-[#1E1E1E]/40 dark:text-white/40">{label}</span>
+          <div key={label} className="flex items-center gap-1.5">
+            <span className={`w-2 h-2 rounded-full ${color}`} />
+            <span className="text-[9px] font-bold uppercase tracking-wider text-[#1E1E1E]/40 dark:text-white/40">{label}</span>
           </div>
         ))}
       </div>
