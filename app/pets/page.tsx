@@ -57,6 +57,7 @@ export default function PetsPage() {
 
   const fetchData = useCallback(async () => {
     if (!selectedPetId) return;
+    setSlots([]); // Clear stale data immediately
     setIsLoading(true);
     try {
       const data = await feedingService.getWeeklySlots(viewedWeekStart, selectedPetId);
