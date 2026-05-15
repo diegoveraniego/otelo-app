@@ -3,6 +3,16 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import { FeedingSlotWithDetails, Member, Pet } from '@/lib/types';
+import { useUserStore } from '@/lib/store';
+import {
+  CheckCircle2, X, UserPlus, AlertTriangle, Clock,
+  ArrowLeftRight, Trash2
+} from 'lucide-react';
+import Avatar from './Avatar';
+import {
+  DAY_NAMES_FULL, SLOT_LABELS, isSlotOverdue,
+  wasFedLate, formatFedTime, format, isSlotNow
+} from '@/lib/feedingUtils';
 
 type Props = {
   slot: FeedingSlotWithDetails | null;
@@ -18,7 +28,6 @@ export default function FeedingSlotModal({ slot, isOpen, onClose, onRefresh }: P
   const [view, setView] = useState<ModalView>('main');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [members, setMembers] = useState<Member[]>([]);
-
   const [pets, setPets] = useState<Pet[]>([]);
 
   useEffect(() => {
