@@ -11,7 +11,7 @@ import {
 import Avatar from './Avatar';
 import {
   DAY_NAMES_FULL, SLOT_LABELS, isSlotOverdue,
-  wasFedLate, formatFedTime, format, isSlotNow
+  wasFedLate, formatFedTime, isSlotNow
 } from '@/lib/feedingUtils';
 
 type Props = {
