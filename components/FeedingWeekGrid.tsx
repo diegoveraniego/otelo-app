@@ -23,7 +23,12 @@ export default function FeedingWeekGrid({ slots, weekStart, petId, onOpenModal }
 
   // Build lookup: "morning-0", "evening-3" → slot
   const slotMap = new Map<string, FeedingSlotWithDetails>();
-  slots.forEach((s) => slotMap.set(`${s.slot}-${s.day_of_week}`, s));
+  slots.forEach((s) => {
+    // Only map slots that belong to the current viewed week
+    if (s.week_start === weekStart) {
+      slotMap.set(`${s.slot}-${s.day_of_week}`, s);
+    }
+  });
 
   const getOrVirtual = (slotType: 'morning' | 'evening', dow: number): FeedingSlotWithDetails => {
     const existing = slotMap.get(`${slotType}-${dow}`);
