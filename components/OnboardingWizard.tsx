@@ -345,16 +345,7 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
               {isSubmitting ? 'Guardando...' : 'Finalizar configuración'}
               <Check className="w-5 h-5" />
             </button>
-          ) || (step === 3 && !hasPets && (
-             <button
-              onClick={handleFinish}
-              disabled={isSubmitting}
-              className="flex items-center gap-2 px-8 py-2 bg-[#26A269] text-white rounded-xl font-medium hover:bg-[#1E8254] transition-colors disabled:opacity-50"
-            >
-              {isSubmitting ? 'Guardando...' : 'Finalizar configuración'}
-              <Check className="w-5 h-5" />
-            </button>
-          ))}
+          )}
         </div>
       </div>
     </div>
