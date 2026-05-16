@@ -1,6 +1,7 @@
 'use server';
 
 import { supabase } from '@/lib/supabase/client';
+import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 

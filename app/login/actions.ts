@@ -32,6 +32,23 @@ export async function loginWithHomePassword(formData: FormData) {
       path: '/',
       sameSite: 'lax',
     });
+
+    // Backwards compatibility: find default home if it exists
+    const { data: homes } = await (await import('@/lib/supabase/client')).supabase
+      .from('homes')
+      .select('id')
+      .limit(2);
+    
+    if (homes && homes.length === 1) {
+      (await cookies()).set('home_id', homes[0].id, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 60 * 60 * 24 * 365, // 1 year
+        path: '/',
+        sameSite: 'lax',
+      });
+    }
+
     redirect('/');
   } else {
     return { error: 'Contraseña incorrecta' };
