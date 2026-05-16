@@ -50,68 +50,6 @@ export const feedingService = {
       fed_member: s.fed_by ? memberMap.get(s.fed_by) ?? null : null,
     }));
 
-    // 2. Integration with historical logs for "past fed" visibility
-    try {
-      const pets = await this.getPets();
-      const pet = pets.find(p => p.id === petId);
-      const chores = await choreService.getChores();
-      
-      let choreName: string | null = null;
-      if (pet?.name.toLowerCase().includes('otelo')) choreName = 'Dar comida y agua a Otelo';
-      else if (pet?.type === 'cat' || pet?.name.toLowerCase().includes('gato')) choreName = 'Dar comida y agua a Gatos';
-
-      const chore = chores.find(c => c.name === choreName);
-      
-      if (chore) {
-        const start = parseISO(weekStart);
-        const end = addDays(start, 7);
-        
-        const { data: logs } = await supabase
-          .from('logs')
-          .select('*')
-          .eq('chore_id', chore.id)
-          .gte('done_at', start.toISOString())
-          .lt('done_at', end.toISOString());
-
-        if (logs && logs.length > 0) {
-          logs.forEach(log => {
-            const logDate = parseISO(log.done_at);
-            const dayOfWeek = (logDate.getDay() + 6) % 7; // Convert to 0=Mon...6=Sun
-            const hour = getHours(logDate);
-            const slot: 'morning' | 'evening' = hour < 15 ? 'morning' : 'evening';
-
-            // Find if there's already a slot record for this day/slot
-            let existing = enriched.find(s => s.day_of_week === dayOfWeek && s.slot === slot);
-            
-            if (existing) {
-              if (!existing.fed_at) {
-                existing.fed_at = log.done_at;
-                existing.fed_by = log.member_id;
-                existing.fed_member = memberMap.get(log.member_id) ?? null;
-              }
-            } else {
-              // Create a "virtual" slot from the log
-              enriched.push({
-                id: `log-${log.id}`,
-                pet_id: petId,
-                week_start: weekStart,
-                day_of_week: dayOfWeek,
-                slot: slot,
-                assigned_to: null,
-                assigned_at: null,
-                fed_at: log.done_at,
-                fed_by: log.member_id,
-                fed_member: memberMap.get(log.member_id) ?? null,
-                assigned_member: null
-              });
-            }
-          });
-        }
-      }
-    } catch (logErr) {
-      console.error('Error enriching slots with logs:', logErr);
-    }
-
     return enriched.sort((a, b) => a.day_of_week - b.day_of_week || a.slot.localeCompare(b.slot));
   },
 

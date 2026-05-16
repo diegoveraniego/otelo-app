@@ -77,5 +77,6 @@ bunx next dev
 - [ ] Pasar la funcionalidad de coordinar horarios para otras tareas.
 - [ ] Añadir asistente de configuración para la primera database creada.
 - [ ] Clarificar el readme de configuración.
+- [ ] Photo evidence for chore completion (Supabase Storage, compress client-side before upload with browser-image-compression)
 
 

@@ -53,7 +53,7 @@ export default function PetsPage() {
       .finally(() => {
         if (pets.length === 0) setIsLoading(false);
       });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchData = useCallback(async () => {
@@ -83,7 +83,7 @@ export default function PetsPage() {
     };
   }, [slots, isCurrentWeek, todayDow]);
 
-  const overdueToday = useMemo(() => 
+  const overdueToday = useMemo(() =>
     [todayMorning, todayEvening].filter(
       (s): s is FeedingSlotWithDetails => !!s && !s.fed_at && isSlotOverdue(s)
     ), [todayMorning, todayEvening]
@@ -132,14 +132,13 @@ export default function PetsPage() {
               <button
                 key={pet.id}
                 onClick={() => {
-                   setSlots([]); // Clear slots to show loading state
-                   setSelectedPetId(pet.id);
+                  setSlots([]); // Clear slots to show loading state
+                  setSelectedPetId(pet.id);
                 }}
-                className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all border ${
-                  selectedPetId === pet.id
+                className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all border ${selectedPetId === pet.id
                     ? 'bg-[#3584E4] text-white border-[#3584E4] shadow-sm'
                     : 'bg-white dark:bg-[#303030] text-[#1E1E1E]/60 dark:text-white/60 border-[#E5E6E6] dark:border-[#3D3D3D] hover:border-[#3584E4]'
-                }`}
+                  }`}
               >
                 {pet.name}
               </button>

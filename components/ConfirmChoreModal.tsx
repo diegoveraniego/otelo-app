@@ -64,58 +64,6 @@ export default function ConfirmChoreModal({ chore, isOpen, onClose }: Props) {
     if (!error) {
       setSuccess(true);
 
-      // --- SYNC WITH PET FEEDING ---
-      if (chore.name.includes('Dar comida y agua')) {
-        try {
-          const pets = await feedingService.getPets();
-          let targetPet: Pet | undefined;
-          
-          if (chore.name.includes('Otelo')) {
-            targetPet = pets.find(p => p.name.toLowerCase().includes('otelo'));
-          } else if (chore.name.includes('Gatos')) {
-            targetPet = pets.find(p => p.type?.toLowerCase().includes('cat') || p.name.toLowerCase().includes('gato'));
-          }
-
-          if (targetPet) {
-            const weekStart = getWeekStart();
-            const dayOfWeek = getTodayDayOfWeek();
-            const currentSlot = getCurrentSlot();
-            
-            // If we are currently in a slot window, use it. 
-            // Otherwise, find the first slot today that is not fed.
-            let slotToUpdate: 'morning' | 'evening' | null = currentSlot;
-            
-            const todaySlots = await feedingService.getWeeklySlots(weekStart, targetPet.id);
-            const morning = todaySlots.find(s => s.day_of_week === dayOfWeek && s.slot === 'morning');
-            const evening = todaySlots.find(s => s.day_of_week === dayOfWeek && s.slot === 'evening');
-
-            if (!slotToUpdate) {
-              if (morning && !morning.fed_at) {
-                slotToUpdate = 'morning';
-              } else if (evening && !evening.fed_at) {
-                slotToUpdate = 'evening';
-              }
-            }
-
-            if (slotToUpdate) {
-              const existingSlot = slotToUpdate === 'morning' ? morning : evening;
-
-              await feedingService.markAsFed({
-                id: existingSlot?.id,
-                pet_id: targetPet.id,
-                week_start: weekStart,
-                day_of_week: dayOfWeek,
-                slot: slotToUpdate,
-                fed_by: currentUser.id
-              });
-            }
-          }
-        } catch (fedErr) {
-          console.error('Error syncing feeding slot:', fedErr);
-        }
-      }
-      // -----------------------------
-
       triggerPushNotification({
         title: '¡Nueva Tarea Completada! 🎉',
         body: `${currentUser.name} ha completado: ${chore.name} ${chore.emoji}`,
