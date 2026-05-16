@@ -62,6 +62,7 @@ export const feedingService = {
     day_of_week: number;
     slot: string;
     assigned_to: string;
+    home_id: string;
     id?: string;
   }) {
     // Clean payload: remove empty ID if virtual
@@ -91,6 +92,7 @@ export const feedingService = {
     day_of_week: number;
     slot: string;
     fed_by: string;
+    home_id: string;
   }) {
     // Only allow marking as fed for today
     const monday = new Date(payload.week_start + 'T00:00:00');
@@ -116,7 +118,8 @@ export const feedingService = {
           day_of_week: payload.day_of_week,
           slot: payload.slot,
           fed_at,
-          fed_by: payload.fed_by
+          fed_by: payload.fed_by,
+          home_id: payload.home_id
         }, { onConflict: 'pet_id,week_start,day_of_week,slot' });
     if (error) throw error;
     }
@@ -125,14 +128,15 @@ export const feedingService = {
   /**
    * Creates a trade request for a feeding slot
    */
-  async createTrade(slotId: string, fromId: string, toId: string) {
+  async createTrade(slotId: string, fromId: string, toId: string, homeId: string) {
     const { error } = await supabase
       .from('feeding_trades')
       .insert({
         slot_id: slotId,
         from_member_id: fromId,
         to_member_id: toId,
-        status: 'pending'
+        status: 'pending',
+        home_id: homeId
       });
     if (error) throw error;
   }

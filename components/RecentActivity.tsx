@@ -72,7 +72,7 @@ export default function RecentActivity() {
     setThankingId(log.id);
 
     try {
-      await choreService.giveThanks(log.id, currentUser.id, log.member_id);
+      await choreService.giveThanks(log.id, currentUser.id, log.member_id, currentUser.home_id);
       
       triggerPushNotification({
         title: '¡Alguien te ha agradecido! ❤️',

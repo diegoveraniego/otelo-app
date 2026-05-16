@@ -78,6 +78,7 @@ export default function FeedingSlotModal({ slot, isOpen, onClose, onRefresh }: P
       day_of_week: slot.day_of_week,
       slot: slot.slot,
       assigned_to: currentUser.id,
+      home_id: currentUser.home_id,
       id: slot.id
     });
   }, 'success');
@@ -90,7 +91,8 @@ export default function FeedingSlotModal({ slot, isOpen, onClose, onRefresh }: P
       week_start: slot.week_start,
       day_of_week: slot.day_of_week,
       slot: slot.slot,
-      fed_by: currentUser.id
+      fed_by: currentUser.id,
+      home_id: currentUser.home_id
     });
     // Also log the chore (fire-and-forget)
     logChoreInBackground().catch(console.error);
@@ -105,14 +107,14 @@ export default function FeedingSlotModal({ slot, isOpen, onClose, onRefresh }: P
     const chores = await choreService.getChores();
     const chore = chores.find(c => c.name === choreName);
     if (chore) {
-      await choreService.completeChore(chore.id, currentUser.id);
+      await choreService.completeChore(chore.id, currentUser.id, currentUser.home_id);
       window.dispatchEvent(new CustomEvent('chore-logged'));
     }
   };
 
   const handleRequestTrade = (toMember: Member) => wrapAction(async () => {
     if (!currentUser || !slot.id) throw new Error('No se puede pedir trueque para un turno no guardado');
-    await feedingService.createTrade(slot.id, currentUser.id, toMember.id);
+    await feedingService.createTrade(slot.id, currentUser.id, toMember.id, currentUser.home_id);
     
     triggerPushNotification({
       title: 'Solicitud de trueque 🔄',
@@ -132,6 +134,7 @@ export default function FeedingSlotModal({ slot, isOpen, onClose, onRefresh }: P
       day_of_week: slot.day_of_week,
       slot: slot.slot,
       assigned_to: null as any,
+      home_id: currentUser.home_id,
       id: slot.id
     });
     onClose();

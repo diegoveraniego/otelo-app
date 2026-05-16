@@ -57,6 +57,7 @@ export default function ConfirmChoreModal({ chore, isOpen, onClose }: Props) {
     const { error } = await supabase.from('logs').insert({
       member_id: currentUser.id,
       chore_id: chore.id,
+      home_id: currentUser.home_id,
     });
 
     setIsSubmitting(false);

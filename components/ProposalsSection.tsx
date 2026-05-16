@@ -103,7 +103,7 @@ export default function ProposalsSection() {
     }
     
     try {
-      await proposalService.toggleVote(proposalId, currentUser.id);
+      await proposalService.toggleVote(proposalId, currentUser.id, currentUser.home_id);
       
       // Refresh to check for approval
       fetchData();
@@ -313,5 +313,8 @@ export default function ProposalsSection() {
         })}
       </div>
     </div>
+  );
+}
+   </div>
   );
 }

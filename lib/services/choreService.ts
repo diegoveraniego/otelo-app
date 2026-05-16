@@ -57,10 +57,11 @@ export const choreService = {
   /**
    * Records a chore as completed
    */
-  async completeChore(choreId: string, memberId: string) {
+  async completeChore(choreId: string, memberId: string, homeId: string) {
     const { error } = await supabase.from('logs').insert({
       chore_id: choreId,
       member_id: memberId,
+      home_id: homeId,
       done_at: new Date().toISOString()
     });
     if (error) throw error;
@@ -90,11 +91,12 @@ export const choreService = {
   /**
    * Gives thanks for a chore completion
    */
-  async giveThanks(logId: string, fromMemberId: string, toMemberId: string) {
+  async giveThanks(logId: string, fromMemberId: string, toMemberId: string, homeId: string) {
     const { error } = await supabase.from('thanks').insert({
       log_id: logId,
       from_member_id: fromMemberId,
       to_member_id: toMemberId,
+      home_id: homeId,
     });
     if (error) throw error;
   }

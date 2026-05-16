@@ -38,7 +38,7 @@ export const proposalService = {
   /**
    * Toggles a vote on a proposal (adds if missing, removes if exists)
    */
-  async toggleVote(proposalId: string, memberId: string) {
+  async toggleVote(proposalId: string, memberId: string, homeId: string) {
     const { data: existing } = await supabase
       .from('proposal_votes')
       .select('id')
@@ -53,7 +53,8 @@ export const proposalService = {
     } else {
       const { error } = await supabase.from('proposal_votes').insert({
         proposal_id: proposalId,
-        member_id: memberId
+        member_id: memberId,
+        home_id: homeId
       });
       if (error) throw error;
       return true;
@@ -61,26 +62,15 @@ export const proposalService = {
   },
 
   /**
-   * Approves a proposal: marks as approved and creates a corresponding chore.
+   * Approves a proposal: marks as approved. 
+   * A DB trigger (013_proposal_trigger) handles the automatic chore creation.
    */
-  async approveProposal(proposal: Proposal) {
-    // 1. Mark as approved
-    const { error: updateError } = await supabase
+  async approveProposal(proposalId: string) {
+    const { error } = await supabase
       .from('proposals')
       .update({ status: 'approved' })
-      .eq('id', proposal.id);
-    if (updateError) throw updateError;
-
-    // 2. Create the chore
-    const { error: choreError } = await supabase
-      .from('chores')
-      .insert({
-        name: proposal.name,
-        emoji: proposal.emoji,
-        category: proposal.category,
-        threshold_days: proposal.threshold_days
-      });
-    if (choreError) throw choreError;
+      .eq('id', proposalId);
+    if (error) throw error;
   },
 
   /**
@@ -97,7 +87,7 @@ export const proposalService = {
   /**
    * Creates a new proposal
    */
-  async createProposal(payload: Partial<Proposal>) {
+  async createProposal(payload: Partial<Proposal> & { home_id: string }) {
     const { data, error } = await supabase
       .from('proposals')
       .insert({
