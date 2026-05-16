@@ -315,6 +315,3 @@ export default function ProposalsSection() {
     </div>
   );
 }
-   </div>
-  );
-}
