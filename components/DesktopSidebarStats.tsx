@@ -6,6 +6,7 @@ import { Member } from '@/lib/types';
 import { startOfWeek, endOfWeek } from 'date-fns';
 import { Heart } from 'lucide-react';
 import Avatar from './Avatar';
+import { useUserStore } from '@/lib/store';
 
 type MemberStat = {
   member: Member;
@@ -14,42 +15,59 @@ type MemberStat = {
 };
 
 export default function DesktopSidebarStats() {
+  const { currentUser } = useUserStore();
   const [stats, setStats] = useState<MemberStat[]>([]);
 
   const fetchStats = useCallback(async () => {
-    const { data: members } = await supabase.from('members').select('*');
+    if (!currentUser?.home_id) return;
+
+    const { data: members } = await supabase
+      .from('members')
+      .select('*')
+      .eq('home_id', currentUser.home_id);
+      
     if (!members) return;
 
     const start = startOfWeek(new Date(), { weekStartsOn: 1 }).toISOString();
     const end = endOfWeek(new Date(), { weekStartsOn: 1 }).toISOString();
 
     const [{ data: logs }, { data: thanks }] = await Promise.all([
-      supabase.from('logs').select('member_id').gte('done_at', start).lte('done_at', end),
-      supabase.from('thanks').select('to_member_id').gte('created_at', start).lte('created_at', end),
+      supabase.from('logs')
+        .select('member_id')
+        .eq('home_id', currentUser.home_id)
+        .gte('done_at', start)
+        .lte('done_at', end),
+      supabase.from('thanks')
+        .select('to_member_id')
+        .eq('home_id', currentUser.home_id)
+        .gte('created_at', start)
+        .lte('created_at', end),
     ]);
 
-    const result: MemberStat[] = members
-      .map((m: Member) => ({
-        member: m,
+    const result: MemberStat[] = (members as any[])
+      .map((m: any) => ({
+        member: m as Member,
         tasks: logs?.filter((l) => l.member_id === m.id).length ?? 0,
         thanks: thanks?.filter((t) => t.to_member_id === m.id).length ?? 0,
       }))
       .sort((a, b) => b.tasks - a.tasks || b.thanks - a.thanks);
 
     setStats(result);
-  }, []);
+  }, [currentUser?.home_id]);
 
   useEffect(() => {
-    fetchStats();
+    if (currentUser?.home_id) {
+      fetchStats();
 
-    const handler = () => fetchStats();
-    window.addEventListener('chore-logged', handler);
-    window.addEventListener('thanks-updated', handler);
-    return () => {
-      window.removeEventListener('chore-logged', handler);
-      window.removeEventListener('thanks-updated', handler);
-    };
-  }, [fetchStats]);
+      const handler = () => fetchStats();
+      window.addEventListener('chore-logged', handler);
+      window.addEventListener('thanks-updated', handler);
+      return () => {
+        window.removeEventListener('chore-logged', handler);
+        window.removeEventListener('thanks-updated', handler);
+      };
+    }
+  }, [fetchStats, currentUser?.home_id]);
 
   if (stats.length === 0) return null;
 
