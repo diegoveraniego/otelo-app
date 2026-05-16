@@ -8,7 +8,7 @@ const memberSchema = z.object({
   name: z.string().min(1, 'Requerido'),
   color: z.string().regex(/^#[0-9A-F]{6}$/i, 'Color inválido'),
   pin: z.string().length(4, '4 dígitos'),
-  role: z.enum(['admin', 'member'])
+  role: z.enum(['admin', 'member', 'organizator'])
 });
 
 type Member = z.infer<typeof memberSchema>;
@@ -23,7 +23,7 @@ const COLORS = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'
 
 export default function MembersStep({ data, onNext, onBack }: Props) {
   const [members, setMembers] = useState<Member[]>(data.length > 0 ? data : [
-    { name: '', color: COLORS[0], pin: '1234', role: 'admin' }
+    { name: '', color: COLORS[0], pin: '1234', role: 'organizator' }
   ]);
   const [errors, setErrors] = useState<Record<number, any>>({});
 
