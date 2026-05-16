@@ -22,7 +22,7 @@ export default function HomeStep({ data, onNext }: Props) {
       onNext({ homeName });
     } catch (e) {
       if (e instanceof z.ZodError) {
-        setError(e.errors[0].message);
+        setError(e.issues[0].message);
       }
     }
   };
