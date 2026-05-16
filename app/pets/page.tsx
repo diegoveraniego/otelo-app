@@ -13,7 +13,8 @@ import { CalendarDays, AlertCircle, ChevronLeft, ChevronRight, PawPrint } from '
 import { addWeeks, format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
-const MAX_WEEKS_AHEAD = 4;
+const MAX_WEEKS_AHEAD = 8;
+const MAX_WEEKS_BACK = 12;
 
 function getOffsetWeekStart(offset: number): string {
   const base = addWeeks(new Date(), offset);
@@ -210,9 +211,9 @@ export default function PetsPage() {
             <button
               onClick={() => {
                 setSlots([]);
-                setWeekOffset((w) => Math.max(0, w - 1));
+                setWeekOffset((w) => Math.max(-MAX_WEEKS_BACK, w - 1));
               }}
-              disabled={weekOffset === 0}
+              disabled={weekOffset <= -MAX_WEEKS_BACK}
               className="p-1.5 rounded-lg text-[#1E1E1E]/50 dark:text-white/50 hover:bg-[#E5E6E6] dark:hover:bg-[#3D3D3D] disabled:opacity-20 transition-colors"
               aria-label="Semana anterior"
             >
