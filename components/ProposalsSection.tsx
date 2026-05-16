@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { proposalService } from '@/lib/services/proposalService';
 import { choreService } from '@/lib/services/choreService';
-import { supabase } from '@/lib/supabase/client'; // Still needed for member count or can move to service
+import { supabase } from '@/lib/supabase/client';
 import { Proposal, Member, Chore } from '@/lib/types';
 import { useUserStore } from '@/lib/store';
 import { Plus, MessageSquare, ThumbsUp, Clock, Tag, Smile, X } from 'lucide-react';
@@ -39,12 +39,15 @@ export default function ProposalsSection() {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
   const fetchData = useCallback(async () => {
+    const homeId = currentUser?.home_id;
+    if (!homeId) return;
+    
     setIsLoading(true);
     try {
       // 1. Parallel fetch for base data
       const [allMembers, choreData] = await Promise.all([
-        feedingService.getMembers(),
-        choreService.getChores()
+        feedingService.getMembers(homeId),
+        choreService.getChores(homeId)
       ]);
       
       setMembersCount(allMembers.length);
@@ -54,7 +57,7 @@ export default function ProposalsSection() {
       }
 
       // 2. Fetch active proposals and their votes
-      const props = await proposalService.getActiveProposals();
+      const props = await proposalService.getActiveProposals(homeId);
       const allVotes = await proposalService.getVotes(props.map(p => p.id));
       
       // 3. Auto-process: Check for approvals or expirations
@@ -65,7 +68,7 @@ export default function ProposalsSection() {
         const isExpired = isBefore(deadline, new Date());
 
         if (propVotes.length >= allMembers.length) {
-          await proposalService.approveProposal(prop);
+          await proposalService.approveProposal(prop.id);
           needsRefresh = true;
         } else if (isExpired) {
           await proposalService.rejectProposal(prop.id);
@@ -75,7 +78,7 @@ export default function ProposalsSection() {
 
       // 4. Final state update
       if (needsRefresh) {
-        const updatedProps = await proposalService.getActiveProposals();
+        const updatedProps = await proposalService.getActiveProposals(homeId);
         const updatedVotes = await proposalService.getVotes(updatedProps.map(p => p.id));
         setProposals(updatedProps);
         setVotes(updatedVotes);
@@ -88,7 +91,7 @@ export default function ProposalsSection() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [currentUser?.home_id]);
 
   useEffect(() => {
     fetchData();
@@ -104,8 +107,6 @@ export default function ProposalsSection() {
     
     try {
       await proposalService.toggleVote(proposalId, currentUser.id, currentUser.home_id);
-      
-      // Refresh to check for approval
       fetchData();
     } catch (err) {
       console.error('Error voting:', err);
@@ -137,7 +138,8 @@ export default function ProposalsSection() {
         emoji,
         category: finalCategory,
         threshold_days: parseInt(threshold),
-        created_by: currentUser.id
+        created_by: currentUser.id,
+        home_id: currentUser.home_id
       });
       
       setFormData({ name: '', emoji: '', category: '', newCategory: '', threshold: '3' });

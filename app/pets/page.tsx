@@ -42,9 +42,13 @@ export default function PetsPage() {
   const viewedWeekStart = getOffsetWeekStart(weekOffset);
   const isCurrentWeek = weekOffset === 0;
 
+  const { currentUser } = useUserStore();
+
   // Cache pets on mount
   useEffect(() => {
-    feedingService.getPets().then(data => {
+    if (!currentUser?.home_id) return;
+    
+    feedingService.getPets(currentUser.home_id).then(data => {
       if (data && data.length > 0) {
         setPets(data);
         if (!selectedPetId) setSelectedPetId(data[0].id);
@@ -54,7 +58,7 @@ export default function PetsPage() {
         if (pets.length === 0) setIsLoading(false);
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [currentUser?.home_id]);
 
   const fetchData = useCallback(async () => {
     if (!selectedPetId) return;

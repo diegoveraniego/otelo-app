@@ -18,9 +18,10 @@ export default function ChoreGrid() {
   const fetchData = useCallback(async () => {
     setIsLoading(true);
     try {
+      const homeId = currentUser?.home_id;
       const [choresData, latestLogs] = await Promise.all([
-        choreService.getChores(),
-        choreService.getLatestLogs()
+        choreService.getChores(homeId),
+        choreService.getLatestLogs(homeId)
       ]);
       setChores(choresData);
       setLastDoneMap(latestLogs);
@@ -29,7 +30,7 @@ export default function ChoreGrid() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [currentUser?.home_id]);
 
   useEffect(() => {
     fetchData();

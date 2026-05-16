@@ -5,11 +5,8 @@ import { supabase } from '@/lib/supabase/client';
 import { Chore } from '@/lib/types';
 import { useUserStore } from '@/lib/store';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
-import { subHours } from 'date-fns';
 import { triggerPushNotification } from '@/lib/pushUtils';
-import { feedingService } from '@/lib/services/feedingService';
-import { getWeekStart, getTodayDayOfWeek, getCurrentSlot } from '@/lib/feedingUtils';
-import { Pet } from '@/lib/types';
+import { choreService } from '@/lib/services/choreService';
 
 type Props = {
   chore: Chore | null;
@@ -20,24 +17,31 @@ type Props = {
 export default function ConfirmChoreModal({ chore, isOpen, onClose }: Props) {
   const { currentUser } = useUserStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showDuplicateWarning, setShowDuplicateWarning] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [showDuplicateWarning, setShowDuplicateWarning] = useState(false);
 
   useEffect(() => {
     if (isOpen && chore && currentUser) {
-      checkDuplicate();
-    } else {
-      setShowDuplicateWarning(false);
       setSuccess(false);
+      setShowDuplicateWarning(false);
+      checkDuplicate();
     }
-  }, [isOpen, chore, currentUser]);
+  }, [isOpen, chore?.id]);
+
+  useEffect(() => {
+    if (success) {
+      const timer = setTimeout(() => {
+        onClose();
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [success, onClose]);
 
   const checkDuplicate = async () => {
     if (!chore || !currentUser) return;
+    const oneHourAgo = new Date(Date.now() - 3600000).toISOString();
     
-    const oneHourAgo = subHours(new Date(), 1).toISOString();
-    
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('logs')
       .select('id')
       .eq('member_id', currentUser.id)
@@ -52,17 +56,17 @@ export default function ConfirmChoreModal({ chore, isOpen, onClose }: Props) {
 
   const handleConfirm = async () => {
     if (!chore || !currentUser) return;
+    
+    if (!currentUser.home_id) {
+      alert('Error de sesión: No se encontró el identificador del hogar. Por favor, vuelve a seleccionar tu usuario.');
+      window.dispatchEvent(new CustomEvent('open-user-modal'));
+      return;
+    }
+
     setIsSubmitting(true);
     
-    const { error } = await supabase.from('logs').insert({
-      member_id: currentUser.id,
-      chore_id: chore.id,
-      home_id: currentUser.home_id,
-    });
-
-    setIsSubmitting(false);
-    
-    if (!error) {
+    try {
+      await choreService.completeChore(chore.id, currentUser.id, currentUser.home_id);
       setSuccess(true);
 
       triggerPushNotification({
@@ -71,11 +75,14 @@ export default function ConfirmChoreModal({ chore, isOpen, onClose }: Props) {
         sourceMemberId: currentUser.id,
         eventType: 'chore'
       });
-      setTimeout(() => {
-        onClose();
-        // Trigger a refresh event for recent activity/stats
-        window.dispatchEvent(new CustomEvent('chore-logged'));
-      }, 1500);
+
+      // Dispatch event for other components to refresh
+      window.dispatchEvent(new CustomEvent('chore-logged'));
+    } catch (err: any) {
+      console.error('Error logging chore:', err);
+      alert('Error al guardar la tarea: ' + (err.message || 'Desconocido'));
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -93,33 +100,36 @@ export default function ConfirmChoreModal({ chore, isOpen, onClose }: Props) {
           </div>
         ) : (
           <div className="p-6">
-            <div className="text-center mb-6">
-              <div className="text-6xl mb-4">{chore.emoji}</div>
-              <h2 className="text-2xl font-bold text-[#1E1E1E] dark:text-white">¿Hiciste esto?</h2>
-              <p className="text-[#1E1E1E]/70 dark:text-white/70 mt-1 text-lg">{chore.name}</p>
+            <div className="flex flex-col items-center text-center gap-4">
+              <div className="text-5xl bg-[#FAFAFA] dark:bg-[#2A2A2A] w-20 h-20 rounded-2xl flex items-center justify-center border border-[#E5E6E6] dark:border-[#3D3D3D]">
+                {chore.emoji}
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-[#1E1E1E] dark:text-white">{chore.name}</h3>
+                <p className="text-sm text-[#1E1E1E]/50 dark:text-white/50">¿Confirmas que terminaste esta tarea?</p>
+              </div>
             </div>
 
             {showDuplicateWarning && (
-              <div className="bg-orange-50 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-800/50 text-orange-800 dark:text-orange-200 p-4 rounded-xl flex gap-3 mb-6 items-start">
-                <AlertCircle className="w-5 h-5 shrink-0 mt-0.5 text-orange-500 dark:text-orange-400" />
-                <p className="text-sm font-medium">
-                  Ya registraste esta tarea hace menos de una hora. ¿Es un nuevo registro? Puedes anotarla otra vez sin problema.
+              <div className="mt-6 flex items-start gap-3 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40 rounded-xl">
+                <AlertCircle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+                <p className="text-xs text-amber-700 dark:text-amber-400">
+                  Ya registraste esta tarea hace menos de una hora.
                 </p>
               </div>
             )}
 
-            <div className="flex gap-3">
+            <div className="grid grid-cols-2 gap-3 mt-8">
               <button
                 onClick={onClose}
-                disabled={isSubmitting}
-                className="flex-1 px-4 py-3 text-[#1E1E1E] dark:text-white font-medium bg-[#E5E6E6] dark:bg-[#3D3D3D] hover:bg-[#D4D4D4] dark:hover:bg-[#474747] rounded-lg transition-colors disabled:opacity-50"
+                className="px-4 py-3 bg-[#E5E6E6] dark:bg-[#3D3D3D] text-[#1E1E1E] dark:text-white font-bold rounded-xl hover:bg-[#D4D4D4] dark:hover:bg-[#474747] transition-all"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleConfirm}
                 disabled={isSubmitting}
-                className="flex-1 px-4 py-3 text-white font-medium bg-[#3584E4] hover:bg-[#1C71D8] rounded-lg transition-colors shadow-sm disabled:opacity-50"
+                className="px-4 py-3 bg-[#3584E4] hover:bg-[#1C71D8] text-white font-bold rounded-xl transition-all shadow-sm active:scale-95 disabled:opacity-50"
               >
                 {isSubmitting ? 'Guardando...' : showDuplicateWarning ? 'Registrar de nuevo' : 'Sí, lo hice'}
               </button>

@@ -43,6 +43,18 @@ export default function UserSelectModal() {
     const { data } = await supabase.from('members').select('*').order('name');
     if (data) {
       setMembers(data);
+      
+      // SYNC: Update currentUser if they exist in the fresh list
+      if (currentUser) {
+        const freshUser = data.find(m => m.id === currentUser.id);
+        if (freshUser) {
+          // Only update if something changed (like home_id being added)
+          if (JSON.stringify(freshUser) !== JSON.stringify(currentUser)) {
+            setCurrentUser(freshUser as Member);
+          }
+        }
+      }
+
       if (data.length === 0) {
         setShowOnboarding(true);
       } else {

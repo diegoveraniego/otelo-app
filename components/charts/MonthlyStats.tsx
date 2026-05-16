@@ -10,6 +10,7 @@ import ChartTooltip from './ChartTooltip';
 import ThanksRankingCard, { ThanksRankingEntry } from './ThanksRankingCard';
 import { useTheme } from 'next-themes';
 import { Flame } from 'lucide-react';
+import { useUserStore } from '@/lib/store';
 
 function calcStreak(doneDates: string[]): number {
   if (doneDates.length === 0) return 0;
@@ -27,6 +28,7 @@ function calcStreak(doneDates: string[]): number {
 }
 
 export default function MonthlyStats({ currentDate }: { currentDate: Date }) {
+  const { currentUser } = useUserStore();
   const [choreData, setChoreData] = useState<any[]>([]);
   const [heatmapData, setHeatmapData] = useState<any[]>([]);
   const [lineData, setLineData] = useState<any[]>([]);
@@ -37,23 +39,28 @@ export default function MonthlyStats({ currentDate }: { currentDate: Date }) {
   const isDark = resolvedTheme === 'dark';
 
   useEffect(() => {
-    fetchStats();
+    if (currentUser?.home_id) {
+      fetchStats();
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentDate]);
+  }, [currentDate, currentUser?.home_id]);
 
   const fetchStats = async () => {
+    if (!currentUser?.home_id) return;
+    
+    const homeId = currentUser.home_id;
     const start = startOfMonth(currentDate);
     const end = endOfMonth(currentDate);
 
-    const { data: mData } = await supabase.from('members').select('*');
-    const { data: cData } = await supabase.from('chores').select('*');
+    const { data: mData } = await supabase.from('members').select('*').eq('home_id', homeId);
+    const { data: cData } = await supabase.from('chores').select('*').eq('home_id', homeId);
     if (!mData || !cData) return;
-    setMembers(mData);
+    setMembers(mData as Member[]);
 
     const [{ data: logs }, { data: thanks }, { data: allLogs }] = await Promise.all([
-      supabase.from('logs').select('*').gte('done_at', start.toISOString()).lte('done_at', end.toISOString()),
-      supabase.from('thanks').select('to_member_id').gte('created_at', start.toISOString()).lte('created_at', end.toISOString()),
-      supabase.from('logs').select('done_at,member_id').gte('done_at', subDays(new Date(), 60).toISOString()),
+      supabase.from('logs').select('*').eq('home_id', homeId).gte('done_at', start.toISOString()).lte('done_at', end.toISOString()),
+      supabase.from('thanks').select('to_member_id').eq('home_id', homeId).gte('created_at', start.toISOString()).lte('created_at', end.toISOString()),
+      supabase.from('logs').select('done_at,member_id').eq('home_id', homeId).gte('done_at', subDays(new Date(), 60).toISOString()),
     ]);
 
     if (allLogs) {
@@ -66,8 +73,8 @@ export default function MonthlyStats({ currentDate }: { currentDate: Date }) {
     }
 
     setThanksRanking(
-      mData.map((m: Member) => ({
-        member: m,
+      mData.map((m: any) => ({
+        member: m as Member,
         count: thanks?.filter(t => t.to_member_id === m.id).length ?? 0,
       }))
     );

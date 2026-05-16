@@ -10,6 +10,7 @@ import ChartTooltip from './ChartTooltip';
 import ThanksRankingCard, { ThanksRankingEntry } from './ThanksRankingCard';
 import { useTheme } from 'next-themes';
 import Avatar from '@/components/Avatar';
+import { useUserStore } from '@/lib/store';
 
 type StatsData = {
   name: string;
@@ -20,25 +21,42 @@ type StatsData = {
 };
 
 export default function WeeklyStats() {
+  const { currentUser } = useUserStore();
   const [data, setData] = useState<StatsData[]>([]);
   const [thanksRanking, setThanksRanking] = useState<ThanksRankingEntry[]>([]);
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
 
   useEffect(() => {
-    fetchStats();
-  }, []);
+    if (currentUser?.home_id) {
+      fetchStats();
+    }
+  }, [currentUser?.home_id]);
 
   const fetchStats = async () => {
+    if (!currentUser?.home_id) return;
+    
     const start = startOfWeek(new Date(), { weekStartsOn: 1 }).toISOString();
     const end = endOfWeek(new Date(), { weekStartsOn: 1 }).toISOString();
 
-    const { data: members } = await supabase.from('members').select('*');
+    const { data: members } = await supabase
+      .from('members')
+      .select('*')
+      .eq('home_id', currentUser.home_id);
+    
     if (!members) return;
 
     const [{ data: logs }, { data: thanks }] = await Promise.all([
-      supabase.from('logs').select('member_id').gte('done_at', start).lte('done_at', end),
-      supabase.from('thanks').select('to_member_id').gte('created_at', start).lte('created_at', end),
+      supabase.from('logs')
+        .select('member_id')
+        .eq('home_id', currentUser.home_id)
+        .gte('done_at', start)
+        .lte('done_at', end),
+      supabase.from('thanks')
+        .select('to_member_id')
+        .eq('home_id', currentUser.home_id)
+        .gte('created_at', start)
+        .lte('created_at', end),
     ]);
 
     if (logs) {

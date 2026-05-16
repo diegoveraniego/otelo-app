@@ -7,18 +7,20 @@ import { Chore, LogWithDetails, Member } from '../types';
  */
 export const choreService = {
   /**
-   * Fetches the full list of chores
+   * Fetches the full list of chores for a specific home
    */
-  async getChores() {
-    const { data, error } = await supabase.from('chores').select('*').order('name');
+  async getChores(homeId?: string) {
+    let query = supabase.from('chores').select('*').order('name');
+    if (homeId) query = query.eq('home_id', homeId);
+    const { data, error } = await query;
     if (error) throw error;
     return data as Chore[];
   },
 
   /**
-   * Fetches recent logs with member and chore information
+   * Fetches recent logs with member and chore information for a specific home
    */
-  async getRecentLogs(limit = 30) {
+  async getRecentLogs(homeId: string, limit = 30) {
     const { data, error } = await supabase
       .from('logs')
       .select(`
@@ -26,6 +28,7 @@ export const choreService = {
         member:members(*),
         chore:chores(*)
       `)
+      .eq('home_id', homeId)
       .order('done_at', { ascending: false })
       .limit(limit);
 
@@ -34,13 +37,13 @@ export const choreService = {
   },
 
   /**
-   * Fetches the latest log for each chore to calculate "last done" status
+   * Fetches the latest log for each chore to calculate "last done" status for a specific home
    */
-  async getLatestLogs() {
-    const { data, error } = await supabase
-      .from('logs')
-      .select('chore_id, done_at')
-      .order('done_at', { ascending: false });
+  async getLatestLogs(homeId?: string) {
+    let query = supabase.from('logs').select('chore_id, done_at');
+    if (homeId) query = query.eq('home_id', homeId);
+    
+    const { data, error } = await query.order('done_at', { ascending: false });
 
     if (error) throw error;
 
@@ -78,12 +81,16 @@ export const choreService = {
   /**
    * Fetches thanks given by a specific member for a list of logs
    */
-  async getMyThanks(memberId: string, logIds: string[]) {
-    const { data, error } = await supabase
+  async getMyThanks(memberId: string, logIds: string[], homeId?: string) {
+    let query = supabase
       .from('thanks')
       .select('log_id')
       .eq('from_member_id', memberId)
       .in('log_id', logIds);
+      
+    if (homeId) query = query.eq('home_id', homeId);
+    
+    const { data, error } = await query;
     if (error) throw error;
     return (data ?? []).map(t => t.log_id);
   },

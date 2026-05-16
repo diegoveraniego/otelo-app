@@ -20,14 +20,15 @@ export default function RecentActivity() {
   const { currentUser } = useUserStore();
 
   const fetchLogs = useCallback(async (reset = false) => {
+    if (!currentUser?.home_id) return;
     setIsLoading(true);
     try {
-      const data = await choreService.getRecentLogs(PAGE_SIZE);
+      const data = await choreService.getRecentLogs(currentUser.home_id, PAGE_SIZE);
       setLogs(data);
 
-      if (currentUser && data.length > 0) {
+      if (data.length > 0) {
         const logIds = data.map((l) => l.id);
-        const thankedIds = await choreService.getMyThanks(currentUser.id, logIds);
+        const thankedIds = await choreService.getMyThanks(currentUser.id, logIds, currentUser.home_id);
         setMyThanks(thankedIds);
       }
     } catch (err) {

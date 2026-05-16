@@ -6,8 +6,10 @@ import { startOfWeek, endOfWeek, subWeeks, isSunday, isMonday, format } from 'da
 import { Trophy, Star, TrendingUp } from 'lucide-react';
 import { Member } from '@/lib/types';
 import Avatar from './Avatar';
+import { useUserStore } from '@/lib/store';
 
 export default function WeeklySummaryBanner() {
+  const { currentUser } = useUserStore();
   const [summary, setSummary] = useState<{
     topMember: Member | null;
     totalChores: number;
@@ -18,12 +20,14 @@ export default function WeeklySummaryBanner() {
   const shouldShow = isSunday(today) || isMonday(today);
 
   useEffect(() => {
-    if (shouldShow) {
+    if (shouldShow && currentUser?.home_id) {
       fetchWeeklySummary();
     }
-  }, [shouldShow]);
+  }, [shouldShow, currentUser?.home_id]);
 
   const fetchWeeklySummary = async () => {
+    if (!currentUser?.home_id) return;
+    
     // Last week range
     const lastWeek = subWeeks(new Date(), 1);
     const start = startOfWeek(lastWeek, { weekStartsOn: 1 }).toISOString();
@@ -32,11 +36,16 @@ export default function WeeklySummaryBanner() {
     const { data: logs } = await supabase
       .from('logs')
       .select('member_id')
+      .eq('home_id', currentUser.home_id)
       .gte('done_at', start)
       .lte('done_at', end);
 
     if (logs && logs.length > 0) {
-      const { data: members } = await supabase.from('members').select('*');
+      const { data: members } = await supabase
+        .from('members')
+        .select('*')
+        .eq('home_id', currentUser.home_id);
+        
       if (!members) return;
 
       const counts: Record<string, number> = {};

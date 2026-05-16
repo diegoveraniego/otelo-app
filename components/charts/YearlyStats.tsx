@@ -9,8 +9,10 @@ import ChartTooltip from './ChartTooltip';
 import ThanksRankingCard, { ThanksRankingEntry } from './ThanksRankingCard';
 import { useTheme } from 'next-themes';
 import Avatar from '@/components/Avatar';
+import { useUserStore } from '@/lib/store';
 
 export default function YearlyStats() {
+  const { currentUser } = useUserStore();
   const [data, setData] = useState<any[]>([]);
   const [topChores, setTopChores] = useState<any[]>([]);
   const [thanksRanking, setThanksRanking] = useState<ThanksRankingEntry[]>([]);
@@ -18,33 +20,38 @@ export default function YearlyStats() {
   const isDark = resolvedTheme === 'dark';
 
   useEffect(() => {
-    fetchStats();
-  }, []);
+    if (currentUser?.home_id) {
+      fetchStats();
+    }
+  }, [currentUser?.home_id]);
 
   const fetchStats = async () => {
+    if (!currentUser?.home_id) return;
+    
+    const homeId = currentUser.home_id;
     const start = startOfYear(new Date()).toISOString();
     const end = endOfYear(new Date()).toISOString();
 
-    const { data: members } = await supabase.from('members').select('*');
-    const { data: chores } = await supabase.from('chores').select('*');
+    const { data: members } = await supabase.from('members').select('*').eq('home_id', homeId);
+    const { data: chores } = await supabase.from('chores').select('*').eq('home_id', homeId);
     if (!members || !chores) return;
 
     const [{ data: logs }, { data: thanks }] = await Promise.all([
-      supabase.from('logs').select('*').gte('done_at', start).lte('done_at', end),
-      supabase.from('thanks').select('to_member_id').gte('created_at', start).lte('created_at', end),
+      supabase.from('logs').select('*').eq('home_id', homeId).gte('done_at', start).lte('done_at', end),
+      supabase.from('thanks').select('to_member_id').eq('home_id', homeId).gte('created_at', start).lte('created_at', end),
     ]);
 
     // Build thanks ranking
     setThanksRanking(
-      members.map((m: Member) => ({
-        member: m,
+      members.map((m: any) => ({
+        member: m as Member,
         count: thanks?.filter(t => t.to_member_id === m.id).length ?? 0,
       }))
     );
 
     if (logs) {
       // Total per person
-      const stats = members.map((m: Member) => ({
+      const stats = members.map((m: any) => ({
         name: m.name,
         color: m.color,
         total: logs.filter(l => l.member_id === m.id).length
@@ -52,9 +59,9 @@ export default function YearlyStats() {
       setData(stats);
 
       // Most done chore per person
-      const tops = members.map((m: Member) => {
+      const tops = members.map((m: any) => {
         const mLogs = logs.filter(l => l.member_id === m.id);
-        if (mLogs.length === 0) return { member: m, chore: null, count: 0 };
+        if (mLogs.length === 0) return { member: m as Member, chore: null, count: 0 };
         
         const counts: Record<string, number> = {};
         mLogs.forEach(l => {
@@ -62,9 +69,9 @@ export default function YearlyStats() {
         });
         
         const topChoreId = Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
-        const chore = chores.find((c: Chore) => c.id === topChoreId);
+        const chore = chores.find((c: any) => c.id === topChoreId);
         
-        return { member: m, chore, count: counts[topChoreId] };
+        return { member: m as Member, chore, count: counts[topChoreId] };
       }).filter(t => t.chore !== null);
       
       setTopChores(tops);

@@ -9,19 +9,23 @@ import { choreService } from './choreService';
  */
 export const feedingService = {
   /**
-   * Fetches all members and caches them if needed (future optimization)
+   * Fetches all members for a specific home
    */
-  async getMembers() {
-    const { data, error } = await supabase.from('members').select('*').order('name');
+  async getMembers(homeId?: string) {
+    let query = supabase.from('members').select('*').order('name');
+    if (homeId) query = query.eq('home_id', homeId);
+    const { data, error } = await query;
     if (error) throw error;
     return data as Member[];
   },
 
   /**
-   * Fetches all pets
+   * Fetches all pets for a specific home
    */
-  async getPets() {
-    const { data, error } = await supabase.from('pets').select('*').order('name');
+  async getPets(homeId?: string) {
+    let query = supabase.from('pets').select('*').order('name');
+    if (homeId) query = query.eq('home_id', homeId);
+    const { data, error } = await query;
     if (error) throw error;
     return data;
   },
