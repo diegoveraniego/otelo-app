@@ -44,6 +44,7 @@ export default function FeedingWeekGrid({ slots, weekStart, petId, onOpenModal }
       assigned_at: null,
       fed_at: null,
       fed_by: null,
+      home_id: null,
     };
   };
 
