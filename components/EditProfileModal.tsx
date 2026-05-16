@@ -32,11 +32,12 @@ export default function EditProfileModal({ isOpen, onClose, onUpdated }: EditPro
 
   useEffect(() => {
     if (currentUser?.notification_prefs) {
+      const p = currentUser.notification_prefs as any;
       setPrefs({
-        thanks: currentUser.notification_prefs.thanks ?? true,
-        chores: currentUser.notification_prefs.chores ?? true,
-        summary: currentUser.notification_prefs.summary ?? true,
-        trade: currentUser.notification_prefs.trade ?? true,
+        thanks: p.thanks ?? true,
+        chores: p.chores ?? true,
+        summary: p.summary ?? true,
+        trade: p.trade ?? true,
       });
     }
   }, [currentUser]);
@@ -112,24 +113,30 @@ export default function EditProfileModal({ isOpen, onClose, onUpdated }: EditPro
   };
 
   const fetchUsedColors = async () => {
-    if (!currentUser) return;
-    const { data: membersData } = await supabase.from('members').select('*');
+    if (!currentUser?.home_id) return;
+    
+    const { data: membersData } = await supabase
+      .from('members')
+      .select('*')
+      .eq('home_id', currentUser.home_id);
+      
     const { data: tradesData } = await supabase
       .from('color_trades')
       .select('*')
+      .eq('home_id', currentUser.home_id)
       .eq('from_member_id', currentUser.id)
       .eq('status', 'pending');
 
     if (membersData) {
       const othersColors: Record<string, Member> = {};
-      membersData
+      (membersData as any[])
         .filter(m => m.id !== currentUser.id)
         .forEach(m => {
-          othersColors[m.color.toLowerCase()] = m;
+          othersColors[m.color.toLowerCase()] = m as Member;
         });
       setUsedColors(othersColors);
     }
-    setPendingTrade(tradesData?.[0] || null);
+    setPendingTrade(tradesData?.[0] as ColorTrade || null);
   };
 
   const handleColorChange = async (color: string) => {
@@ -166,7 +173,8 @@ export default function EditProfileModal({ isOpen, onClose, onUpdated }: EditPro
         .insert({
           from_member_id: currentUser.id,
           to_member_id: targetMember.id,
-          status: 'pending'
+          status: 'pending',
+          home_id: currentUser.home_id
         })
         .select()
         .single();

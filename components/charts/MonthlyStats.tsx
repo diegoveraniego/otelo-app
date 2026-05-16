@@ -65,7 +65,7 @@ export default function MonthlyStats({ currentDate }: { currentDate: Date }) {
 
     if (allLogs) {
       const streaks: Record<string, number> = {};
-      mData.forEach(m => {
+      (mData as any[]).forEach(m => {
         const memberLogs = allLogs.filter(l => l.member_id === m.id).map(l => l.done_at);
         streaks[m.id] = calcStreak(memberLogs);
       });
@@ -73,17 +73,17 @@ export default function MonthlyStats({ currentDate }: { currentDate: Date }) {
     }
 
     setThanksRanking(
-      mData.map((m: any) => ({
+      (mData as any[]).map((m: any) => ({
         member: m as Member,
         count: thanks?.filter(t => t.to_member_id === m.id).length ?? 0,
       }))
     );
 
     if (logs) {
-      const cStats = cData.map(chore => {
+      const cStats = (cData as any[]).map(chore => {
         const item: any = { name: chore.name, emoji: chore.emoji };
         let total = 0;
-        mData.forEach(m => {
+        (mData as any[]).forEach(m => {
           const count = logs.filter(l => l.chore_id === chore.id && l.member_id === m.id).length;
           item[m.name] = count;
           total += count;
@@ -95,20 +95,20 @@ export default function MonthlyStats({ currentDate }: { currentDate: Date }) {
       setChoreData(cStats);
 
       const days = getDaysInMonth(start);
-      const hData = mData.map(m => {
+      const hData = (mData as any[]).map(m => {
         const activity = Array.from({ length: days }, (_, i) => {
           const dayString = format(new Date(start.getFullYear(), start.getMonth(), i + 1), 'yyyy-MM-dd');
           const count = logs.filter(l => l.member_id === m.id && l.done_at.startsWith(dayString)).length;
           return count;
         });
-        return { member: m, activity };
+        return { member: m as Member, activity };
       });
       setHeatmapData(hData);
 
       const lData = Array.from({ length: days }, (_, i) => {
         const dayString = format(new Date(start.getFullYear(), start.getMonth(), i + 1), 'yyyy-MM-dd');
         const dayItem: any = { day: (i + 1).toString() };
-        mData.forEach(m => {
+        (mData as any[]).forEach(m => {
           dayItem[m.name] = logs.filter(l => l.member_id === m.id && l.done_at.startsWith(dayString)).length;
         });
         return dayItem;

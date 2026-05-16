@@ -9,6 +9,7 @@ import {
 import FeedingTodayCard from '@/components/FeedingTodayCard';
 import FeedingWeekGrid from '@/components/FeedingWeekGrid';
 import FeedingSlotModal from '@/components/FeedingSlotModal';
+import { useUserStore } from '@/lib/store';
 import { CalendarDays, AlertCircle, ChevronLeft, ChevronRight, PawPrint } from 'lucide-react';
 import { addWeeks, format } from 'date-fns';
 import { es } from 'date-fns/locale';

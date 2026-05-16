@@ -34,13 +34,13 @@ export default function FeedingSlotModal({ slot, isOpen, onClose, onRefresh }: P
 
   // Reset view when opening or changing slot
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && currentUser?.home_id) {
       setView('main');
       setIsSubmitting(false);
-      feedingService.getPets().then(setPets).catch(console.error);
-      feedingService.getMembers().then(setMembers).catch(console.error);
+      feedingService.getPets(currentUser.home_id).then(setPets).catch(console.error);
+      feedingService.getMembers(currentUser.home_id).then(setMembers).catch(console.error);
     }
-  }, [isOpen, slot?.id]);
+  }, [isOpen, slot?.id, currentUser?.home_id]);
 
   const selectedPet = useMemo(() => pets.find(p => p.id === slot?.pet_id), [pets, slot]);
   const isCurrentUserAssigned = currentUser?.id === slot?.assigned_to;
@@ -72,6 +72,8 @@ export default function FeedingSlotModal({ slot, isOpen, onClose, onRefresh }: P
 
   const handleSignUp = () => wrapAction(async () => {
     if (!currentUser) throw new Error('Debes iniciar sesión');
+    if (!slot.pet_id) throw new Error('ID de mascota faltante');
+    
     await feedingService.signUp({
       pet_id: slot.pet_id,
       week_start: slot.week_start,
@@ -85,6 +87,8 @@ export default function FeedingSlotModal({ slot, isOpen, onClose, onRefresh }: P
 
   const handleMarkFed = () => wrapAction(async () => {
     if (!currentUser) throw new Error('Debes iniciar sesión');
+    if (!slot.pet_id) throw new Error('ID de mascota faltante');
+
     await feedingService.markAsFed({
       id: slot.id,
       pet_id: slot.pet_id,
@@ -104,7 +108,7 @@ export default function FeedingSlotModal({ slot, isOpen, onClose, onRefresh }: P
     if (selectedPet.type === 'dog') choreName = 'Dar comida y agua a Otelo';
     else if (selectedPet.type === 'cat') choreName = 'Dar comida y agua a Gatos';
     if (!choreName) return;
-    const chores = await choreService.getChores();
+    const chores = await choreService.getChores(currentUser.home_id);
     const chore = chores.find(c => c.name === choreName);
     if (chore) {
       await choreService.completeChore(chore.id, currentUser.id, currentUser.home_id);
@@ -127,7 +131,7 @@ export default function FeedingSlotModal({ slot, isOpen, onClose, onRefresh }: P
   });
 
   const handleUnassign = () => wrapAction(async () => {
-    if (!slot) return;
+    if (!slot || !slot.pet_id || !currentUser) return;
     await feedingService.signUp({
       pet_id: slot.pet_id,
       week_start: slot.week_start,

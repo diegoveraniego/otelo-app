@@ -7,32 +7,28 @@ import { Proposal, ProposalVote } from '../types';
  */
 export const proposalService = {
   /**
-   * Fetches all active (pending) proposals with author details
+   * Fetches all pending proposals for a specific home
    */
-  async getActiveProposals() {
-    const { data, error } = await supabase
-      .from('proposals')
-      .select('*, author:members(*)')
-      .eq('status', 'pending')
-      .order('created_at', { ascending: false });
-
+  async getActiveProposals(homeId?: string) {
+    let query = supabase.from('proposals').select('*').eq('status', 'pending');
+    if (homeId) query = query.eq('home_id', homeId);
+    
+    const { data, error } = await query;
     if (error) throw error;
     return data as Proposal[];
   },
 
   /**
-   * Fetches all votes for a list of proposals
+   * Fetches votes for a list of proposal IDs
    */
   async getVotes(proposalIds: string[]) {
     if (proposalIds.length === 0) return [];
-    
     const { data, error } = await supabase
       .from('proposal_votes')
-      .select('*, member:members(*)')
+      .select('*')
       .in('proposal_id', proposalIds);
-
     if (error) throw error;
-    return data as any[];
+    return data as ProposalVote[];
   },
 
   /**
@@ -87,7 +83,14 @@ export const proposalService = {
   /**
    * Creates a new proposal
    */
-  async createProposal(payload: Partial<Proposal> & { home_id: string }) {
+  async createProposal(payload: {
+    name: string;
+    emoji: string;
+    category: string;
+    threshold_days: number;
+    created_by: string;
+    home_id: string;
+  }) {
     const { data, error } = await supabase
       .from('proposals')
       .insert({

@@ -50,6 +50,7 @@ export const feedingService = {
     // 1. Initial enriched slots from feeding_slots table
     const enriched: FeedingSlotWithDetails[] = (slotsData ?? []).map((s) => ({
       ...s,
+      slot: s.slot as 'morning' | 'evening',
       assigned_member: s.assigned_to ? memberMap.get(s.assigned_to) ?? null : null,
       fed_member: s.fed_by ? memberMap.get(s.fed_by) ?? null : null,
     }));

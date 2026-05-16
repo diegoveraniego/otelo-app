@@ -54,7 +54,7 @@ export default function WeeklySummaryBanner() {
       });
 
       const topMemberId = Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
-      const topMember = members.find(m => m.id === topMemberId);
+      const topMember = (members as any[]).find(m => m.id === topMemberId) as Member;
 
       setSummary({
         topMember: topMember || null,

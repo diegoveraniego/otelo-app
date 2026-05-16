@@ -60,7 +60,7 @@ export default function WeeklyStats() {
     ]);
 
     if (logs) {
-      const stats = members.map((m: Member) => ({
+      const stats = (members as any[]).map((m: any) => ({
         name: m.name,
         color: m.color,
         total: logs.filter(l => l.member_id === m.id).length,
@@ -72,8 +72,8 @@ export default function WeeklyStats() {
 
       // Build thanks ranking
       setThanksRanking(
-        members.map((m: Member) => ({
-          member: m,
+        (members as any[]).map((m: any) => ({
+          member: m as Member,
           count: thanks?.filter(t => t.to_member_id === m.id).length ?? 0,
         }))
       );

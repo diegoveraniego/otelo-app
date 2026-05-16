@@ -7,58 +7,54 @@ import { Member } from '@/lib/types';
 import { KeyRound, X, Settings } from 'lucide-react';
 import Avatar from './Avatar';
 import EditProfileModal from './EditProfileModal';
-import OnboardingWizard from './OnboardingWizard';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 export default function UserSelectModal() {
   const pathname = usePathname();
+  const router = useRouter();
   const { currentUser, setCurrentUser, hasDismissedUserModal, setHasDismissedUserModal } = useUserStore();
   const [members, setMembers] = useState<Member[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const [showOnboarding, setShowOnboarding] = useState(false);
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
   const [pin, setPin] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (pathname !== '/login') {
+    if (pathname !== '/login' && pathname !== '/onboarding') {
       fetchMembers();
     }
   }, [pathname]);
 
   useEffect(() => {
-    if (!currentUser && !hasDismissedUserModal) {
+    if (!currentUser && !hasDismissedUserModal && pathname !== '/login' && pathname !== '/onboarding') {
       setIsOpen(true);
     }
     
     const handleOpenModal = () => setIsOpen(true);
     window.addEventListener('open-user-modal', handleOpenModal);
     return () => window.removeEventListener('open-user-modal', handleOpenModal);
-  }, [currentUser]);
+  }, [currentUser, pathname]);
 
   const fetchMembers = async () => {
     setIsLoading(true);
     const { data } = await supabase.from('members').select('*').order('name');
     if (data) {
-      setMembers(data);
+      setMembers(data as Member[]);
       
       // SYNC: Update currentUser if they exist in the fresh list
       if (currentUser) {
-        const freshUser = data.find(m => m.id === currentUser.id);
+        const freshUser = (data as Member[]).find(m => m.id === currentUser.id);
         if (freshUser) {
-          // Only update if something changed (like home_id being added)
           if (JSON.stringify(freshUser) !== JSON.stringify(currentUser)) {
-            setCurrentUser(freshUser as Member);
+            setCurrentUser(freshUser);
           }
         }
       }
 
-      if (data.length === 0) {
-        setShowOnboarding(true);
-      } else {
-        setShowOnboarding(false);
+      if (data.length === 0 && pathname !== '/onboarding') {
+        router.push('/onboarding');
       }
     }
     setIsLoading(false);
@@ -82,15 +78,7 @@ export default function UserSelectModal() {
     }
   };
 
-  if (pathname === '/login') return null;
-  
-  if (showOnboarding) {
-    return <OnboardingWizard onComplete={() => {
-      setShowOnboarding(false);
-      fetchMembers();
-    }} />;
-  }
-
+  if (pathname === '/login' || pathname === '/onboarding') return null;
   if (!isOpen) return null;
 
   return (
@@ -138,7 +126,7 @@ export default function UserSelectModal() {
               <div className="text-center p-4">
                 <p className="text-zinc-500 dark:text-zinc-400 text-sm mb-2">No hay miembros configurados.</p>
                 <p className="text-xs text-zinc-400 dark:text-zinc-500">
-                  Cargando asistente de configuración...
+                  Redirigiendo al asistente...
                 </p>
               </div>
             ) : (
@@ -221,7 +209,7 @@ export function OpenUserModalButton() {
     setIsClient(true);
   }, []);
 
-  if (!isClient || pathname === '/login') return null;
+  if (!isClient || pathname === '/login' || pathname === '/onboarding') return null;
 
   return (
     <button

@@ -53,6 +53,7 @@ export type Database = {
         Row: {
           created_at: string
           from_member_id: string
+          home_id: string
           id: string
           status: string
           to_member_id: string
@@ -61,6 +62,7 @@ export type Database = {
         Insert: {
           created_at?: string
           from_member_id: string
+          home_id: string
           id?: string
           status?: string
           to_member_id: string
@@ -69,6 +71,7 @@ export type Database = {
         Update: {
           created_at?: string
           from_member_id?: string
+          home_id?: string
           id?: string
           status?: string
           to_member_id?: string
@@ -80,6 +83,13 @@ export type Database = {
             columns: ["from_member_id"]
             isOneToOne: false
             referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "color_trades_home_id_fkey"
+            columns: ["home_id"]
+            isOneToOne: false
+            referencedRelation: "homes"
             referencedColumns: ["id"]
           },
           {
@@ -163,6 +173,7 @@ export type Database = {
         Row: {
           created_at: string
           from_member_id: string
+          home_id: string
           id: string
           slot_id: string
           status: string
@@ -172,6 +183,7 @@ export type Database = {
         Insert: {
           created_at?: string
           from_member_id: string
+          home_id: string
           id?: string
           slot_id: string
           status?: string
@@ -181,6 +193,7 @@ export type Database = {
         Update: {
           created_at?: string
           from_member_id?: string
+          home_id?: string
           id?: string
           slot_id?: string
           status?: string
@@ -193,6 +206,13 @@ export type Database = {
             columns: ["from_member_id"]
             isOneToOne: false
             referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feeding_trades_home_id_fkey"
+            columns: ["home_id"]
+            isOneToOne: false
+            referencedRelation: "homes"
             referencedColumns: ["id"]
           },
           {
@@ -384,23 +404,33 @@ export type Database = {
       proposal_votes: {
         Row: {
           created_at: string
+          home_id: string
           id: string
           member_id: string
           proposal_id: string
         }
         Insert: {
           created_at?: string
+          home_id: string
           id?: string
           member_id: string
           proposal_id: string
         }
         Update: {
           created_at?: string
+          home_id?: string
           id?: string
           member_id?: string
           proposal_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "proposal_votes_home_id_fkey"
+            columns: ["home_id"]
+            isOneToOne: false
+            referencedRelation: "homes"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "proposal_votes_member_id_fkey"
             columns: ["member_id"]
@@ -517,6 +547,7 @@ export type Database = {
         Row: {
           created_at: string
           from_member_id: string
+          home_id: string
           id: string
           log_id: string
           to_member_id: string
@@ -524,6 +555,7 @@ export type Database = {
         Insert: {
           created_at?: string
           from_member_id: string
+          home_id: string
           id?: string
           log_id: string
           to_member_id: string
@@ -531,6 +563,7 @@ export type Database = {
         Update: {
           created_at?: string
           from_member_id?: string
+          home_id?: string
           id?: string
           log_id?: string
           to_member_id?: string
@@ -541,6 +574,13 @@ export type Database = {
             columns: ["from_member_id"]
             isOneToOne: false
             referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "thanks_home_id_fkey"
+            columns: ["home_id"]
+            isOneToOne: false
+            referencedRelation: "homes"
             referencedColumns: ["id"]
           },
           {

@@ -53,7 +53,7 @@ export default function ProposalsSection() {
       setMembersCount(allMembers.length);
       if (choreData) {
         setExistingEmojis(choreData.map(c => c.emoji));
-        setCategories(Array.from(new Set(choreData.map(c => c.category).filter(Boolean))));
+        setCategories(Array.from(new Set(choreData.map(c => c.category).filter((c): c is string => !!c))));
       }
 
       // 2. Fetch active proposals and their votes
