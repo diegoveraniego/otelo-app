@@ -57,4 +57,7 @@ INSERT INTO public.chores (name, emoji, category) VALUES
 ('Limpiar Living', '🧹', 'Limpieza'),
 ('Cortar Pasto', '🌿', 'Jardín'),
 ('Cocinar para todos', '🍳', 'Cocina'),
-('Ir a comprar', '🛒', 'Compras');
+('Ir a comprar', '🛒', 'Compras'),
+('Sacar popó perro', '💩', 'Mascotas'),
+('Sacar la basura', '🗑️', 'Limpieza'),
+('Pasear perro', '🦮', 'Mascotas');

@@ -5,6 +5,8 @@ ALTER TABLE public.chores ADD COLUMN IF NOT EXISTS threshold_days INTEGER DEFAUL
 UPDATE public.chores SET threshold_days = 7 WHERE name = 'Ir a comprar';
 UPDATE public.chores SET threshold_days = 30 WHERE name = 'Cortar Pasto';
 UPDATE public.chores SET threshold_days = 7 WHERE name = 'Limpiar Living';
+UPDATE public.chores SET threshold_days = 1 WHERE name = 'Sacar popó perro';
+UPDATE public.chores SET threshold_days = 1 WHERE name = 'Pasear perro';
 
 -- Create proposals table
 CREATE TABLE public.proposals (

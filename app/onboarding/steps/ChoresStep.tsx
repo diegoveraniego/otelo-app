@@ -24,11 +24,13 @@ const CHORE_TEMPLATES: ChoreTemplate[] = [
   { name: 'Lavar Ropa', emoji: '👕', category: 'Limpieza', threshold_days: 7 },
   { name: 'Colgar Ropa', emoji: '🪢', category: 'Limpieza', threshold_days: 7 },
   { name: 'Limpiar Living', emoji: '🧹', category: 'Limpieza', threshold_days: 7 },
-  { name: 'Sacar Basura', emoji: '🗑️', category: 'Limpieza', threshold_days: 3 },
+  { name: 'Sacar la basura', emoji: '🗑️', category: 'Limpieza', threshold_days: 3 },
   { name: 'Cortar Pasto', emoji: '🌿', category: 'Jardín', threshold_days: 30 },
   { name: 'Ir a comprar', emoji: '🛒', category: 'Compras', threshold_days: 7 },
   { name: 'Trapear pisos', emoji: '🧼', category: 'Limpieza', threshold_days: 15 },
   { name: 'Limpiar baños', emoji: '🚽', category: 'Limpieza', threshold_days: 7 },
+  { name: 'Sacar popó perro', emoji: '💩', category: 'Mascotas', threshold_days: 1 },
+  { name: 'Pasear perro', emoji: '🦮', category: 'Mascotas', threshold_days: 1 },
 ];
 
 export default function ChoresStep({ data, pets, onFinish, onBack, isSubmitting }: Props) {
