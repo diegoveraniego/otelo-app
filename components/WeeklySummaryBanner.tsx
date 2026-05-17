@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/lib/supabase/client';
-import { startOfWeek, endOfWeek, subWeeks, isSunday, isMonday } from 'date-fns';
+import { startOfWeek, endOfWeek, subWeeks, isSunday, isMonday, isFriday, isSaturday } from 'date-fns';
 import { Trophy, Star, Sparkles, Flame, Crown } from 'lucide-react';
 import { Member } from '@/lib/types';
 import Avatar from './Avatar';
@@ -29,9 +29,11 @@ export default function WeeklySummaryBanner() {
   const [mounted, setMounted] = useState(false);
 
   const today = new Date();
+  const isFri = isFriday(today);
+  const isSat = isSaturday(today);
   const isSun = isSunday(today);
   const isMon = isMonday(today);
-  const shouldShow = isSun || isMon;
+  const shouldShow = isFri || isSat || isSun || isMon;
 
   const fetchBannerData = useCallback(async () => {
     if (!currentUser?.home_id) return;
@@ -43,7 +45,7 @@ export default function WeeklySummaryBanner() {
       
     if (!members || members.length === 0) return;
 
-    if (isSun) {
+    if (isFri || isSat || isSun) {
       // --- SUNDAY MODE: Candidates for the ending week ---
       const start = startOfWeek(today, { weekStartsOn: 1 }).toISOString();
       const end = endOfWeek(today, { weekStartsOn: 1 }).toISOString();
