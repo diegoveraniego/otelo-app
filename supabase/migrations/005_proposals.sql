@@ -7,6 +7,9 @@ UPDATE public.chores SET threshold_days = 30 WHERE name = 'Cortar Pasto';
 UPDATE public.chores SET threshold_days = 7 WHERE name = 'Limpiar Living';
 UPDATE public.chores SET threshold_days = 1 WHERE name = 'Sacar popó perro';
 UPDATE public.chores SET threshold_days = 1 WHERE name = 'Pasear perro';
+UPDATE public.chores SET threshold_days = 1 WHERE name = 'Barrer cocina';
+UPDATE public.chores SET threshold_days = 7 WHERE name = 'Limpiar patio';
+UPDATE public.chores SET threshold_days = 2 WHERE name = 'Regar plantas';
 
 -- Create proposals table
 CREATE TABLE public.proposals (
