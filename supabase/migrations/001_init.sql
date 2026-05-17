@@ -64,4 +64,9 @@ INSERT INTO public.chores (name, emoji, category) VALUES
 ('Barrer cocina', '🧹', 'Cocina'),
 ('Limpiar cocina', '🧼', 'Cocina'),
 ('Limpiar patio', '🍂', 'Jardín'),
-('Regar plantas', '🪴', 'Jardín');
+('Regar plantas', '🪴', 'Jardín'),
+('Limpiar el refrigerador', '🧊', 'Cocina'),
+('Organizar la despensa', '🥫', 'Cocina'),
+('Limpiar microondas / horno', '🍕', 'Cocina'),
+('Limpiar vidrios y ventanas', '🪟', 'Limpieza'),
+('Barrer la vereda / entrada', '🧹', 'Jardín');

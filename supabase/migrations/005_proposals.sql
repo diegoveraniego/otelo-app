@@ -10,6 +10,11 @@ UPDATE public.chores SET threshold_days = 1 WHERE name = 'Pasear perro';
 UPDATE public.chores SET threshold_days = 1 WHERE name = 'Barrer cocina';
 UPDATE public.chores SET threshold_days = 7 WHERE name = 'Limpiar patio';
 UPDATE public.chores SET threshold_days = 2 WHERE name = 'Regar plantas';
+UPDATE public.chores SET threshold_days = 30 WHERE name = 'Limpiar el refrigerador';
+UPDATE public.chores SET threshold_days = 15 WHERE name = 'Organizar la despensa';
+UPDATE public.chores SET threshold_days = 7 WHERE name = 'Limpiar microondas / horno';
+UPDATE public.chores SET threshold_days = 15 WHERE name = 'Limpiar vidrios y ventanas';
+UPDATE public.chores SET threshold_days = 7 WHERE name = 'Barrer la vereda / entrada';
 
 -- Create proposals table
 CREATE TABLE public.proposals (
