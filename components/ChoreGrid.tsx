@@ -93,7 +93,11 @@ export default function ChoreGrid() {
                       </div>
                     )}
                     <span className="text-3xl sm:text-4xl mb-2 sm:mb-3 group-hover:scale-110 transition-transform">{chore.emoji}</span>
-                    <span className="text-xs sm:text-sm font-medium text-[#1E1E1E] dark:text-white text-center leading-tight w-full truncate px-1">
+                    <span className={`font-medium text-center leading-tight w-full line-clamp-2 px-1 transition-all ${
+                      chore.name.length > 16 
+                        ? 'text-[10px] sm:text-xs' 
+                        : 'text-xs sm:text-sm'
+                    } text-[#1E1E1E] dark:text-white`}>
                       {chore.name}
                     </span>
                     {lastDone && (
