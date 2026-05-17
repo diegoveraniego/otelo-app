@@ -1,6 +1,6 @@
 'use client';
 
-import { Home, BarChart3, PawPrint } from 'lucide-react';
+import { Home, BarChart3, PawPrint, History } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -25,6 +25,13 @@ export default function BottomNav() {
         >
           <PawPrint className="w-6 h-6" strokeWidth={pathname === '/pets' ? 2.5 : 2} />
           <span className="text-[10px] font-medium">Mascotas</span>
+        </Link>
+        <Link 
+          href="/history" 
+          className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${pathname === '/history' ? 'text-[#3584E4] dark:text-[#3584E4]' : 'text-[#1E1E1E]/50 dark:text-white/50 hover:text-[#1E1E1E] dark:hover:text-white'}`}
+        >
+          <History className="w-6 h-6" strokeWidth={pathname === '/history' ? 2.5 : 2} />
+          <span className="text-[10px] font-medium">Historial</span>
         </Link>
         <Link 
           href="/stats" 
