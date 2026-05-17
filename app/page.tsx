@@ -4,6 +4,7 @@ import RecentActivity from '@/components/RecentActivity';
 import DateHeader from '@/components/DateHeader';
 import DesktopSidebarStats from '@/components/DesktopSidebarStats';
 import WeeklySummaryBanner from '@/components/WeeklySummaryBanner';
+import GamificationBanner from '@/components/GamificationBanner';
 import ProposalsSection from '@/components/ProposalsSection';
 
 export default function Home() {
@@ -14,6 +15,7 @@ export default function Home() {
         <div className="min-w-0">
           <DateHeader />
           <WeeklySummaryBanner />
+          <GamificationBanner />
           {/* SummaryCard solo en móvil — en desktop va en la sidebar */}
           <div className="md:hidden">
             <SummaryCard />
