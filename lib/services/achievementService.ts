@@ -9,7 +9,7 @@ export const achievementService = {
       .eq('member_id', memberId);
     
     if (error) throw error;
-    return data as { achievement_id: string, unlocked_at: string }[];
+    return data as unknown as { achievement_id: string, unlocked_at: string }[];
   },
 
   async evaluateAndUnlock(memberId: string, homeId: string) {
@@ -19,7 +19,7 @@ export const achievementService = {
       .select('achievement_id')
       .eq('member_id', memberId);
       
-    const unlockedIds = new Set(unlocked?.map((a: any) => a.achievement_id) || []);
+    const unlockedIds = new Set((unlocked as unknown as any[])?.map((a: any) => a.achievement_id) || []);
     const pendingAchievements = ACHIEVEMENTS.filter(a => !unlockedIds.has(a.id));
     
     if (pendingAchievements.length === 0) return []; // Nothing to unlock
