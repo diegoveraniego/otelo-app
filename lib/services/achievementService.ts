@@ -2,24 +2,24 @@ import { supabase } from '../supabase/client';
 import { ACHIEVEMENTS, Achievement } from '../achievements/data';
 
 export const achievementService = {
-  async getUnlockedAchievements(memberId: string) {
+  async getUnlockedAchievements(memberId: string): Promise<{ achievement_id: string, unlocked_at: string }[]> {
     const { data, error } = await supabase
-      .from('member_achievements')
+      .from('member_achievements' as any)
       .select('achievement_id, unlocked_at')
       .eq('member_id', memberId);
     
     if (error) throw error;
-    return data;
+    return data as { achievement_id: string, unlocked_at: string }[];
   },
 
   async evaluateAndUnlock(memberId: string, homeId: string) {
     // 1. Fetch all unlocked to know what is left
     const { data: unlocked } = await supabase
-      .from('member_achievements')
+      .from('member_achievements' as any)
       .select('achievement_id')
       .eq('member_id', memberId);
       
-    const unlockedIds = new Set(unlocked?.map(a => a.achievement_id) || []);
+    const unlockedIds = new Set(unlocked?.map((a: any) => a.achievement_id) || []);
     const pendingAchievements = ACHIEVEMENTS.filter(a => !unlockedIds.has(a.id));
     
     if (pendingAchievements.length === 0) return []; // Nothing to unlock
@@ -179,7 +179,7 @@ export const achievementService = {
         unlocked_at: new Date().toISOString()
       }));
 
-      await supabase.from('member_achievements').insert(inserts);
+      await supabase.from('member_achievements' as any).insert(inserts);
     }
 
     return newlyUnlocked;
