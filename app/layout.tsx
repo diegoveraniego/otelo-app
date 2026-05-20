@@ -6,6 +6,7 @@ import UserSelectModal, { OpenUserModalButton } from "@/components/UserSelectMod
 import BottomNav from "@/components/BottomNav";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import NotificationBell from "@/components/NotificationBell";
+import AchievementToast from "@/components/AchievementToast";
 import Image from "next/image";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -68,6 +69,7 @@ export default function RootLayout({
           </main>
 
           <UserSelectModal />
+          <AchievementToast />
           <BottomNav />
         </ThemeProvider>
       </body>

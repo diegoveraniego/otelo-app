@@ -7,6 +7,7 @@ import { useUserStore } from '@/lib/store';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
 import { triggerPushNotification } from '@/lib/pushUtils';
 import { choreService } from '@/lib/services/choreService';
+import { achievementService } from '@/lib/services/achievementService';
 
 type Props = {
   chore: Chore | null;
@@ -92,6 +93,13 @@ export default function ConfirmChoreModal({ chore, isOpen, onClose }: Props) {
     
     try {
       await choreService.completeChore(chore.id, currentUser.id, currentUser.home_id, doneAt);
+      
+      achievementService.evaluateAndUnlock(currentUser.id, currentUser.home_id).then(newlyUnlocked => {
+        if (newlyUnlocked.length > 0) {
+          window.dispatchEvent(new CustomEvent('achievements-unlocked', { detail: newlyUnlocked }));
+        }
+      }).catch(console.error);
+
       setSuccess(true);
 
       triggerPushNotification({

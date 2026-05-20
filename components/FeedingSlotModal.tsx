@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { feedingService } from '@/lib/services/feedingService';
 import { choreService } from '@/lib/services/choreService';
+import { achievementService } from '@/lib/services/achievementService';
 import { FeedingSlotWithDetails, Member, Pet } from '@/lib/types';
 import { useUserStore } from '@/lib/store';
 import {
@@ -98,6 +99,14 @@ export default function FeedingSlotModal({ slot, isOpen, onClose, onRefresh }: P
       fed_by: currentUser.id,
       home_id: currentUser.home_id
     });
+    
+    // Evaluate achievements asynchronously
+    achievementService.evaluateAndUnlock(currentUser.id, currentUser.home_id).then(newlyUnlocked => {
+      if (newlyUnlocked.length > 0) {
+        window.dispatchEvent(new CustomEvent('achievements-unlocked', { detail: newlyUnlocked }));
+      }
+    }).catch(console.error);
+
     // Also log the chore (fire-and-forget)
     logChoreInBackground().catch(console.error);
   }, 'fed-success');

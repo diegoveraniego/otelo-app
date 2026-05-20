@@ -1,6 +1,6 @@
 'use client';
 
-import { Home, BarChart3, PawPrint, History } from 'lucide-react';
+import { Home, BarChart3, PawPrint, History, Trophy } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -39,6 +39,13 @@ export default function BottomNav() {
         >
           <BarChart3 className="w-6 h-6" strokeWidth={pathname === '/stats' ? 2.5 : 2} />
           <span className="text-[10px] font-medium">Estadísticas</span>
+        </Link>
+        <Link 
+          href="/trophies" 
+          className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${pathname === '/trophies' ? 'text-[#3584E4] dark:text-[#3584E4]' : 'text-[#1E1E1E]/50 dark:text-white/50 hover:text-[#1E1E1E] dark:hover:text-white'}`}
+        >
+          <Trophy className="w-6 h-6" strokeWidth={pathname === '/trophies' ? 2.5 : 2} />
+          <span className="text-[10px] font-medium">Trofeos</span>
         </Link>
       </div>
     </nav>
