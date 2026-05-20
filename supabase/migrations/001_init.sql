@@ -53,7 +53,7 @@ INSERT INTO public.chores (name, emoji, category) VALUES
 ('Dar comida y agua a Gatos', '🐈', 'Mascotas'),
 ('Lavar Ropa', '👕', 'Limpieza'),
 ('Colgar Ropa', '🪢', 'Limpieza'),
-('Destender la ropa', '👕', 'Limpieza'),
+('Destender la ropa', '👚', 'Limpieza'),
 ('Doblar Ropa', '📦', 'Limpieza'),
 ('Limpiar Living', '🧹', 'Limpieza'),
 ('Cortar Pasto', '🌿', 'Jardín'),
