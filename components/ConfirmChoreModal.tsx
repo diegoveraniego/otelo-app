@@ -19,11 +19,17 @@ export default function ConfirmChoreModal({ chore, isOpen, onClose }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [showDuplicateWarning, setShowDuplicateWarning] = useState(false);
+  const [showCustomTime, setShowCustomTime] = useState(false);
+  const [customDate, setCustomDate] = useState<'today' | 'yesterday'>('today');
+  const [customTime, setCustomTime] = useState('');
 
   useEffect(() => {
     if (isOpen && chore && currentUser) {
       setSuccess(false);
       setShowDuplicateWarning(false);
+      setShowCustomTime(false);
+      setCustomDate('today');
+      setCustomTime('');
       checkDuplicate();
     }
   }, [isOpen, chore?.id]);
@@ -54,6 +60,14 @@ export default function ConfirmChoreModal({ chore, isOpen, onClose }: Props) {
     }
   };
 
+  const handleShowCustomTime = () => {
+    setShowCustomTime(true);
+    const now = new Date();
+    const hh = String(now.getHours()).padStart(2, '0');
+    const mm = String(now.getMinutes()).padStart(2, '0');
+    setCustomTime(`${hh}:${mm}`);
+  };
+
   const handleConfirm = async () => {
     if (!chore || !currentUser) return;
     
@@ -63,10 +77,21 @@ export default function ConfirmChoreModal({ chore, isOpen, onClose }: Props) {
       return;
     }
 
+    let doneAt = new Date().toISOString();
+    if (showCustomTime && customTime) {
+      const [hours, minutes] = customTime.split(':').map(Number);
+      const date = new Date();
+      if (customDate === 'yesterday') {
+        date.setDate(date.getDate() - 1);
+      }
+      date.setHours(hours, minutes, 0, 0);
+      doneAt = date.toISOString();
+    }
+
     setIsSubmitting(true);
     
     try {
-      await choreService.completeChore(chore.id, currentUser.id, currentUser.home_id);
+      await choreService.completeChore(chore.id, currentUser.id, currentUser.home_id, doneAt);
       setSuccess(true);
 
       triggerPushNotification({
@@ -119,21 +144,82 @@ export default function ConfirmChoreModal({ chore, isOpen, onClose }: Props) {
               </div>
             )}
 
-            <div className="grid grid-cols-2 gap-3 mt-8">
-              <button
-                onClick={onClose}
-                className="px-4 py-3 bg-[#E5E6E6] dark:bg-[#3D3D3D] text-[#1E1E1E] dark:text-white font-bold rounded-xl hover:bg-[#D4D4D4] dark:hover:bg-[#474747] transition-all"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleConfirm}
-                disabled={isSubmitting}
-                className="px-4 py-3 bg-[#3584E4] hover:bg-[#1C71D8] text-white font-bold rounded-xl transition-all shadow-sm active:scale-95 disabled:opacity-50"
-              >
-                {isSubmitting ? 'Guardando...' : showDuplicateWarning ? 'Registrar de nuevo' : 'Sí, lo hice'}
-              </button>
-            </div>
+            {!showCustomTime ? (
+              <>
+                <div className="grid grid-cols-2 gap-3 mt-8">
+                  <button
+                    onClick={onClose}
+                    className="px-4 py-3 bg-[#E5E6E6] dark:bg-[#3D3D3D] text-[#1E1E1E] dark:text-white font-bold rounded-xl hover:bg-[#D4D4D4] dark:hover:bg-[#474747] transition-all"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={handleConfirm}
+                    disabled={isSubmitting}
+                    className="px-4 py-3 bg-[#3584E4] hover:bg-[#1C71D8] text-white font-bold rounded-xl transition-all shadow-sm active:scale-95 disabled:opacity-50"
+                  >
+                    {isSubmitting ? 'Guardando...' : showDuplicateWarning ? 'Registrar de nuevo' : 'Sí, lo hice'}
+                  </button>
+                </div>
+                <button
+                  onClick={handleShowCustomTime}
+                  className="w-full mt-3 px-4 py-3 text-[#3584E4] font-bold rounded-xl hover:bg-blue-50 dark:hover:bg-[#3D3D3D]/50 transition-all"
+                >
+                  Lo hice en otro momento
+                </button>
+              </>
+            ) : (
+              <div className="mt-8 space-y-4">
+                <div className="flex gap-2 p-1 bg-[#F4F4F4] dark:bg-[#2A2A2A] rounded-xl border border-[#E5E6E6] dark:border-[#3D3D3D]">
+                  <button
+                    onClick={() => setCustomDate('today')}
+                    className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${
+                      customDate === 'today'
+                        ? 'bg-white dark:bg-[#3D3D3D] shadow-sm text-[#1E1E1E] dark:text-white'
+                        : 'text-[#1E1E1E]/50 dark:text-white/50 hover:text-[#1E1E1E] dark:hover:text-white'
+                    }`}
+                  >
+                    Hoy
+                  </button>
+                  <button
+                    onClick={() => setCustomDate('yesterday')}
+                    className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${
+                      customDate === 'yesterday'
+                        ? 'bg-white dark:bg-[#3D3D3D] shadow-sm text-[#1E1E1E] dark:text-white'
+                        : 'text-[#1E1E1E]/50 dark:text-white/50 hover:text-[#1E1E1E] dark:hover:text-white'
+                    }`}
+                  >
+                    Ayer
+                  </button>
+                </div>
+                
+                <div className="flex items-center justify-between p-3 bg-[#F4F4F4] dark:bg-[#2A2A2A] rounded-xl border border-[#E5E6E6] dark:border-[#3D3D3D]">
+                  <span className="text-sm font-medium text-[#1E1E1E] dark:text-white">Hora</span>
+                  <input
+                    type="time"
+                    value={customTime}
+                    onChange={(e) => setCustomTime(e.target.value)}
+                    className="bg-transparent font-bold text-[#1E1E1E] dark:text-white outline-none"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 mt-4">
+                  <button
+                    onClick={() => setShowCustomTime(false)}
+                    className="px-4 py-3 bg-[#E5E6E6] dark:bg-[#3D3D3D] text-[#1E1E1E] dark:text-white font-bold rounded-xl hover:bg-[#D4D4D4] dark:hover:bg-[#474747] transition-all"
+                  >
+                    Volver
+                  </button>
+                  <button
+                    onClick={handleConfirm}
+                    disabled={isSubmitting || !customTime}
+                    className="px-4 py-3 bg-[#3584E4] hover:bg-[#1C71D8] text-white font-bold rounded-xl transition-all shadow-sm active:scale-95 disabled:opacity-50"
+                  >
+                    {isSubmitting ? 'Guardando...' : 'Confirmar'}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>

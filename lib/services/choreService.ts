@@ -60,12 +60,12 @@ export const choreService = {
   /**
    * Records a chore as completed
    */
-  async completeChore(choreId: string, memberId: string, homeId: string) {
+  async completeChore(choreId: string, memberId: string, homeId: string, doneAt?: string) {
     const { error } = await supabase.from('logs').insert({
       chore_id: choreId,
       member_id: memberId,
       home_id: homeId,
-      done_at: new Date().toISOString()
+      done_at: doneAt || new Date().toISOString()
     });
     if (error) throw error;
   },

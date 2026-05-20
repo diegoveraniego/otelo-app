@@ -54,7 +54,7 @@ export default function FeedingWeekGrid({ slots, weekStart, petId, onOpenModal }
     const now = isSlotNow(slot);
     const isMine = currentUser && slot.assigned_to === currentUser.id;
     const isReplacement = !!(slot.fed_at && slot.assigned_to && slot.fed_by !== slot.assigned_to);
-    const member = slot.assigned_member ?? slot.fed_member ?? null;
+    const member = slot.fed_member ?? slot.assigned_member ?? null;
 
     let cellClass =
       'relative flex flex-col items-center justify-center rounded-xl border transition-all active:scale-95 cursor-pointer p-1.5 min-h-[64px] ';

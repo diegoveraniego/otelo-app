@@ -28,6 +28,7 @@ const CHORE_TEMPLATES: ChoreTemplate[] = [
   { name: 'Limpiar microondas / horno', emoji: '🍕', category: 'Cocina', threshold_days: 7 },
   { name: 'Lavar Ropa', emoji: '👕', category: 'Limpieza', threshold_days: 7 },
   { name: 'Colgar Ropa', emoji: '🪢', category: 'Limpieza', threshold_days: 7 },
+  { name: 'Destender la ropa', emoji: '👕', category: 'Limpieza', threshold_days: 7 },
   { name: 'Limpiar Living', emoji: '🧹', category: 'Limpieza', threshold_days: 7 },
   { name: 'Sacar la basura', emoji: '🗑️', category: 'Limpieza', threshold_days: 3 },
   { name: 'Limpiar vidrios y ventanas', emoji: '🪟', category: 'Limpieza', threshold_days: 15 },
@@ -38,6 +39,8 @@ const CHORE_TEMPLATES: ChoreTemplate[] = [
   { name: 'Ir a comprar', emoji: '🛒', category: 'Compras', threshold_days: 7 },
   { name: 'Trapear pisos', emoji: '🧼', category: 'Limpieza', threshold_days: 15 },
   { name: 'Limpiar baños', emoji: '🚽', category: 'Limpieza', threshold_days: 7 },
+  { name: 'Hacer baño', emoji: '🚽', category: 'Limpieza', threshold_days: 7 },
+  { name: 'Reparar algo de la casa', emoji: '🛠️', category: 'Mantenimiento', threshold_days: 30 },
   { name: 'Sacar popó perro', emoji: '💩', category: 'Mascotas', threshold_days: 1 },
   { name: 'Pasear perro', emoji: '🦮', category: 'Mascotas', threshold_days: 1 },
 ];
