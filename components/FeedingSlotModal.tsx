@@ -98,16 +98,33 @@ export default function FeedingSlotModal({ slot, isOpen, onClose, onRefresh }: P
     if (!currentUser) throw new Error('Debes iniciar sesión');
     if (!slot.pet_id) throw new Error('ID de mascota faltante');
 
-    await feedingService.markAsFed({
-      id: slot.id,
-      pet_id: slot.pet_id,
-      week_start: slot.week_start,
-      day_of_week: slot.day_of_week,
-      slot: slot.slot,
-      fed_by: currentUser.id,
-      home_id: currentUser.home_id
-    });
+    if (!selectedPet) return;
+    let choreName: string | null = null;
+    if (selectedPet.type === 'dog') choreName = 'Dar comida y agua a Otelo';
+    else if (selectedPet.type === 'cat') choreName = 'Dar comida y agua a Gatos';
     
+    if (choreName) {
+      const chores = await choreService.getChores(currentUser.home_id);
+      const chore = chores.find(c => c.name === choreName);
+      if (chore) {
+        // Complete the chore and explicitly pass the slot as metadata!
+        // The trigger will read this and perfectly assign it.
+        await choreService.completeChore(chore.id, currentUser.id, currentUser.home_id, undefined, { slot: slot.slot });
+        window.dispatchEvent(new CustomEvent('chore-logged'));
+      } else {
+        // Fallback if chore not found
+        await feedingService.markAsFed({
+          id: slot.id,
+          pet_id: slot.pet_id,
+          week_start: slot.week_start,
+          day_of_week: slot.day_of_week,
+          slot: slot.slot,
+          fed_by: currentUser.id,
+          home_id: currentUser.home_id
+        });
+      }
+    }
+
     // Evaluate achievements asynchronously
     achievementService.evaluateAndUnlock(currentUser.id, currentUser.home_id).then(newlyUnlocked => {
       if (newlyUnlocked.length > 0) {
@@ -115,23 +132,7 @@ export default function FeedingSlotModal({ slot, isOpen, onClose, onRefresh }: P
       }
     }).catch(console.error);
 
-    // Also log the chore (fire-and-forget)
-    logChoreInBackground().catch(console.error);
   }, 'fed-success');
-
-  const logChoreInBackground = async () => {
-    if (!selectedPet || !currentUser) return;
-    let choreName: string | null = null;
-    if (selectedPet.type === 'dog') choreName = 'Dar comida y agua a Otelo';
-    else if (selectedPet.type === 'cat') choreName = 'Dar comida y agua a Gatos';
-    if (!choreName) return;
-    const chores = await choreService.getChores(currentUser.home_id);
-    const chore = chores.find(c => c.name === choreName);
-    if (chore) {
-      await choreService.completeChore(chore.id, currentUser.id, currentUser.home_id);
-      window.dispatchEvent(new CustomEvent('chore-logged'));
-    }
-  };
 
   const handleRequestTrade = (toMember: Member) => wrapAction(async () => {
     if (!currentUser || !slot.id) throw new Error('No se puede pedir trueque para un turno no guardado');

@@ -86,7 +86,11 @@ export const ACHIEVEMENTS: Achievement[] = [
   {id: 'hum_speed', name: 'Chore Speedrunner', description: 'Completaste 3 tareas en menos de 5 minutos. ¡Récord mundial!', emoji: '🏎️', category: 'rachas'},
 
   // AGRADECIMIENTOS / REACCIONES
+  {id: 'hum_giver_1', name: 'Buena Vibra', description: 'Diste tu primer agradecimiento o reacción a alguien más.', emoji: '✌️', category: 'especiales'},
+  {id: 'hum_giver_10', name: 'Animador', description: 'Reaccionaste a 10 tareas de otros. ¡Motivando al equipo!', emoji: '📣', category: 'especiales'},
   {id: 'hum_giver', name: 'Devoto del Respeto', description: 'Agradeciste/reaccionaste a tareas de otros 50 veces.', emoji: '🙇', category: 'especiales'},
+  {id: 'hum_receiver_1', name: 'Primeros Aplausos', description: 'Alguien agradeció o reaccionó a tu tarea por primera vez.', emoji: '👏', category: 'especiales'},
+  {id: 'hum_receiver_10', name: 'Popular', description: 'Recibiste 10 reacciones de tu familia. ¡Eres una estrella!', emoji: '🤩', category: 'especiales'},
   {id: 'hum_receiver', name: 'El Consentido', description: 'Recibiste 50 reacciones de agradecimiento de tu familia.', emoji: '🥰', category: 'especiales'},
 
   // DÍAS / LIMPIEZA

@@ -36,8 +36,8 @@ export const achievementService = {
 
     // Check what pending achievements require external tables to avoid querying them unnecessarily
     const hasPendingProposals = pendingAchievements.some(a => a.id.startsWith('prop_') || a.id.startsWith('appr_'));
-    const hasPendingThanksGiver = pendingAchievements.some(a => a.id === 'hum_giver');
-    const hasPendingThanksReceiver = pendingAchievements.some(a => a.id === 'hum_receiver');
+    const hasPendingThanksGiver = pendingAchievements.some(a => a.id.startsWith('hum_giver'));
+    const hasPendingThanksReceiver = pendingAchievements.some(a => a.id.startsWith('hum_receiver'));
 
     let proposalsCount = 0;
     let approvedProposalsCount = 0;
@@ -295,7 +295,11 @@ export const achievementService = {
     check('hum_speed', hasSpeedrunner);
 
     // Thanks / Reactions
+    check('hum_giver_1', thanksGivenCount >= 1);
+    check('hum_giver_10', thanksGivenCount >= 10);
     check('hum_giver', thanksGivenCount >= 50);
+    check('hum_receiver_1', thanksReceivedCount >= 1);
+    check('hum_receiver_10', thanksReceivedCount >= 10);
     check('hum_receiver', thanksReceivedCount >= 50);
 
     // Humorous Day / Clean achievements
