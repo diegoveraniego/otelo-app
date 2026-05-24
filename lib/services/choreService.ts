@@ -29,7 +29,7 @@ export const choreService = {
         chore:chores(*),
         thanks:thanks(
           *,
-          member:members(*)
+          member:members!thanks_from_member_id_fkey(*)
         )
       `)
       .eq('home_id', homeId)

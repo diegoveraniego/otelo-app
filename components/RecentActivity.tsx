@@ -102,7 +102,26 @@ export default function RecentActivity() {
     }
   };
 
-  if (logs.length === 0 && !isLoading) return null;
+  if (!currentUser?.home_id) return null;
+
+  if (logs.length === 0 && !isLoading) {
+    return (
+      <div className="mt-8 mb-4">
+        <h2 className="text-lg font-bold text-[#1E1E1E] dark:text-white mb-4 px-1">
+          Actividad Reciente
+        </h2>
+        <div className="bg-white dark:bg-[#303030] rounded-2xl p-8 text-center border border-[#E5E6E6] dark:border-[#3D3D3D] transition-colors shadow-sm">
+          <div className="text-3xl mb-2">✨</div>
+          <p className="text-sm font-medium text-[#1E1E1E] dark:text-white mb-1">
+            Sin actividad reciente
+          </p>
+          <p className="text-xs text-[#1E1E1E]/50 dark:text-white/40">
+            ¡Las tareas completadas por tu familia aparecerán aquí!
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mt-8 mb-4">
