@@ -86,10 +86,17 @@ export default function DesktopSidebarStats() {
               </div>
               <Avatar member={item.member} className="w-8 h-8 text-sm shrink-0" />
               <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm font-medium text-[#1E1E1E] dark:text-white truncate">
-                    {item.member.name}
-                  </span>
+                <div className="flex items-center justify-between mb-0.5">
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-sm font-semibold text-[#1E1E1E] dark:text-white truncate">
+                      {item.member.name}
+                    </span>
+                    {item.member.selected_title && (
+                      <span className="text-[9px] font-bold uppercase tracking-wider text-[#1E1E1E]/40 dark:text-white/40 leading-none mt-0.5">
+                        {item.member.selected_title}
+                      </span>
+                    )}
+                  </div>
                   <div className="flex items-center gap-2 shrink-0 ml-2">
                     <span className="text-sm font-bold text-[#1E1E1E] dark:text-white">{item.tasks}</span>
                     {item.thanks > 0 && (
@@ -100,7 +107,7 @@ export default function DesktopSidebarStats() {
                     )}
                   </div>
                 </div>
-                <div className="h-1.5 w-full bg-[#E5E6E6] dark:bg-[#3D3D3D] rounded-full overflow-hidden">
+                <div className="h-1.5 w-full bg-[#E5E6E6] dark:bg-[#3D3D3D] rounded-full overflow-hidden mt-1.5">
                   <div
                     className="h-full rounded-full transition-all duration-700 ease-out"
                     style={{ width: `${pct}%`, backgroundColor: item.member.color }}

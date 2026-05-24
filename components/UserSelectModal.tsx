@@ -139,7 +139,12 @@ export default function UserSelectModal() {
                     style={{ borderBottomColor: member.color, borderBottomWidth: 4 }}
                   >
                     <Avatar member={member} className="w-12 h-12 mb-2 text-lg" />
-                    <span className="font-medium text-[#1E1E1E] dark:text-white">{member.name}</span>
+                    <span className="font-medium text-[#1E1E1E] dark:text-white leading-tight">{member.name}</span>
+                    {member.selected_title && (
+                      <span className="text-[9px] font-bold uppercase tracking-wider text-[#1E1E1E]/40 dark:text-white/40 mt-1 line-clamp-1">
+                        {member.selected_title}
+                      </span>
+                    )}
                   </button>
                 ))}
               </div>
@@ -148,7 +153,12 @@ export default function UserSelectModal() {
             <form onSubmit={handlePinSubmit} className="space-y-4">
               <div className="flex flex-col items-center mb-6">
                 <Avatar member={selectedMember} className="w-16 h-16 mb-3 text-2xl" />
-                <span className="font-semibold text-[#1E1E1E] dark:text-white">{selectedMember.name}</span>
+                <span className="font-semibold text-base text-[#1E1E1E] dark:text-white leading-tight">{selectedMember.name}</span>
+                {selectedMember.selected_title && (
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#1E1E1E]/50 dark:text-white/50 mt-1 bg-[#FAFAFA] dark:bg-[#242424] border border-[#E5E6E6]/60 dark:border-[#3D3D3D]/60 px-2 py-0.5 rounded-full">
+                    {selectedMember.selected_title}
+                  </span>
+                )}
               </div>
               
               <div>
@@ -222,7 +232,16 @@ export function OpenUserModalButton() {
       {currentUser ? (
         <>
           <Avatar member={currentUser} className="w-8 h-8 text-sm" />
-          <span className="font-medium text-sm text-[#1E1E1E] dark:text-white">{currentUser.name}</span>
+          <div className="flex flex-col items-start text-left">
+            <span className="font-semibold text-xs text-[#1E1E1E] dark:text-white leading-tight">
+              {currentUser.name}
+            </span>
+            {currentUser.selected_title && (
+              <span className="text-[8px] font-bold uppercase tracking-wider text-[#1E1E1E]/55 dark:text-white/55 leading-none mt-0.5">
+                {currentUser.selected_title}
+              </span>
+            )}
+          </div>
         </>
       ) : (
         <span className="font-medium text-sm text-[#1E1E1E] dark:text-white">Iniciar Sesión</span>

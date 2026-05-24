@@ -425,7 +425,14 @@ export default function EditProfileModal({ isOpen, onClose, onUpdated }: EditPro
                 />
               </div>
             ) : (
-              <Avatar member={currentUser} className="w-24 h-24 text-4xl" />
+              <div className="flex flex-col items-center">
+                <Avatar member={currentUser} className="w-24 h-24 text-4xl" />
+                {currentUser.selected_title && (
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#1E1E1E]/50 dark:text-white/50 mt-2 bg-[#FAFAFA] dark:bg-[#242424] border border-[#E5E6E6]/60 dark:border-[#3D3D3D]/60 px-2.5 py-0.5 rounded-full">
+                    {currentUser.selected_title}
+                  </span>
+                )}
+              </div>
             )}
             
             <div className="flex gap-2 w-full justify-center">

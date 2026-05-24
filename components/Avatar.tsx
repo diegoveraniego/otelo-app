@@ -33,15 +33,8 @@ export default function Avatar({ member, className = '' }: AvatarProps) {
   );
 
   return (
-    <div className="flex flex-col items-center gap-1 shrink-0">
-      <div className={className}>
-        {avatarContent}
-      </div>
-      {member.selected_title && (
-        <span className="text-[10px] font-bold uppercase tracking-wider text-[#1E1E1E]/40 dark:text-white/40 leading-none">
-          {member.selected_title}
-        </span>
-      )}
+    <div className={`${className} shrink-0`}>
+      {avatarContent}
     </div>
   );
 }
