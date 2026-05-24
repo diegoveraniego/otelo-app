@@ -48,12 +48,34 @@ export const feedingService = {
     const memberMap = new Map(members.map(m => [m.id, m]));
 
     // 1. Initial enriched slots from feeding_slots table
-    const enriched: FeedingSlotWithDetails[] = (slotsData ?? []).map((s) => ({
-      ...s,
-      slot: s.slot as 'morning' | 'evening',
-      assigned_member: s.assigned_to ? memberMap.get(s.assigned_to) ?? null : null,
-      fed_member: s.fed_by ? memberMap.get(s.fed_by) ?? null : null,
-    }));
+    const enriched: FeedingSlotWithDetails[] = (slotsData ?? []).map((s) => {
+      let fed_members: (Member & { fed_at?: string })[] = [];
+      const rawFeedings = s.feedings;
+      
+      if (Array.isArray(rawFeedings)) {
+        rawFeedings.forEach((f: any) => {
+          if (f && typeof f === 'object' && f.fed_by) {
+            const m = memberMap.get(f.fed_by);
+            if (m) {
+              fed_members.push({ ...m, fed_at: f.fed_at });
+            }
+          }
+        });
+      } else if (s.fed_by) {
+        const m = memberMap.get(s.fed_by);
+        if (m) {
+          fed_members.push({ ...m, fed_at: s.fed_at ?? undefined });
+        }
+      }
+
+      return {
+        ...s,
+        slot: s.slot as 'morning' | 'evening',
+        assigned_member: s.assigned_to ? memberMap.get(s.assigned_to) ?? null : null,
+        fed_member: s.fed_by ? memberMap.get(s.fed_by) ?? null : null,
+        fed_members,
+      };
+    });
 
     return enriched.sort((a, b) => a.day_of_week - b.day_of_week || a.slot.localeCompare(b.slot));
   },
@@ -107,11 +129,31 @@ export const feedingService = {
     }
 
     const fed_at = new Date().toISOString();
+    const newFeedingObj = { fed_by: payload.fed_by, fed_at };
     
     if (payload.id && payload.id.length > 10) {
+      const { data: existingSlot } = await supabase
+        .from('feeding_slots')
+        .select('feedings, fed_by, fed_at')
+        .eq('id', payload.id)
+        .single();
+
+      let newFeedings: any[] = [];
+      if (existingSlot?.feedings && Array.isArray(existingSlot.feedings)) {
+        newFeedings = [...existingSlot.feedings, newFeedingObj];
+      } else if (existingSlot?.fed_by) {
+        newFeedings = [{ fed_by: existingSlot.fed_by, fed_at: existingSlot.fed_at }, newFeedingObj];
+      } else {
+        newFeedings = [newFeedingObj];
+      }
+
       const { error } = await supabase
         .from('feeding_slots')
-        .update({ fed_at, fed_by: payload.fed_by })
+        .update({ 
+          fed_at: existingSlot?.fed_at || fed_at, 
+          fed_by: existingSlot?.fed_by || payload.fed_by,
+          feedings: newFeedings 
+        })
         .eq('id', payload.id);
       if (error) throw error;
     } else {
@@ -124,9 +166,10 @@ export const feedingService = {
           slot: payload.slot,
           fed_at,
           fed_by: payload.fed_by,
+          feedings: [newFeedingObj],
           home_id: payload.home_id
         }, { onConflict: 'pet_id,week_start,day_of_week,slot' });
-    if (error) throw error;
+      if (error) throw error;
     }
   },
 

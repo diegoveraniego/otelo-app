@@ -45,6 +45,7 @@ export type ColorTradeWithDetails = ColorTrade & {
 export type FeedingSlotWithDetails = FeedingSlot & {
   assigned_member?: Member | null;
   fed_member?: Member | null;
+  fed_members?: (Member & { fed_at?: string })[];
   slot: 'morning' | 'evening'; // Explicitly typed for convenience
 };
 

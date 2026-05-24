@@ -108,6 +108,7 @@ export type Database = {
           day_of_week: number
           fed_at: string | null
           fed_by: string | null
+          feedings: Json | null
           home_id: string | null
           id: string
           pet_id: string | null
@@ -120,6 +121,7 @@ export type Database = {
           day_of_week: number
           fed_at?: string | null
           fed_by?: string | null
+          feedings?: Json | null
           home_id?: string | null
           id?: string
           pet_id?: string | null
@@ -132,6 +134,7 @@ export type Database = {
           day_of_week?: number
           fed_at?: string | null
           fed_by?: string | null
+          feedings?: Json | null
           home_id?: string | null
           id?: string
           pet_id?: string | null

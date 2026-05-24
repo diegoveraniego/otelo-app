@@ -187,14 +187,14 @@ export default function PetsPage() {
               <FeedingTodayCard
                 slot={todayMorning ?? {
                   id: undefined as any, pet_id: selectedPetId!, week_start: currentWeekStart, day_of_week: todayDow, slot: 'morning',
-                  assigned_to: null, assigned_at: null, fed_at: null, fed_by: null, home_id: null,
+                  assigned_to: null, assigned_at: null, fed_at: null, fed_by: null, feedings: null, home_id: null,
                 }}
                 onOpenModal={openModal}
               />
               <FeedingTodayCard
                 slot={todayEvening ?? {
                   id: undefined as any, pet_id: selectedPetId!, week_start: currentWeekStart, day_of_week: todayDow, slot: 'evening',
-                  assigned_to: null, assigned_at: null, fed_at: null, fed_by: null, home_id: null,
+                  assigned_to: null, assigned_at: null, fed_at: null, fed_by: null, feedings: null, home_id: null,
                 }}
                 onOpenModal={openModal}
               />

@@ -44,6 +44,7 @@ export default function FeedingWeekGrid({ slots, weekStart, petId, onOpenModal }
       assigned_at: null,
       fed_at: null,
       fed_by: null,
+      feedings: null,
       home_id: null,
     };
   };
@@ -95,7 +96,22 @@ export default function FeedingWeekGrid({ slots, weekStart, petId, onOpenModal }
         ) : null}
 
         {/* Avatar or empty state */}
-        {member ? (
+        {slot.fed_at && slot.fed_members && slot.fed_members.length > 0 ? (
+          <>
+            <div className="flex -space-x-1.5 items-center justify-center">
+              {slot.fed_members.map((m, idx) => (
+                <Avatar 
+                  key={`${m.id}-${idx}`} 
+                  member={m} 
+                  className="w-7 h-7 border border-white dark:border-[#303030] shadow-sm text-xs" 
+                />
+              ))}
+            </div>
+            <span className="text-[9px] font-medium text-[#1E1E1E] dark:text-white mt-1 leading-none text-center max-w-full truncate px-0.5">
+              {slot.fed_members.map(m => m.id === currentUser?.id ? 'Tú' : m.name.split(' ')[0]).join('+')}
+            </span>
+          </>
+        ) : member ? (
           <>
             <Avatar member={member} className="w-7 h-7 text-xs" />
             <span className="text-[9px] font-medium text-[#1E1E1E] dark:text-white mt-1 leading-none text-center max-w-full truncate px-0.5">

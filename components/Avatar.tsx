@@ -33,7 +33,7 @@ export default function Avatar({ member, className = '' }: AvatarProps) {
   );
 
   return (
-    <div className={`${className} shrink-0`}>
+    <div className={`rounded-full overflow-hidden shrink-0 ${className}`}>
       {avatarContent}
     </div>
   );

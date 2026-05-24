@@ -241,22 +241,30 @@ export default function FeedingSlotModal({ slot, isOpen, onClose, onRefresh }: P
             : 'bg-[#FAFAFA] dark:bg-[#2A2A2A] border-[#E5E6E6] dark:border-[#3D3D3D]'
         }`}>
           {slot.fed_at ? (
-            <div className="flex items-center gap-3">
-              <Avatar member={slot.fed_member!} className="w-10 h-10" />
-              <div>
-                <p className="text-sm font-bold text-[#1E1E1E] dark:text-white">
-                  {isReplacement ? `Reemplazado por ${slot.fed_member?.name}` : `Alimentado por ${slot.fed_member?.name}`}
-                </p>
-                <p className="text-xs text-[#1E1E1E]/50 dark:text-white/50">
-                  {formatFedTime(slot.fed_at)} {fedLate && '(tarde)'}
-                </p>
-                {isReplacement && slot.assigned_member && (
-                  <p className="text-xs text-amber-600 dark:text-amber-400 font-medium mt-0.5">
-                    Turno de {slot.assigned_member.name}
-                  </p>
-                )}
-              </div>
-              <CheckCircle2 className={`ml-auto w-5 h-5 ${isReplacement ? 'text-amber-500' : 'text-green-500'}`} />
+            <div className="space-y-3">
+              {(slot.fed_members && slot.fed_members.length > 0 ? slot.fed_members : [slot.fed_member]).map((fedM, idx) => {
+                if (!fedM) return null;
+                const localIsReplacement = !!(slot.assigned_to && fedM.id !== slot.assigned_to);
+                return (
+                  <div key={`${fedM.id}-${idx}`} className="flex items-center gap-3">
+                    <Avatar member={fedM} className="w-10 h-10" />
+                    <div>
+                      <p className="text-sm font-bold text-[#1E1E1E] dark:text-white">
+                        {localIsReplacement ? `Reemplazado por ${fedM.name}` : `Alimentado por ${fedM.name}`}
+                      </p>
+                      <p className="text-xs text-[#1E1E1E]/50 dark:text-white/50">
+                        {(fedM as any).fed_at ? formatFedTime((fedM as any).fed_at) : formatFedTime(slot.fed_at!)} {fedLate && '(tarde)'}
+                      </p>
+                    </div>
+                    <CheckCircle2 className={`ml-auto w-5 h-5 ${localIsReplacement ? 'text-amber-500' : 'text-green-500'}`} />
+                  </div>
+                );
+              })}
+              {isReplacement && slot.assigned_member && (
+                <div className="pt-2 border-t border-[#E5E6E6]/60 dark:border-[#3D3D3D]/60 text-xs text-amber-600 dark:text-amber-400 font-medium">
+                  Turno asignado originalmente a {slot.assigned_member.name}
+                </div>
+              )}
             </div>
           ) : slot.assigned_to ? (
             <div className="flex items-center gap-3">
@@ -273,10 +281,10 @@ export default function FeedingSlotModal({ slot, isOpen, onClose, onRefresh }: P
             </div>
           )}
         </div>
-
+ 
         {/* Action Buttons */}
         <div className="grid gap-2">
-          {!slot.fed_at && isToday && (
+          {isToday && (
             <>
               {isEarly && (
                 <div className="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40 rounded-xl flex items-start gap-2 mb-1">
@@ -293,7 +301,7 @@ export default function FeedingSlotModal({ slot, isOpen, onClose, onRefresh }: P
                 className="w-full flex items-center justify-center gap-2 py-3.5 bg-[#26A269] hover:bg-[#1E8254] text-white font-bold rounded-xl transition-all active:scale-[0.98] disabled:opacity-50"
               >
                 <CheckCircle2 className="w-5 h-5" />
-                {isSubmitting ? 'Guardando...' : 'Marcar como alimentado'}
+                {isSubmitting ? 'Guardando...' : slot.fed_at ? 'Alimentar otra vez' : 'Marcar como alimentado'}
               </button>
             </>
           )}

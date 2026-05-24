@@ -76,11 +76,25 @@ export default function FeedingTodayCard({ slot, onOpenModal }: Props) {
       <div className="w-full">
         {slot?.fed_at ? (
           <div className="flex flex-col items-center gap-1">
-            {slot.fed_member && <Avatar member={slot.fed_member} className="w-9 h-9 text-sm" />}
-            <span className={`text-xs font-medium text-center leading-tight ${
+            {slot.fed_members && slot.fed_members.length > 0 ? (
+              <div className="flex -space-x-2 items-center justify-center mb-1">
+                {slot.fed_members.map((m, idx) => (
+                  <Avatar 
+                    key={`${m.id}-${idx}`} 
+                    member={m} 
+                    className="w-9 h-9 border border-white dark:border-[#303030] shadow-sm text-sm" 
+                  />
+                ))}
+              </div>
+            ) : (
+              slot.fed_member && <Avatar member={slot.fed_member} className="w-9 h-9 text-sm" />
+            )}
+            <span className={`text-xs font-semibold text-center leading-tight truncate w-full px-1 ${
               isReplacement ? 'text-amber-600 dark:text-amber-400' : 'text-green-600 dark:text-green-400'
             }`}>
-              {slot.fed_member?.name ?? '—'}
+              {slot.fed_members && slot.fed_members.length > 0 
+                ? slot.fed_members.map(m => m.name.split(' ')[0]).join(' y ')
+                : slot.fed_member?.name ?? '—'}
             </span>
           </div>
         ) : slot?.assigned_to && slot.assigned_member ? (
