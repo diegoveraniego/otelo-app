@@ -30,6 +30,7 @@ export type NotificationPrefs = {
 export type LogWithDetails = Log & {
   member: Member;
   chore: Chore;
+  thanks?: (Thanks & { member: Member })[];
 };
 
 export type ThanksWithDetails = Thanks & {

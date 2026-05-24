@@ -1,19 +1,26 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { choreService } from '@/lib/services/choreService';
 import { Chore } from '@/lib/types';
 import ConfirmChoreModal from './ConfirmChoreModal';
 import { useUserStore } from '@/lib/store';
-import { Clock } from 'lucide-react';
+import { Clock, CheckCircle2 } from 'lucide-react';
 import { differenceInDays } from 'date-fns';
+import { offlineQueue } from '@/lib/offlineQueue';
+import { triggerPushNotification } from '@/lib/pushUtils';
+import { achievementService } from '@/lib/services/achievementService';
 
 export default function ChoreGrid() {
   const [chores, setChores] = useState<Chore[]>([]);
   const [lastDoneMap, setLastDoneMap] = useState<Map<string, string>>(new Map());
   const [selectedChore, setSelectedChore] = useState<Chore | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [successAnimationId, setSuccessAnimationId] = useState<string | null>(null);
+  
   const { currentUser } = useUserStore();
+  const timerRef = useRef<any>(null);
+  const isLongPressRef = useRef(false);
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
@@ -40,7 +47,73 @@ export default function ChoreGrid() {
     return () => window.removeEventListener('chore-logged', handleRefresh);
   }, [fetchData]);
 
+  // Quick log execution (double-click or long-press)
+  const executeQuickLog = async (chore: Chore) => {
+    if (!currentUser) {
+      window.dispatchEvent(new CustomEvent('open-user-modal'));
+      return;
+    }
+    if (!currentUser.home_id) return;
+
+    const doneAt = new Date().toISOString();
+    
+    // Set success animation
+    setSuccessAnimationId(chore.id);
+    setTimeout(() => setSuccessAnimationId(null), 1500);
+
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      // Offline mode
+      offlineQueue.enqueue(chore.id, currentUser.id, currentUser.home_id, doneAt);
+      alert(`¡Guardado offline! Se sincronizará "${chore.name}" cuando recuperes conexión. 📡`);
+      window.dispatchEvent(new CustomEvent('chore-logged'));
+    } else {
+      // Online mode
+      try {
+        await choreService.completeChore(chore.id, currentUser.id, currentUser.home_id, doneAt);
+        
+        // Evaluate achievements
+        achievementService.evaluateAndUnlock(currentUser.id, currentUser.home_id).then(newlyUnlocked => {
+          if (newlyUnlocked.length > 0) {
+            window.dispatchEvent(new CustomEvent('achievements-unlocked', { detail: newlyUnlocked }));
+          }
+        }).catch(console.error);
+
+        // Notify other family members
+        triggerPushNotification({
+          title: '¡Nueva Tarea Completada! 🎉',
+          body: `${currentUser.name} ha completado: ${chore.name} ${chore.emoji}`,
+          sourceMemberId: currentUser.id,
+          eventType: 'chore'
+        });
+
+        window.dispatchEvent(new CustomEvent('chore-logged'));
+      } catch (err: any) {
+        console.error('Error in quick log:', err);
+      }
+    }
+  };
+
+  const startLongPress = (chore: Chore) => {
+    isLongPressRef.current = false;
+    timerRef.current = setTimeout(() => {
+      isLongPressRef.current = true;
+      executeQuickLog(chore);
+    }, 600); // 600ms hold
+  };
+
+  const cancelLongPress = () => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+  };
+
   const handleChoreClick = (chore: Chore) => {
+    // If it was triggered by a long press, ignore standard click
+    if (isLongPressRef.current) {
+      isLongPressRef.current = false;
+      return;
+    }
     if (!currentUser) {
       window.dispatchEvent(new CustomEvent('open-user-modal'));
       return;
@@ -48,7 +121,7 @@ export default function ChoreGrid() {
     setSelectedChore(chore);
   };
 
-  // Performance: Memoize categories and grouped chores
+  // Performance: Memoize categories
   const categories = useMemo(() => 
     Array.from(new Set(chores.map(c => c.category || 'Otros'))),
     [chores]
@@ -84,8 +157,23 @@ export default function ChoreGrid() {
                   <button
                     key={chore.id}
                     onClick={() => handleChoreClick(chore)}
-                    className="group relative flex flex-col items-center justify-center p-3 sm:p-4 bg-white dark:bg-[#303030] rounded-xl shadow-sm border border-[#E5E6E6] dark:border-[#3D3D3D] hover:bg-[#FAFAFA] dark:hover:bg-[#3D3D3D] transition-all hover:scale-[1.02] active:scale-95 aspect-square w-full min-w-0"
+                    onDoubleClick={() => executeQuickLog(chore)}
+                    onMouseDown={() => startLongPress(chore)}
+                    onMouseUp={cancelLongPress}
+                    onMouseLeave={cancelLongPress}
+                    onTouchStart={() => startLongPress(chore)}
+                    onTouchEnd={cancelLongPress}
+                    onTouchMove={cancelLongPress}
+                    className="group relative flex flex-col items-center justify-center p-3 sm:p-4 bg-white dark:bg-[#303030] rounded-xl shadow-sm border border-[#E5E6E6] dark:border-[#3D3D3D] hover:bg-[#FAFAFA] dark:hover:bg-[#3D3D3D] transition-all hover:scale-[1.02] active:scale-95 aspect-square w-full min-w-0 overflow-hidden"
                   >
+                    {/* Success animation overlay */}
+                    {successAnimationId === chore.id && (
+                      <div className="absolute inset-0 bg-[#26A269]/95 dark:bg-[#1E8254]/95 rounded-xl flex flex-col items-center justify-center text-white z-10 animate-in fade-in duration-200">
+                        <CheckCircle2 className="w-8 h-8 animate-bounce" />
+                        <span className="text-[10px] font-bold mt-1">¡Listo!</span>
+                      </div>
+                    )}
+
                     {isOverdue && (
                       <div className="absolute top-2 right-2 flex items-center gap-1 px-1.5 py-0.5 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-full text-[10px] font-bold animate-pulse">
                         <Clock className="w-3 h-3" />

@@ -595,6 +595,7 @@ export type Database = {
           home_id: string
           id: string
           log_id: string
+          reaction_type: string
           to_member_id: string
         }
         Insert: {
@@ -603,6 +604,7 @@ export type Database = {
           home_id: string
           id?: string
           log_id: string
+          reaction_type?: string
           to_member_id: string
         }
         Update: {
@@ -611,6 +613,7 @@ export type Database = {
           home_id?: string
           id?: string
           log_id?: string
+          reaction_type?: string
           to_member_id?: string
         }
         Relationships: [

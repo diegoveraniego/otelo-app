@@ -2,11 +2,12 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { choreService } from '@/lib/services/choreService';
+import { achievementService } from '@/lib/services/achievementService';
 import { LogWithDetails } from '@/lib/types';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { useUserStore } from '@/lib/store';
-import { Trash2, Heart } from 'lucide-react';
+import { Trash2, Smile } from 'lucide-react';
 import Avatar from './Avatar';
 import { triggerPushNotification } from '@/lib/pushUtils';
 
@@ -15,8 +16,7 @@ export default function RecentActivity() {
   const [logs, setLogs] = useState<LogWithDetails[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [thankingId, setThankingId] = useState<string | null>(null);
-  const [myThanks, setMyThanks] = useState<string[]>([]);
+  const [activePickerLogId, setActivePickerLogId] = useState<string | null>(null);
   const { currentUser } = useUserStore();
 
   const fetchLogs = useCallback(async (reset = false) => {
@@ -25,12 +25,6 @@ export default function RecentActivity() {
     try {
       const data = await choreService.getRecentLogs(currentUser.home_id, PAGE_SIZE);
       setLogs(data);
-
-      if (data.length > 0) {
-        const logIds = data.map((l) => l.id);
-        const thankedIds = await choreService.getMyThanks(currentUser.id, logIds, currentUser.home_id);
-        setMyThanks(thankedIds);
-      }
     } catch (err) {
       console.error('Error fetching logs:', err);
     } finally {
@@ -65,31 +59,46 @@ export default function RecentActivity() {
     }
   };
 
-  const handleThank = async (log: LogWithDetails) => {
-    if (!currentUser || myThanks.includes(log.id)) return;
-
-    // Optimistic UI update
-    setMyThanks((prev) => [...prev, log.id]);
-    setThankingId(log.id);
+  const handleToggleReaction = async (log: LogWithDetails, reactionType: string) => {
+    if (!currentUser) return;
 
     try {
-      await choreService.giveThanks(log.id, currentUser.id, log.member_id, currentUser.home_id);
-      
-      triggerPushNotification({
-        title: '¡Alguien te ha agradecido! ❤️',
-        body: `${currentUser.name} te dio las gracias por ${log.chore.name} ${log.chore.emoji}`,
-        targetMemberId: log.member_id,
-        eventType: 'thanks'
-      });
-      
+      const res = await choreService.toggleReaction(
+        log.id,
+        currentUser.id,
+        log.member_id,
+        currentUser.home_id,
+        reactionType
+      );
+
+      if (res.action === 'added') {
+        const emojiMap: Record<string, string> = {
+          heart: '❤️',
+          sparkle: '🧼',
+          cook: '🍳',
+          paw: '🐾',
+          speed: '⚡',
+        };
+        const emoji = emojiMap[reactionType] || '❤️';
+        triggerPushNotification({
+          title: '¡Reaccionaron a tu tarea! ✨',
+          body: `${currentUser.name} reaccionó con ${emoji} a tu tarea: ${log.chore.name} ${log.chore.emoji}`,
+          targetMemberId: log.member_id,
+          eventType: 'thanks',
+        });
+      }
+
+      fetchLogs(true);
       window.dispatchEvent(new CustomEvent('thanks-updated'));
-    } catch (error: any) {
-      // Rollback on error
-      setMyThanks((prev) => prev.filter((id) => id !== log.id));
-      console.error('Error giving thanks:', error);
-      alert('No se pudo enviar el agradecimiento');
-    } finally {
-      setThankingId(null);
+
+      // Evaluate achievements for giving a reaction / thanks
+      achievementService.evaluateAndUnlock(currentUser.id, currentUser.home_id).then(newlyUnlocked => {
+        if (newlyUnlocked.length > 0) {
+          window.dispatchEvent(new CustomEvent('achievements-unlocked', { detail: newlyUnlocked }));
+        }
+      }).catch(console.error);
+    } catch (err) {
+      console.error('Error toggling reaction:', err);
     }
   };
 
@@ -105,7 +114,6 @@ export default function RecentActivity() {
       <div className="bg-white dark:bg-[#303030] rounded-2xl overflow-hidden shadow-sm border border-[#E5E6E6] dark:border-[#3D3D3D] transition-colors">
         <div className="flex flex-col">
           {logs.map((log, i) => {
-            const alreadyThanked = myThanks.includes(log.id);
             const isOwnLog = currentUser?.id === log.member_id;
             const canThank = currentUser && !isOwnLog;
 
@@ -125,24 +133,93 @@ export default function RecentActivity() {
                   <p className="text-[11px] text-[#1E1E1E]/50 dark:text-white/40 mt-0.5">
                     Hace {formatDistanceToNow(new Date(log.done_at), { locale: es })}
                   </p>
+
+                  {/* Grouped Reactions display */}
+                  {log.thanks && log.thanks.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mt-2 animate-in fade-in duration-200">
+                      {Object.entries(
+                        log.thanks.reduce((acc, t) => {
+                          acc[t.reaction_type] = acc[t.reaction_type] || [];
+                          acc[t.reaction_type].push(t);
+                          return acc;
+                        }, {} as Record<string, typeof log.thanks>)
+                      ).map(([reactionType, thanksForType]) => {
+                        const hasUserReacted = thanksForType.some(t => t.from_member_id === currentUser?.id);
+                        const listNames = thanksForType.map(t => t.member?.name || 'Alguien').join(', ');
+                        const emojiMap: Record<string, string> = {
+                          heart: '❤️',
+                          sparkle: '🧼',
+                          cook: '🍳',
+                          paw: '🐾',
+                          speed: '⚡',
+                        };
+                        const emoji = emojiMap[reactionType] || '❤️';
+
+                        return (
+                          <button
+                            key={reactionType}
+                            title={listNames}
+                            onClick={() => handleToggleReaction(log, reactionType)}
+                            className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold transition-all border ${
+                              hasUserReacted
+                                ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800/40 text-blue-600 dark:text-blue-400 scale-105 shadow-sm'
+                                : 'bg-zinc-50 dark:bg-zinc-800/40 border-zinc-200 dark:border-zinc-700/40 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-700'
+                            }`}
+                          >
+                            <span>{emoji}</span>
+                            <span className="text-[10px]">{thanksForType.length}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
 
-                <div className="flex items-center gap-1 shrink-0">
+                <div className="flex items-center gap-1 shrink-0 relative">
                   {canThank && (
-                    <button
-                      onClick={() => handleThank(log)}
-                      disabled={thankingId === log.id || alreadyThanked}
-                      className={`p-2.5 rounded-xl transition-all duration-300 ${
-                        alreadyThanked
-                          ? 'text-[#E01B24] dark:text-[#FF6B6B] bg-[#E01B24]/10 dark:bg-[#FF6B6B]/10 cursor-default'
-                          : 'text-[#1E1E1E]/30 dark:text-white/20 hover:text-[#E01B24] dark:hover:text-[#FF6B6B] hover:bg-[#E01B24]/10 dark:hover:bg-[#FF6B6B]/10 hover:scale-110 active:scale-95'
-                      } disabled:opacity-60`}
-                    >
-                      <Heart
-                        className={`w-4 h-4 transition-all ${alreadyThanked ? 'scale-110' : ''}`}
-                        fill={alreadyThanked ? 'currentColor' : 'none'}
-                      />
-                    </button>
+                    <div className="relative">
+                      <button
+                        onClick={() => setActivePickerLogId(activePickerLogId === log.id ? null : log.id)}
+                        className={`p-2.5 rounded-xl transition-all duration-300 ${
+                          activePickerLogId === log.id
+                            ? 'text-[#3584E4] bg-[#3584E4]/10'
+                            : 'text-[#1E1E1E]/30 dark:text-white/20 hover:text-[#3584E4] hover:bg-[#3584E4]/10 hover:scale-105'
+                        }`}
+                      >
+                        <Smile className="w-4 h-4" />
+                      </button>
+                      {activePickerLogId === log.id && (
+                        <>
+                          <div className="fixed inset-0 z-30" onClick={() => setActivePickerLogId(null)} />
+                          <div className="absolute right-0 bottom-full mb-2 z-40 bg-white dark:bg-[#303030] border border-[#E5E6E6] dark:border-[#3D3D3D] rounded-2xl p-1.5 shadow-xl flex gap-1 animate-in fade-in slide-in-from-bottom-2 duration-150">
+                            {[
+                              { name: 'heart', emoji: '❤️', label: 'Amor' },
+                              { name: 'sparkle', emoji: '🧼', label: 'Limpieza' },
+                              { name: 'cook', emoji: '🍳', label: 'Sabroso' },
+                              { name: 'paw', emoji: '🐾', label: 'Mascota' },
+                              { name: 'speed', emoji: '⚡', label: 'Rayo' },
+                            ].map((r) => {
+                              const alreadyHasThis = log.thanks?.some(t => t.from_member_id === currentUser?.id && t.reaction_type === r.name);
+                              return (
+                                <button
+                                  key={r.name}
+                                  title={r.label}
+                                  onClick={() => {
+                                    handleToggleReaction(log, r.name);
+                                    setActivePickerLogId(null);
+                                  }}
+                                  className={`text-xl p-1.5 hover:scale-125 active:scale-95 rounded-lg transition-all ${
+                                    alreadyHasThis ? 'bg-blue-50 dark:bg-blue-900/30' : ''
+                                  }`}
+                                >
+                                  {r.emoji}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </>
+                      )}
+                    </div>
                   )}
 
                   {isOwnLog && (

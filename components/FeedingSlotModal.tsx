@@ -8,7 +8,7 @@ import { FeedingSlotWithDetails, Member, Pet } from '@/lib/types';
 import { useUserStore } from '@/lib/store';
 import {
   CheckCircle2, X, UserPlus, AlertTriangle, Clock,
-  ArrowLeftRight, Trash2
+  ArrowLeftRight, Trash2, Bell
 } from 'lucide-react';
 import Avatar from './Avatar';
 import { triggerPushNotification } from '@/lib/pushUtils';
@@ -158,6 +158,18 @@ export default function FeedingSlotModal({ slot, isOpen, onClose, onRefresh }: P
       home_id: currentUser.home_id,
       id: slot.id
     });
+    onClose();
+  });
+
+  const handleSendNudge = () => wrapAction(async () => {
+    if (!currentUser || !slot.assigned_to) return;
+    await triggerPushNotification({
+      title: '¡Turno de comida! 🐾',
+      body: `${currentUser.name} te recuerda alimentar a ${selectedPet?.name || 'la mascota'} en el turno de la ${slotLabel.toLowerCase()}.`,
+      targetMemberId: slot.assigned_to,
+      eventType: 'nudge'
+    });
+    alert(`Recordatorio enviado a ${slot.assigned_member?.name || 'el responsable'} 🔔`);
     onClose();
   });
 
@@ -314,6 +326,17 @@ export default function FeedingSlotModal({ slot, isOpen, onClose, onRefresh }: P
             >
               <UserPlus className="w-5 h-5" />
               Anotarme para este turno
+            </button>
+          )}
+
+          {slot.assigned_to && !slot.fed_at && currentUser?.id !== slot.assigned_to && (isToday || overdue) && (
+            <button
+              onClick={handleSendNudge}
+              disabled={isSubmitting}
+              className="w-full flex items-center justify-center gap-2 py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl transition-all active:scale-[0.98] disabled:opacity-50"
+            >
+              <Bell className="w-4 h-4 animate-bounce" />
+              {isSubmitting ? 'Enviando...' : 'Enviar Recordatorio (Nudge)'}
             </button>
           )}
 

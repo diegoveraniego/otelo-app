@@ -64,6 +64,32 @@ export const ACHIEVEMENTS: Achievement[] = [
   { id: 'spec_trash_50', name: 'Rey de la Basura', description: 'Sacaste la basura 50 veces.', emoji: '🗑️', category: 'especiales' },
   { id: 'spec_clothes_50', name: 'Lavandero', description: 'Lavaste ropa 50 veces.', emoji: '👕', category: 'especiales' },
   { id: 'spec_bathroom_20', name: 'La Ingrata', description: 'Limpiaste o hiciste el baño 20 veces.', emoji: '🚽', category: 'especiales' },
-  { id: 'spec_repair_10', name: 'Bob el Constructor', description: 'Reparaste cosas de la casa 10 veces.', emoji: '🔨', category: 'especiales' },
-  { id: 'spec_plants_20', name: 'Druida', description: 'Regaste las plantas 20 veces.', emoji: '🪴', category: 'especiales' },
+  {id: 'spec_repair_10', name: 'Bob el Constructor', description: 'Reparaste cosas de la casa 10 veces.', emoji: '🔨', category: 'especiales'},
+  {id: 'spec_plants_20', name: 'Druida', description: 'Regaste las plantas 20 veces.', emoji: '🪴', category: 'especiales'},
+
+  // PROPUESTAS EN EL CONSEJO
+  {id: 'prop_1', name: 'El Visionario', description: 'Propusiste tu primera tarea en el consejo familiar.', emoji: '💡', category: 'especiales'},
+  {id: 'prop_10', name: 'Diputado de Pasillo', description: 'Propusiste 10 tareas en el consejo. Eres muy opinólogo.', emoji: '🗣️', category: 'especiales'},
+  {id: 'prop_50', name: 'Constituyente', description: 'Propusiste 50 tareas. Prácticamente redactas la ley familiar.', emoji: '📜', category: 'especiales'},
+  {id: 'prop_100', name: 'Dictador Demócrata', description: 'Propusiste 100 tareas en el consejo. La asamblea soy yo.', emoji: '📢', category: 'especiales'},
+
+  // APROBACIONES
+  {id: 'appr_1', name: 'Victoria Política', description: 'Lograste que aprueben tu primera propuesta de tarea.', emoji: '🗳️', category: 'especiales'},
+  {id: 'appr_5', name: 'Negociador de Paz', description: 'Aprobaste 5 propuestas. Convenciste a todos de trabajar más.', emoji: '🤝', category: 'especiales'},
+  {id: 'appr_10', name: 'El Padrino', description: 'Aprobaste 10 propuestas. Haces ofertas que nadie puede rechazar.', emoji: '🎩', category: 'especiales'},
+
+  // HORARIOS HUMORÍSTICOS
+  {id: 'hum_insomnia', name: 'Ansiedad Nocturna', description: 'Registraste 10 tareas de madrugada (12:00 AM - 5:00 AM). ¿Insomnio o hiperactividad?', emoji: '☕', category: 'horarios'},
+  {id: 'hum_vamp_pet', name: 'Comida Transilvana', description: 'Alimentaste a la mascota de madrugada (12:00 AM - 4:00 AM). ¿Es un perro lobo?', emoji: '🧛', category: 'horarios'},
+
+  // VELOCIDAD / RACHAS
+  {id: 'hum_speed', name: 'Chore Speedrunner', description: 'Completaste 3 tareas en menos de 5 minutos. ¡Récord mundial!', emoji: '🏎️', category: 'rachas'},
+
+  // AGRADECIMIENTOS / REACCIONES
+  {id: 'hum_giver', name: 'Devoto del Respeto', description: 'Agradeciste/reaccionaste a tareas de otros 50 veces.', emoji: '🙇', category: 'especiales'},
+  {id: 'hum_receiver', name: 'El Consentido', description: 'Recibiste 50 reacciones de agradecimiento de tu familia.', emoji: '🥰', category: 'especiales'},
+
+  // DÍAS / LIMPIEZA
+  {id: 'hum_mon_hate', name: 'Odiador de Lunes', description: 'Hiciste 15 tareas un día lunes. Queriendo que la semana termine rápido.', emoji: '🥱', category: 'variedad'},
+  {id: 'hum_cleaner', name: 'Obsesivo del Brillo', description: 'Completaste 5 tareas de limpieza en el mismo día. Todo debe brillar.', emoji: '🧽', category: 'limpieza'},
 ];

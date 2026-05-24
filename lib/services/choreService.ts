@@ -26,7 +26,11 @@ export const choreService = {
       .select(`
         *,
         member:members(*),
-        chore:chores(*)
+        chore:chores(*),
+        thanks:thanks(
+          *,
+          member:members(*)
+        )
       `)
       .eq('home_id', homeId)
       .order('done_at', { ascending: false })
@@ -99,12 +103,40 @@ export const choreService = {
    * Gives thanks for a chore completion
    */
   async giveThanks(logId: string, fromMemberId: string, toMemberId: string, homeId: string) {
-    const { error } = await supabase.from('thanks').insert({
-      log_id: logId,
-      from_member_id: fromMemberId,
-      to_member_id: toMemberId,
-      home_id: homeId,
-    });
-    if (error) throw error;
+    await this.toggleReaction(logId, fromMemberId, toMemberId, homeId, 'heart');
+  },
+
+  /**
+   * Toggles (inserts, updates or deletes) a reaction on a chore completion
+   */
+  async toggleReaction(logId: string, fromMemberId: string, toMemberId: string, homeId: string, reactionType: string) {
+    const { data: existing } = await supabase
+      .from('thanks')
+      .select('id, reaction_type')
+      .eq('log_id', logId)
+      .eq('from_member_id', fromMemberId)
+      .maybeSingle();
+
+    if (existing) {
+      if (existing.reaction_type === reactionType) {
+        const { error } = await supabase.from('thanks').delete().eq('id', existing.id);
+        if (error) throw error;
+        return { action: 'removed' };
+      } else {
+        const { error } = await supabase.from('thanks').update({ reaction_type: reactionType }).eq('id', existing.id);
+        if (error) throw error;
+        return { action: 'updated' };
+      }
+    } else {
+      const { error } = await supabase.from('thanks').insert({
+        log_id: logId,
+        from_member_id: fromMemberId,
+        to_member_id: toMemberId,
+        home_id: homeId,
+        reaction_type: reactionType
+      });
+      if (error) throw error;
+      return { action: 'added' };
+    }
   }
 };

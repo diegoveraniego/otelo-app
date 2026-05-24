@@ -9,7 +9,7 @@ export async function triggerPushNotification({
   body: string;
   targetMemberId?: string;
   sourceMemberId?: string;
-  eventType: 'thanks' | 'chore' | 'trade';
+  eventType: 'thanks' | 'chore' | 'trade' | 'nudge';
 }) {
   try {
     await fetch('/api/push/send', {

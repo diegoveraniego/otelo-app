@@ -33,9 +33,72 @@ export const achievementService = {
 
     const logs = logsData || [];
     const total = logs.length;
-    if (total === 0) return [];
 
-    // Precompute stats
+    // Check what pending achievements require external tables to avoid querying them unnecessarily
+    const hasPendingProposals = pendingAchievements.some(a => a.id.startsWith('prop_') || a.id.startsWith('appr_'));
+    const hasPendingThanksGiver = pendingAchievements.some(a => a.id === 'hum_giver');
+    const hasPendingThanksReceiver = pendingAchievements.some(a => a.id === 'hum_receiver');
+
+    let proposalsCount = 0;
+    let approvedProposalsCount = 0;
+    let thanksGivenCount = 0;
+    let thanksReceivedCount = 0;
+
+    const queries: PromiseLike<any>[] = [];
+
+    if (hasPendingProposals) {
+      queries.push(
+        supabase
+          .from('proposals')
+          .select('*', { count: 'exact', head: true })
+          .eq('created_by', memberId)
+          .then(({ count }) => {
+            proposalsCount = count ?? 0;
+          })
+      );
+      queries.push(
+        supabase
+          .from('proposals')
+          .select('*', { count: 'exact', head: true })
+          .eq('created_by', memberId)
+          .eq('status', 'approved')
+          .then(({ count }) => {
+            approvedProposalsCount = count ?? 0;
+          })
+      );
+    }
+
+    if (hasPendingThanksGiver) {
+      queries.push(
+        supabase
+          .from('thanks')
+          .select('*', { count: 'exact', head: true })
+          .eq('from_member_id', memberId)
+          .neq('to_member_id', memberId)
+          .then(({ count }) => {
+            thanksGivenCount = count ?? 0;
+          })
+      );
+    }
+
+    if (hasPendingThanksReceiver) {
+      queries.push(
+        supabase
+          .from('thanks')
+          .select('*', { count: 'exact', head: true })
+          .eq('to_member_id', memberId)
+          .neq('from_member_id', memberId)
+          .then(({ count }) => {
+            thanksReceivedCount = count ?? 0;
+          })
+      );
+    }
+
+    if (queries.length > 0) {
+      await Promise.all(queries);
+    }
+
+    // Precompute stats from logs
     let petCount = 0;
     let cookCount = 0;
     let cleanCount = 0;
@@ -54,18 +117,39 @@ export const achievementService = {
     let repairCount = 0;
     let plantsCount = 0;
 
+    // New stats variables
+    let insomniaCount = 0;
+    let vampirePetCount = 0;
+    const cleanTasksPerDay: Record<string, number> = {};
+    const mondayTasksPerDay: Record<string, number> = {};
+
     const uniqueDays = new Set<string>();
 
     for (const log of logs) {
       const date = new Date(log.done_at);
-      const chore = log.chores as unknown as { name: string, category: string };
+      const chore = log.chores as unknown as { name: string, category: string } | null;
+      if (!chore) continue;
       
       const hour = date.getHours();
       const day = date.getDay(); // 0 is Sunday, 1 is Monday
 
-      if (chore.category === 'Mascotas') petCount++;
+      // Use local date values to properly align days according to local time zone
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const dayOfMonth = String(date.getDate()).padStart(2, '0');
+      const localDateString = `${year}-${month}-${dayOfMonth}`;
+
+      if (chore.category === 'Mascotas') {
+        petCount++;
+        if (hour >= 0 && hour < 4) {
+          vampirePetCount++;
+        }
+      }
       if (chore.category === 'Cocina') cookCount++;
-      if (chore.category === 'Limpieza') cleanCount++;
+      if (chore.category === 'Limpieza') {
+        cleanCount++;
+        cleanTasksPerDay[localDateString] = (cleanTasksPerDay[localDateString] || 0) + 1;
+      }
       
       varietySet.add(chore.name);
       
@@ -73,7 +157,15 @@ export const achievementService = {
       if (hour < 8 && hour >= 4) timeEarlyCount++;
       if (hour === 3) timeWitchCount++;
 
-      if (day === 1) mondayCount++;
+      // hum_insomnia: 12:00 AM - 5:00 AM (hour >= 0 && hour < 5)
+      if (hour >= 0 && hour < 5) {
+        insomniaCount++;
+      }
+
+      if (day === 1) {
+        mondayCount++;
+        mondayTasksPerDay[localDateString] = (mondayTasksPerDay[localDateString] || 0) + 1;
+      }
       if (day === 0 || day === 6) weekendCount++;
 
       const n = chore.name.toLowerCase();
@@ -83,7 +175,7 @@ export const achievementService = {
       if (n.includes('reparar')) repairCount++;
       if (n.includes('planta') || n.includes('regar')) plantsCount++;
 
-      uniqueDays.add(date.toISOString().slice(0, 10));
+      uniqueDays.add(localDateString);
     }
 
     // Calc max streak
@@ -106,6 +198,20 @@ export const achievementService = {
       if (currentStreak > maxStreak) maxStreak = currentStreak;
       prevDate = d;
     }
+
+    // hum_speed: 3 chores completed in less than 5 minutes
+    let hasSpeedrunner = false;
+    for (let i = 2; i < logs.length; i++) {
+      const timeI = new Date(logs[i].done_at).getTime();
+      const timeI2 = new Date(logs[i - 2].done_at).getTime();
+      if (timeI - timeI2 <= 5 * 60 * 1000) {
+        hasSpeedrunner = true;
+        break;
+      }
+    }
+
+    const maxCleanInADay = Math.max(0, ...Object.values(cleanTasksPerDay));
+    const maxMondayInADay = Math.max(0, ...Object.values(mondayTasksPerDay));
 
     const newlyUnlocked: Achievement[] = [];
 
@@ -169,6 +275,32 @@ export const achievementService = {
     check('spec_bathroom_20', bathroomCount >= 20);
     check('spec_repair_10', repairCount >= 10);
     check('spec_plants_20', plantsCount >= 20);
+
+    // Council Proposals
+    check('prop_1', proposalsCount >= 1);
+    check('prop_10', proposalsCount >= 10);
+    check('prop_50', proposalsCount >= 50);
+    check('prop_100', proposalsCount >= 100);
+
+    // Approved Proposals
+    check('appr_1', approvedProposalsCount >= 1);
+    check('appr_5', approvedProposalsCount >= 5);
+    check('appr_10', approvedProposalsCount >= 10);
+
+    // Humorous Time achievements
+    check('hum_insomnia', insomniaCount >= 10);
+    check('hum_vamp_pet', vampirePetCount >= 1);
+
+    // Speedrunner
+    check('hum_speed', hasSpeedrunner);
+
+    // Thanks / Reactions
+    check('hum_giver', thanksGivenCount >= 50);
+    check('hum_receiver', thanksReceivedCount >= 50);
+
+    // Humorous Day / Clean achievements
+    check('hum_mon_hate', maxMondayInADay >= 15);
+    check('hum_cleaner', maxCleanInADay >= 5);
 
     // Insert newly unlocked
     if (newlyUnlocked.length > 0) {

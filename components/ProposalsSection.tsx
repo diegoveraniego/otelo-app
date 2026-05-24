@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { proposalService } from '@/lib/services/proposalService';
 import { choreService } from '@/lib/services/choreService';
+import { achievementService } from '@/lib/services/achievementService';
 import { supabase } from '@/lib/supabase/client';
 import { Proposal, Member, Chore } from '@/lib/types';
 import { useUserStore } from '@/lib/store';
@@ -108,6 +109,13 @@ export default function ProposalsSection() {
     try {
       await proposalService.toggleVote(proposalId, currentUser.id, currentUser.home_id);
       fetchData();
+
+      // Evaluate achievements in case this vote triggers approval of their proposal
+      achievementService.evaluateAndUnlock(currentUser.id, currentUser.home_id).then(newlyUnlocked => {
+        if (newlyUnlocked.length > 0) {
+          window.dispatchEvent(new CustomEvent('achievements-unlocked', { detail: newlyUnlocked }));
+        }
+      }).catch(console.error);
     } catch (err) {
       console.error('Error voting:', err);
     }
@@ -145,6 +153,13 @@ export default function ProposalsSection() {
       setFormData({ name: '', emoji: '', category: '', newCategory: '', threshold: '3' });
       setIsAdding(false);
       fetchData();
+
+      // Evaluate achievements for creating a proposal
+      achievementService.evaluateAndUnlock(currentUser.id, currentUser.home_id).then(newlyUnlocked => {
+        if (newlyUnlocked.length > 0) {
+          window.dispatchEvent(new CustomEvent('achievements-unlocked', { detail: newlyUnlocked }));
+        }
+      }).catch(console.error);
     } catch (err: any) {
       setError(`Error: ${err.message}`);
     } finally {
