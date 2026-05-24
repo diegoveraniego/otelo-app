@@ -130,7 +130,7 @@ export default function RecentActivity() {
         {isLoading && <span className="w-4 h-4 rounded-full border-2 border-[#3584E4] border-t-transparent animate-spin" />}
       </h2>
       
-      <div className="bg-white dark:bg-[#303030] rounded-2xl overflow-hidden shadow-sm border border-[#E5E6E6] dark:border-[#3D3D3D] transition-colors">
+      <div className="bg-white dark:bg-[#303030] rounded-2xl shadow-sm border border-[#E5E6E6] dark:border-[#3D3D3D] transition-colors">
         <div className="flex flex-col">
           {logs.map((log, i) => {
             const isOwnLog = currentUser?.id === log.member_id;
@@ -141,6 +141,10 @@ export default function RecentActivity() {
                 key={log.id}
                 className={`flex items-center gap-4 p-4 ${
                   i !== logs.length - 1 ? 'border-b border-[#E5E6E6] dark:border-[#3D3D3D]' : ''
+                } ${
+                  i === 0 ? 'rounded-t-2xl' : ''
+                } ${
+                  i === logs.length - 1 ? 'rounded-b-2xl' : ''
                 } hover:bg-[#FAFAFA] dark:hover:bg-[#353535] transition-colors group`}
               >
                 <Avatar member={log.member} className="w-10 h-10 text-base" />
