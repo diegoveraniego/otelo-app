@@ -7,7 +7,7 @@ import { LogWithDetails } from '@/lib/types';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { useUserStore } from '@/lib/store';
-import { Trash2, Smile } from 'lucide-react';
+import { Trash2, Smile, Heart } from 'lucide-react';
 import Avatar from './Avatar';
 import { triggerPushNotification } from '@/lib/pushUtils';
 
@@ -196,49 +196,70 @@ export default function RecentActivity() {
 
                 <div className="flex items-center gap-1 shrink-0 relative">
                   {canThank && (
-                    <div className="relative">
+                    <>
+                      {/* Botón de Agradecimiento Rápido (Heart) */}
                       <button
-                        onClick={() => setActivePickerLogId(activePickerLogId === log.id ? null : log.id)}
+                        onClick={() => handleToggleReaction(log, 'heart')}
                         className={`p-2.5 rounded-xl transition-all duration-300 ${
-                          activePickerLogId === log.id
-                            ? 'text-[#3584E4] bg-[#3584E4]/10'
-                            : 'text-[#1E1E1E]/30 dark:text-white/20 hover:text-[#3584E4] hover:bg-[#3584E4]/10 hover:scale-105'
+                          log.thanks?.some(t => t.from_member_id === currentUser?.id && t.reaction_type === 'heart')
+                            ? 'text-[#E01B24] dark:text-[#FF6B6B] bg-[#E01B24]/10 dark:bg-[#FF6B6B]/10 scale-105'
+                            : 'text-[#1E1E1E]/30 dark:text-white/20 hover:text-[#E01B24] dark:hover:text-[#FF6B6B] hover:bg-[#E01B24]/10 dark:hover:bg-[#FF6B6B]/10 hover:scale-110 active:scale-95'
                         }`}
                       >
-                        <Smile className="w-4 h-4" />
+                        <Heart
+                          className={`w-4 h-4 transition-all ${
+                            log.thanks?.some(t => t.from_member_id === currentUser?.id && t.reaction_type === 'heart')
+                              ? 'scale-110 fill-current'
+                              : 'none'
+                          }`}
+                        />
                       </button>
-                      {activePickerLogId === log.id && (
-                        <>
-                          <div className="fixed inset-0 z-30" onClick={() => setActivePickerLogId(null)} />
-                          <div className="absolute right-0 bottom-full mb-2 z-40 bg-white dark:bg-[#303030] border border-[#E5E6E6] dark:border-[#3D3D3D] rounded-2xl p-1.5 shadow-xl flex gap-1 animate-in fade-in slide-in-from-bottom-2 duration-150">
-                            {[
-                              { name: 'heart', emoji: '❤️', label: 'Amor' },
-                              { name: 'sparkle', emoji: '🧼', label: 'Limpieza' },
-                              { name: 'cook', emoji: '🍳', label: 'Sabroso' },
-                              { name: 'paw', emoji: '🐾', label: 'Mascota' },
-                              { name: 'speed', emoji: '⚡', label: 'Rayo' },
-                            ].map((r) => {
-                              const alreadyHasThis = log.thanks?.some(t => t.from_member_id === currentUser?.id && t.reaction_type === r.name);
-                              return (
-                                <button
-                                  key={r.name}
-                                  title={r.label}
-                                  onClick={() => {
-                                    handleToggleReaction(log, r.name);
-                                    setActivePickerLogId(null);
-                                  }}
-                                  className={`text-xl p-1.5 hover:scale-125 active:scale-95 rounded-lg transition-all ${
-                                    alreadyHasThis ? 'bg-blue-50 dark:bg-blue-900/30' : ''
-                                  }`}
-                                >
-                                  {r.emoji}
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </>
-                      )}
-                    </div>
+
+                      {/* Selector de Reacciones (Smile) */}
+                      <div className="relative">
+                        <button
+                          onClick={() => setActivePickerLogId(activePickerLogId === log.id ? null : log.id)}
+                          className={`p-2.5 rounded-xl transition-all duration-300 ${
+                            activePickerLogId === log.id
+                              ? 'text-[#3584E4] bg-[#3584E4]/10'
+                              : 'text-[#1E1E1E]/30 dark:text-white/20 hover:text-[#3584E4] hover:bg-[#3584E4]/10 hover:scale-105'
+                          }`}
+                        >
+                          <Smile className="w-4 h-4" />
+                        </button>
+                        {activePickerLogId === log.id && (
+                          <>
+                            <div className="fixed inset-0 z-30" onClick={() => setActivePickerLogId(null)} />
+                            <div className="absolute right-0 bottom-full mb-2 z-40 bg-white dark:bg-[#303030] border border-[#E5E6E6] dark:border-[#3D3D3D] rounded-2xl p-1.5 shadow-xl flex gap-1 animate-in fade-in slide-in-from-bottom-2 duration-150">
+                              {[
+                                { name: 'heart', emoji: '❤️', label: 'Amor' },
+                                { name: 'sparkle', emoji: '🧼', label: 'Limpieza' },
+                                { name: 'cook', emoji: '🍳', label: 'Sabroso' },
+                                { name: 'paw', emoji: '🐾', label: 'Mascota' },
+                                { name: 'speed', emoji: '⚡', label: 'Rayo' },
+                              ].map((r) => {
+                                const alreadyHasThis = log.thanks?.some(t => t.from_member_id === currentUser?.id && t.reaction_type === r.name);
+                                return (
+                                  <button
+                                    key={r.name}
+                                    title={r.label}
+                                    onClick={() => {
+                                      handleToggleReaction(log, r.name);
+                                      setActivePickerLogId(null);
+                                    }}
+                                    className={`text-xl p-1.5 hover:scale-125 active:scale-95 rounded-lg transition-all ${
+                                      alreadyHasThis ? 'bg-blue-50 dark:bg-blue-900/30' : ''
+                                    }`}
+                                  >
+                                    {r.emoji}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </>
                   )}
 
                   {isOwnLog && (

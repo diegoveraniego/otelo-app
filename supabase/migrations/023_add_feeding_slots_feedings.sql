@@ -19,7 +19,8 @@ BEGIN
         SELECT l.id, l.member_id, l.home_id, l.done_at, c.name AS chore_name, c.category AS chore_category
         FROM public.logs l
         JOIN public.chores c ON l.chore_id = c.id
-        WHERE c.category = 'Mascotas' OR c.name ILIKE '%dar comida%' OR c.name ILIKE '%feed%'
+        WHERE (c.name ILIKE '%dar comida%' OR c.name ILIKE '%feed%' OR c.name ILIKE '%alimentar%')
+          AND c.name NOT ILIKE '%gato%'
         ORDER BY l.done_at ASC
     LOOP
         -- 1. Try to identify pet from chore name
@@ -110,8 +111,9 @@ BEGIN
     -- Get chore details
     SELECT category, name INTO v_chore_category, v_chore_name FROM public.chores WHERE id = NEW.chore_id;
     
-    -- Check if it's a pet feeding chore
-    IF v_chore_category = 'Mascotas' OR v_chore_name ILIKE '%dar comida%' OR v_chore_name ILIKE '%feed%' THEN
+    -- Check if it's a pet feeding chore (excluding cats and other non-feeding tasks)
+    IF (v_chore_name ILIKE '%dar comida%' OR v_chore_name ILIKE '%feed%' OR v_chore_name ILIKE '%alimentar%')
+       AND v_chore_name NOT ILIKE '%gato%' THEN
         
         -- 1. Try to identify pet from chore name
         SELECT id INTO v_pet_id FROM public.pets 
