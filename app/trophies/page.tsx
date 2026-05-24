@@ -4,21 +4,23 @@ import { useEffect, useState, useMemo } from 'react';
 import { useUserStore } from '@/lib/store';
 import { achievementService } from '@/lib/services/achievementService';
 import { ACHIEVEMENTS, Achievement } from '@/lib/achievements/data';
-import { Trophy, Lock } from 'lucide-react';
+import { Trophy, Lock, Check } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { supabase } from '@/lib/supabase/client';
 
 export default function TrophiesPage() {
-  const { currentUser } = useUserStore();
+  const { currentUser, setCurrentUser } = useUserStore();
   const [unlockedIds, setUnlockedIds] = useState<Set<string>>(new Set());
   const [unlockDates, setUnlockDates] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
+  const [isUpdatingTitle, setIsUpdatingTitle] = useState<string | null>(null);
 
   useEffect(() => {
     if (currentUser?.id) {
       loadAchievements();
     }
-  }, [currentUser]);
+  }, [currentUser?.id]);
 
   const loadAchievements = async () => {
     if (!currentUser?.id || !currentUser?.home_id) return;
@@ -38,6 +40,29 @@ export default function TrophiesPage() {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSelectTitle = async (achievement: Achievement) => {
+    if (!currentUser || isUpdatingTitle) return;
+    
+    // Toggle: if same title, remove it
+    const newTitle = currentUser.selected_title === achievement.name ? null : achievement.name;
+    
+    setIsUpdatingTitle(achievement.id);
+    try {
+      const { error } = await supabase
+        .from('members')
+        .update({ selected_title: newTitle })
+        .eq('id', currentUser.id);
+        
+      if (error) throw error;
+      
+      setCurrentUser({ ...currentUser, selected_title: newTitle });
+    } catch (err) {
+      console.error('Error updating title:', err);
+    } finally {
+      setIsUpdatingTitle(null);
     }
   };
 
@@ -110,21 +135,39 @@ export default function TrophiesPage() {
                   {cat.achievements.map(ach => {
                     const isUnlocked = unlockedIds.has(ach.id);
                     const unlockDate = unlockDates[ach.id];
+                    const isSelected = currentUser.selected_title === ach.name;
 
                     return (
                       <div 
                         key={ach.id} 
-                        className={`p-4 rounded-2xl border transition-all flex flex-col items-center text-center gap-2 ${
+                        className={`p-4 rounded-2xl border transition-all flex flex-col items-center text-center gap-2 relative group ${
                           isUnlocked 
-                            ? 'bg-white dark:bg-[#303030] border-yellow-200 dark:border-yellow-900/50 shadow-sm hover:scale-105'
+                            ? 'bg-white dark:bg-[#303030] border-yellow-200 dark:border-yellow-900/50 shadow-sm'
                             : 'bg-[#FAFAFA] dark:bg-[#242424] border-[#E5E6E6] dark:border-[#3D3D3D] opacity-60 grayscale'
-                        }`}
+                        } ${isSelected ? 'ring-2 ring-yellow-400' : ''}`}
                       >
+                        {isUnlocked && (
+                          <button
+                            onClick={() => handleSelectTitle(ach)}
+                            disabled={!!isUpdatingTitle}
+                            className={`absolute inset-0 z-10 rounded-2xl transition-all flex items-center justify-center opacity-0 group-hover:opacity-100 bg-white/40 dark:bg-black/40 backdrop-blur-[1px]`}
+                          >
+                            <span className="bg-white dark:bg-[#1E1E1E] text-[10px] font-bold px-3 py-1.5 rounded-full shadow-lg border border-[#E5E6E6] dark:border-[#3D3D3D]">
+                              {isSelected ? 'Quitar Título' : 'Usar Título'}
+                            </span>
+                          </button>
+                        )}
+
                         <div className="text-4xl relative">
                           {isUnlocked ? ach.emoji : '❓'}
                           {!isUnlocked && (
                             <div className="absolute -bottom-1 -right-1 bg-neutral-200 dark:bg-neutral-800 rounded-full p-1 border border-white dark:border-[#3D3D3D]">
                               <Lock className="w-3 h-3 text-neutral-500" />
+                            </div>
+                          )}
+                          {isSelected && (
+                            <div className="absolute -bottom-1 -right-1 bg-yellow-400 rounded-full p-1 border border-white dark:border-[#303030]">
+                              <Check className="w-3 h-3 text-white" />
                             </div>
                           )}
                         </div>

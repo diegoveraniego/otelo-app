@@ -5,7 +5,10 @@ export type Enums<T extends keyof Database['public']['Enums']> = Database['publi
 
 // Base types from Database
 export type Home = Tables<'homes'>;
-export type Member = Tables<'members'> & { role: 'admin' | 'member' | 'organizator' };
+export type Member = Tables<'members'> & { 
+  role: 'admin' | 'member' | 'organizator';
+  selected_title?: string | null;
+};
 export type Chore = Tables<'chores'>;
 export type Log = Tables<'logs'>;
 export type Pet = Tables<'pets'>;

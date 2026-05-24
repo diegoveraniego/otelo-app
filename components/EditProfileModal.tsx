@@ -8,6 +8,7 @@ import Avatar from './Avatar';
 import { useTheme } from 'next-themes';
 import { Member, ColorTrade } from '@/lib/types';
 import { triggerPushNotification } from '@/lib/pushUtils';
+import { ACHIEVEMENTS } from '@/lib/achievements/data';
 
 interface EditProfileModalProps {
   isOpen: boolean;
@@ -72,13 +73,48 @@ export default function EditProfileModal({ isOpen, onClose, onUpdated }: EditPro
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
+  const [unlockedAchievements, setUnlockedAchievements] = useState<any[]>([]);
+
   useEffect(() => {
     setMounted(true);
     if (isOpen) {
       fetchUsedColors();
       checkPushSubscription();
+      fetchUnlockedAchievements();
     }
   }, [isOpen]);
+
+  const fetchUnlockedAchievements = async () => {
+    if (!currentUser?.id) return;
+    const { data } = await supabase
+      .from('member_achievements')
+      .select('achievement_id')
+      .eq('member_id', currentUser.id);
+    
+    if (data) {
+      const unlocked = data.map(d => {
+        const ach = ACHIEVEMENTS.find(a => a.id === d.achievement_id);
+        return ach ? { ...ach } : null;
+      }).filter(Boolean);
+      setUnlockedAchievements(unlocked);
+    }
+  };
+
+  const handleTitleChange = async (title: string | null) => {
+    if (!currentUser) return;
+    try {
+      const { error } = await supabase
+        .from('members')
+        .update({ selected_title: title })
+        .eq('id', currentUser.id);
+      if (error) throw error;
+      setCurrentUser({ ...currentUser, selected_title: title });
+      onUpdated();
+    } catch (e) {
+      console.error(e);
+      setError('Error al actualizar el título');
+    }
+  };
 
   const checkPushSubscription = async () => {
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
@@ -443,6 +479,26 @@ export default function EditProfileModal({ isOpen, onClose, onUpdated }: EditPro
             
             {/* Hidden canvas for capturing video frame */}
             <canvas ref={canvasRef} className="hidden" />
+          </div>
+
+          {/* Selected Title Section */}
+          <div className="border-t border-[#E5E6E6] dark:border-[#3D3D3D] pt-6 transition-colors">
+            <h3 className="text-sm font-semibold text-[#1E1E1E] dark:text-white mb-3 flex items-center gap-2">
+              <Trophy className="w-4 h-4 text-yellow-500" /> Título Seleccionado
+            </h3>
+            <select
+              value={currentUser.selected_title || ''}
+              onChange={(e) => handleTitleChange(e.target.value || null)}
+              className="w-full bg-[#FAFAFA] dark:bg-[#242424] border border-[#E5E6E6] dark:border-[#3D3D3D] rounded-lg px-3 py-2 text-sm text-[#1E1E1E] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#3584E4]"
+            >
+              <option value="">Ninguno</option>
+              {unlockedAchievements.map(ach => (
+                <option key={ach.id} value={ach.name}>{ach.name}</option>
+              ))}
+            </select>
+            <p className="text-[10px] text-[#1E1E1E]/50 dark:text-white/50 mt-2">
+              Selecciona un título de tus trofeos desbloqueados para mostrarlo bajo tu avatar.
+            </p>
           </div>
 
           <div className="border-t border-[#E5E6E6] dark:border-[#3D3D3D] pt-6 transition-colors">

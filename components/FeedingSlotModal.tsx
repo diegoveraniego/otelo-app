@@ -53,6 +53,13 @@ export default function FeedingSlotModal({ slot, isOpen, onClose, onRefresh }: P
   const dayName = slot ? DAY_NAMES_FULL[slot.day_of_week] : '';
   const slotLabel = slot ? SLOT_LABELS[slot.slot] : '';
 
+  // Check if this is a future slot being marked early
+  const isEarly = useMemo(() => {
+    if (!slot || !isToday || slot.fed_at) return false;
+    const hour = new Date().getHours();
+    return hour < SLOT_HOURS[slot.slot].start;
+  }, [slot, isToday]);
+
   if (!isOpen || !slot) return null;
 
   // ── Actions ──────────────────────────────────────────────────
@@ -269,14 +276,25 @@ export default function FeedingSlotModal({ slot, isOpen, onClose, onRefresh }: P
         {/* Action Buttons */}
         <div className="grid gap-2">
           {!slot.fed_at && isToday && (
-            <button
-              onClick={handleMarkFed}
-              disabled={isSubmitting}
-              className="w-full flex items-center justify-center gap-2 py-3.5 bg-[#26A269] hover:bg-[#1E8254] text-white font-bold rounded-xl transition-all active:scale-[0.98] disabled:opacity-50"
-            >
-              <CheckCircle2 className="w-5 h-5" />
-              {isSubmitting ? 'Guardando...' : 'Marcar como alimentado'}
-            </button>
+            <>
+              {isEarly && (
+                <div className="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40 rounded-xl flex items-start gap-2 mb-1">
+                  <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                  <p className="text-[11px] text-amber-700 dark:text-amber-400 font-medium">
+                    Aún es temprano para el turno de la {slotLabel.toLowerCase()}. 
+                    Si le estás dando la comida que faltaba de la mañana, asegúrate de marcar el turno de la mañana en su lugar.
+                  </p>
+                </div>
+              )}
+              <button
+                onClick={handleMarkFed}
+                disabled={isSubmitting}
+                className="w-full flex items-center justify-center gap-2 py-3.5 bg-[#26A269] hover:bg-[#1E8254] text-white font-bold rounded-xl transition-all active:scale-[0.98] disabled:opacity-50"
+              >
+                <CheckCircle2 className="w-5 h-5" />
+                {isSubmitting ? 'Guardando...' : 'Marcar como alimentado'}
+              </button>
+            </>
           )}
 
           {!slot.assigned_to && !slot.fed_at && (
