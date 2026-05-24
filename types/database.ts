@@ -292,6 +292,7 @@ export type Database = {
           home_id: string
           id: string
           member_id: string
+          metadata: Json | null
         }
         Insert: {
           chore_id: string
@@ -299,6 +300,7 @@ export type Database = {
           home_id: string
           id?: string
           member_id: string
+          metadata?: Json | null
         }
         Update: {
           chore_id?: string
@@ -306,6 +308,7 @@ export type Database = {
           home_id?: string
           id?: string
           member_id?: string
+          metadata?: Json | null
         }
         Relationships: [
           {

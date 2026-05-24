@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
@@ -12,11 +12,16 @@ import Image from "next/image";
 const inter = Inter({ subsets: ["latin"] });
 const bagnard = localFont({ src: "../public/fonts/Bagnard.otf", variable: "--font-bagnard" });
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 0.8,
+  viewportFit: "cover",
+};
+
 export const metadata: Metadata = {
   title: "Otelo - Family Chores",
   description: "App para registrar tareas del hogar",
   manifest: "/manifest.json",
-  viewport: "width=device-width, initial-scale=0.8, viewport-fit=cover",
   icons: {
     icon: "/logo_otelo.png",
     apple: "/logo_otelo.png",

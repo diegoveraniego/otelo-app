@@ -6,7 +6,7 @@ const JWT_SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || process.env.HOME_PASSWORD || 'default-secret-at-least-32-chars-long'
 );
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const token = request.cookies.get('home_auth_token')?.value;
   const isLoginPage = request.nextUrl.pathname === '/login';
 
