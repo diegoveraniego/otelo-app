@@ -14,7 +14,8 @@ import Avatar from './Avatar';
 import { triggerPushNotification } from '@/lib/pushUtils';
 import {
   DAY_NAMES_FULL, SLOT_LABELS, isSlotOverdue,
-  wasFedLate, formatFedTime, isSlotNow, isSlotToday
+  wasFedLate, formatFedTime, isSlotNow, isSlotToday,
+  SLOT_HOURS
 } from '@/lib/feedingUtils';
 
 type Props = {

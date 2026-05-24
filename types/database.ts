@@ -328,6 +328,45 @@ export type Database = {
           },
         ]
       }
+      member_achievements: {
+        Row: {
+          achievement_id: string
+          home_id: string
+          id: string
+          member_id: string
+          unlocked_at: string
+        }
+        Insert: {
+          achievement_id: string
+          home_id: string
+          id?: string
+          member_id: string
+          unlocked_at?: string
+        }
+        Update: {
+          achievement_id?: string
+          home_id?: string
+          id?: string
+          member_id?: string
+          unlocked_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "member_achievements_home_id_fkey"
+            columns: ["home_id"]
+            isOneToOne: false
+            referencedRelation: "homes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "member_achievements_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       members: {
         Row: {
           avatar_url: string | null

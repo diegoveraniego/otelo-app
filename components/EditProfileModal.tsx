@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import { useUserStore } from '@/lib/store';
-import { X, Upload, Camera, Loader2, Moon, Sun, Monitor, RefreshCw } from 'lucide-react';
+import { X, Upload, Camera, Loader2, Moon, Sun, Monitor, RefreshCw, Trophy } from 'lucide-react';
 import Avatar from './Avatar';
 import { useTheme } from 'next-themes';
 import { Member, ColorTrade } from '@/lib/types';
