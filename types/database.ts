@@ -338,6 +338,7 @@ export type Database = {
           notification_prefs: Json | null
           pin: string
           role: string
+          selected_title: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -348,6 +349,7 @@ export type Database = {
           notification_prefs?: Json | null
           pin?: string
           role?: string
+          selected_title?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -358,6 +360,7 @@ export type Database = {
           notification_prefs?: Json | null
           pin?: string
           role?: string
+          selected_title?: string | null
         }
         Relationships: [
           {
