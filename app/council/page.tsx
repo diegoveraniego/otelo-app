@@ -1,6 +1,5 @@
 import ProposalsSection from '@/components/ProposalsSection';
 import ChoreVotesSection from '@/components/ChoreVotesSection';
-import GamificationBanner from '@/components/GamificationBanner';
 
 export default function CouncilPage() {
   return (
@@ -9,7 +8,6 @@ export default function CouncilPage() {
         <h1 className="text-2xl font-black text-[#1E1E1E] dark:text-white mb-6 tracking-tight px-1">
           Consejo Familiar
         </h1>
-        <GamificationBanner />
         <ProposalsSection />
         <ChoreVotesSection />
       </div>
