@@ -5,8 +5,6 @@ import DateHeader from '@/components/DateHeader';
 import DesktopSidebarStats from '@/components/DesktopSidebarStats';
 import WeeklySummaryBanner from '@/components/WeeklySummaryBanner';
 import GamificationBanner from '@/components/GamificationBanner';
-import ProposalsSection from '@/components/ProposalsSection';
-
 export default function Home() {
   return (
     <div className="animate-in fade-in duration-500 pb-8 mt-2">
@@ -21,7 +19,6 @@ export default function Home() {
             <SummaryCard />
           </div>
           <ChoreGrid />
-          <ProposalsSection />
           <RecentActivity />
         </div>
 

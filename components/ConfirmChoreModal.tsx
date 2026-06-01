@@ -23,6 +23,9 @@ export default function ConfirmChoreModal({ chore, isOpen, onClose }: Props) {
   const [showCustomTime, setShowCustomTime] = useState(false);
   const [customDate, setCustomDate] = useState<'today' | 'yesterday'>('today');
   const [customTime, setCustomTime] = useState('');
+  const [selectedVariant, setSelectedVariant] = useState<string | null>(null);
+  
+  const isPasto = chore?.name === 'Cortar Pasto';
 
   useEffect(() => {
     if (isOpen && chore && currentUser) {
@@ -31,6 +34,7 @@ export default function ConfirmChoreModal({ chore, isOpen, onClose }: Props) {
       setShowCustomTime(false);
       setCustomDate('today');
       setCustomTime('');
+      setSelectedVariant(null);
       checkDuplicate();
     }
   }, [isOpen, chore?.id]);
@@ -92,7 +96,8 @@ export default function ConfirmChoreModal({ chore, isOpen, onClose }: Props) {
     setIsSubmitting(true);
     
     try {
-      await choreService.completeChore(chore.id, currentUser.id, currentUser.home_id, doneAt);
+      const metadata = selectedVariant ? { variant: selectedVariant } : {};
+      await choreService.completeChore(chore.id, currentUser.id, currentUser.home_id, doneAt, metadata);
       
       achievementService.evaluateAndUnlock(currentUser.id, currentUser.home_id).then(newlyUnlocked => {
         if (newlyUnlocked.length > 0) {
@@ -152,6 +157,23 @@ export default function ConfirmChoreModal({ chore, isOpen, onClose }: Props) {
               </div>
             )}
 
+            {isPasto && (
+              <div className="mt-4 flex flex-col gap-2 animate-in slide-in-from-bottom-2">
+                <span className="text-sm font-bold text-[#1E1E1E] dark:text-white mb-1">¿Qué cortaste?</span>
+                <div className="grid grid-cols-3 gap-2">
+                  {['Casa 3294', 'Casa 3290', 'Ambas'].map(opt => (
+                    <button
+                      key={opt}
+                      onClick={() => setSelectedVariant(opt)}
+                      className={`py-2 px-1 text-xs font-bold rounded-xl transition-all border ${selectedVariant === opt ? 'bg-[#3584E4] text-white border-[#3584E4] shadow-sm scale-105' : 'bg-[#F5F5F7] dark:bg-[#2A2A2A] border-[#E5E6E6] dark:border-[#3D3D3D] text-[#1E1E1E]/70 dark:text-white/70 hover:bg-[#E5E6E6] dark:hover:bg-[#3D3D3D]'}`}
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {!showCustomTime ? (
               <>
                 <div className="grid grid-cols-2 gap-3 mt-8">
@@ -163,7 +185,7 @@ export default function ConfirmChoreModal({ chore, isOpen, onClose }: Props) {
                   </button>
                   <button
                     onClick={handleConfirm}
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || (isPasto && !selectedVariant)}
                     className="px-4 py-3 bg-[#3584E4] hover:bg-[#1C71D8] text-white font-bold rounded-xl transition-all shadow-sm active:scale-95 disabled:opacity-50"
                   >
                     {isSubmitting ? 'Guardando...' : showDuplicateWarning ? 'Registrar de nuevo' : 'Sí, lo hice'}
@@ -220,7 +242,7 @@ export default function ConfirmChoreModal({ chore, isOpen, onClose }: Props) {
                   </button>
                   <button
                     onClick={handleConfirm}
-                    disabled={isSubmitting || !customTime}
+                    disabled={isSubmitting || !customTime || (isPasto && !selectedVariant)}
                     className="px-4 py-3 bg-[#3584E4] hover:bg-[#1C71D8] text-white font-bold rounded-xl transition-all shadow-sm active:scale-95 disabled:opacity-50"
                   >
                     {isSubmitting ? 'Guardando...' : 'Confirmar'}

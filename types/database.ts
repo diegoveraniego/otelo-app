@@ -21,6 +21,7 @@ export type Database = {
           home_id: string
           id: string
           name: string
+          points: number
           threshold_days: number | null
         }
         Insert: {
@@ -29,6 +30,7 @@ export type Database = {
           home_id: string
           id?: string
           name: string
+          points?: number
           threshold_days?: number | null
         }
         Update: {
@@ -37,6 +39,7 @@ export type Database = {
           home_id?: string
           id?: string
           name?: string
+          points?: number
           threshold_days?: number | null
         }
         Relationships: [
@@ -45,6 +48,55 @@ export type Database = {
             columns: ["home_id"]
             isOneToOne: false
             referencedRelation: "homes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chore_votes: {
+        Row: {
+          chore_id: string
+          created_at: string
+          home_id: string
+          id: string
+          member_id: string
+          points: number
+        }
+        Insert: {
+          chore_id: string
+          created_at?: string
+          home_id: string
+          id?: string
+          member_id: string
+          points: number
+        }
+        Update: {
+          chore_id?: string
+          created_at?: string
+          home_id?: string
+          id?: string
+          member_id?: string
+          points?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chore_votes_chore_id_fkey"
+            columns: ["chore_id"]
+            isOneToOne: false
+            referencedRelation: "chores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chore_votes_home_id_fkey"
+            columns: ["home_id"]
+            isOneToOne: false
+            referencedRelation: "homes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chore_votes_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
             referencedColumns: ["id"]
           },
         ]

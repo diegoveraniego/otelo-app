@@ -16,6 +16,7 @@ export type FeedingTrade = Tables<'feeding_trades'>;
 export type ColorTrade = Tables<'color_trades'>;
 export type Proposal = Tables<'proposals'>;
 export type ProposalVote = Tables<'proposal_votes'>;
+export type ChoreVote = Tables<'chore_votes'>;
 export type Thanks = Tables<'thanks'>;
 export type PushSubscriptionType = Tables<'push_subscriptions'>;
 

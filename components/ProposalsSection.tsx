@@ -68,7 +68,7 @@ export default function ProposalsSection() {
         const deadline = addDays(new Date(prop.created_at), prop.threshold_days);
         const isExpired = isBefore(deadline, new Date());
 
-        if (propVotes.length >= allMembers.length) {
+        if (propVotes.length >= 5) {
           await proposalService.approveProposal(prop.id);
           needsRefresh = true;
         } else if (isExpired) {
@@ -318,11 +318,11 @@ export default function ProposalsSection() {
                 <div className="w-full bg-[#E5E6E6] dark:bg-[#3D3D3D] h-1 rounded-full overflow-hidden mt-1">
                    <div 
                     className="bg-[#3584E4] h-full transition-all duration-1000" 
-                    style={{ width: `${(propVotes.length / membersCount) * 100}%` }}
+                    style={{ width: `${(propVotes.length / 5) * 100}%` }}
                    />
                 </div>
                 <span className="text-[10px] font-black text-[#1E1E1E]/40 dark:text-white/40 tracking-widest">
-                  {propVotes.length}/{membersCount}
+                  {propVotes.length}/5
                 </span>
               </div>
             </div>

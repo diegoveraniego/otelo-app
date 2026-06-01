@@ -152,6 +152,9 @@ export default function RecentActivity() {
                   <p className="text-sm text-[#1E1E1E] dark:text-white truncate">
                     <span className="font-semibold">{log.member.name}</span> hizo{' '}
                     <span className="font-medium">{log.chore.name}</span> {log.chore.emoji}
+                    {(log.metadata as any)?.variant && (
+                      <span className="text-[#1E1E1E]/50 dark:text-white/50 text-xs ml-1 font-medium">({(log.metadata as any).variant})</span>
+                    )}
                   </p>
                   <p className="text-[11px] text-[#1E1E1E]/50 dark:text-white/40 mt-0.5">
                     Hace {formatDistanceToNow(new Date(log.done_at), { locale: es })}
