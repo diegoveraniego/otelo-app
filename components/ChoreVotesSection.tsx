@@ -90,19 +90,26 @@ export default function ChoreVotesSection() {
                   </div>
 
                   <div className="flex bg-white dark:bg-[#303030] rounded-xl border border-[#E5E6E6] dark:border-[#3D3D3D] p-1 shadow-sm w-fit">
-                    {[1, 2, 3, 4, 5].map((val) => (
+                    {[1, 2, 3, 4, 5].map((val) => {
+                      const votesForVal = choreVotes.filter(v => v.points === val).length;
+                      return (
                       <button
                         key={val}
                         onClick={() => handleVote(chore.id, val)}
-                        className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold text-sm transition-all ${
+                        className={`relative w-10 h-10 rounded-lg flex items-center justify-center font-bold text-sm transition-all ${
                           userVote === val 
                             ? 'bg-[#3584E4] text-white shadow-sm' 
                             : 'text-[#1E1E1E]/40 dark:text-white/40 hover:bg-[#F5F5F7] dark:hover:bg-[#3D3D3D]'
                         }`}
                       >
                         {val}
+                        {votesForVal > 0 && (
+                          <span className="absolute -top-1 -right-1 bg-amber-500 text-white text-[9px] w-4 h-4 flex items-center justify-center rounded-full font-black shadow-sm">
+                            {votesForVal}
+                          </span>
+                        )}
                       </button>
-                    ))}
+                    )})}
                   </div>
                 </div>
               );
