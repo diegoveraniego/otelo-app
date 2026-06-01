@@ -180,11 +180,9 @@ export default function ChoreGrid() {
                         <span>Pte.</span>
                       </div>
                     )}
-                    {(chore.points && chore.points > 1) ? (
-                      <div className="absolute top-2 left-2 flex items-center gap-1 px-1.5 py-0.5 bg-[#3584E4]/10 text-[#3584E4] rounded-full text-[10px] font-bold">
-                        <span>⭐ {chore.points}</span>
-                      </div>
-                    ) : null}
+                    <div className="absolute top-2 left-2 flex items-center gap-1 px-1.5 py-0.5 bg-[#3584E4]/10 text-[#3584E4] rounded-full text-[10px] font-bold">
+                      <span>{chore.points || 1} pts</span>
+                    </div>
                     <span className="text-3xl sm:text-4xl mb-2 sm:mb-3 group-hover:scale-110 transition-transform">{chore.emoji}</span>
                     <span className={`font-medium text-center leading-tight w-full line-clamp-2 px-1 transition-all ${
                       chore.name.length > 16 

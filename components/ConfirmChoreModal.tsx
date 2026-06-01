@@ -21,7 +21,7 @@ export default function ConfirmChoreModal({ chore, isOpen, onClose }: Props) {
   const [success, setSuccess] = useState(false);
   const [showDuplicateWarning, setShowDuplicateWarning] = useState(false);
   const [showCustomTime, setShowCustomTime] = useState(false);
-  const [customDate, setCustomDate] = useState<'today' | 'yesterday'>('today');
+  const [customDateOffset, setCustomDateOffset] = useState<number>(0);
   const [customTime, setCustomTime] = useState('');
   const [selectedVariant, setSelectedVariant] = useState<string | null>(null);
   
@@ -32,7 +32,7 @@ export default function ConfirmChoreModal({ chore, isOpen, onClose }: Props) {
       setSuccess(false);
       setShowDuplicateWarning(false);
       setShowCustomTime(false);
-      setCustomDate('today');
+      setCustomDateOffset(0);
       setCustomTime('');
       setSelectedVariant(null);
       checkDuplicate();
@@ -86,9 +86,7 @@ export default function ConfirmChoreModal({ chore, isOpen, onClose }: Props) {
     if (showCustomTime && customTime) {
       const [hours, minutes] = customTime.split(':').map(Number);
       const date = new Date();
-      if (customDate === 'yesterday') {
-        date.setDate(date.getDate() - 1);
-      }
+      date.setDate(date.getDate() - customDateOffset);
       date.setHours(hours, minutes, 0, 0);
       doneAt = date.toISOString();
     }
@@ -200,27 +198,25 @@ export default function ConfirmChoreModal({ chore, isOpen, onClose }: Props) {
               </>
             ) : (
               <div className="mt-8 space-y-4">
-                <div className="flex gap-2 p-1 bg-[#F4F4F4] dark:bg-[#2A2A2A] rounded-xl border border-[#E5E6E6] dark:border-[#3D3D3D]">
-                  <button
-                    onClick={() => setCustomDate('today')}
-                    className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${
-                      customDate === 'today'
-                        ? 'bg-white dark:bg-[#3D3D3D] shadow-sm text-[#1E1E1E] dark:text-white'
-                        : 'text-[#1E1E1E]/50 dark:text-white/50 hover:text-[#1E1E1E] dark:hover:text-white'
-                    }`}
-                  >
-                    Hoy
-                  </button>
-                  <button
-                    onClick={() => setCustomDate('yesterday')}
-                    className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${
-                      customDate === 'yesterday'
-                        ? 'bg-white dark:bg-[#3D3D3D] shadow-sm text-[#1E1E1E] dark:text-white'
-                        : 'text-[#1E1E1E]/50 dark:text-white/50 hover:text-[#1E1E1E] dark:hover:text-white'
-                    }`}
-                  >
-                    Ayer
-                  </button>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 p-1 bg-[#F4F4F4] dark:bg-[#2A2A2A] rounded-xl border border-[#E5E6E6] dark:border-[#3D3D3D]">
+                  {[
+                    { label: 'Hoy', offset: 0 },
+                    { label: 'Ayer', offset: 1 },
+                    { label: '-2 días', offset: 2 },
+                    { label: '-3 días', offset: 3 },
+                  ].map((d) => (
+                    <button
+                      key={d.offset}
+                      onClick={() => setCustomDateOffset(d.offset)}
+                      className={`flex-1 py-2 text-xs sm:text-sm font-bold rounded-lg transition-all ${
+                        customDateOffset === d.offset
+                          ? 'bg-white dark:bg-[#3D3D3D] shadow-sm text-[#1E1E1E] dark:text-white'
+                          : 'text-[#1E1E1E]/50 dark:text-white/50 hover:text-[#1E1E1E] dark:hover:text-white'
+                      }`}
+                    >
+                      {d.label}
+                    </button>
+                  ))}
                 </div>
                 
                 <div className="flex items-center justify-between p-3 bg-[#F4F4F4] dark:bg-[#2A2A2A] rounded-xl border border-[#E5E6E6] dark:border-[#3D3D3D]">

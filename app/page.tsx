@@ -5,6 +5,8 @@ import DateHeader from '@/components/DateHeader';
 import DesktopSidebarStats from '@/components/DesktopSidebarStats';
 import WeeklySummaryBanner from '@/components/WeeklySummaryBanner';
 import GamificationBanner from '@/components/GamificationBanner';
+import HomeWarnings from '@/components/HomeWarnings';
+
 export default function Home() {
   return (
     <div className="animate-in fade-in duration-500 pb-8 mt-2">
@@ -14,6 +16,7 @@ export default function Home() {
           <DateHeader />
           <WeeklySummaryBanner />
           <GamificationBanner />
+          <HomeWarnings />
           {/* SummaryCard solo en móvil — en desktop va en la sidebar */}
           <div className="md:hidden">
             <SummaryCard />
