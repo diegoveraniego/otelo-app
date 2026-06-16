@@ -1,5 +1,4 @@
 import ProposalsSection from '@/components/ProposalsSection';
-import ChoreVotesSection from '@/components/ChoreVotesSection';
 
 export default function CouncilPage() {
   return (
@@ -9,7 +8,6 @@ export default function CouncilPage() {
           Consejo Familiar
         </h1>
         <ProposalsSection />
-        <ChoreVotesSection />
       </div>
     </div>
   );

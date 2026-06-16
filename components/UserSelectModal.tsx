@@ -21,6 +21,8 @@ export default function UserSelectModal() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
+  const [isHydrated, setIsHydrated] = useState(false);
+
   useEffect(() => {
     if (pathname !== '/login' && pathname !== '/onboarding') {
       fetchMembers();
@@ -28,14 +30,29 @@ export default function UserSelectModal() {
   }, [pathname]);
 
   useEffect(() => {
-    if (!currentUser && !hasDismissedUserModal && pathname !== '/login' && pathname !== '/onboarding') {
+    // Enable Zustand persist hydration check
+    setIsHydrated(useUserStore.persist.hasHydrated());
+    const unsubFinish = useUserStore.persist.onFinishHydration(() => setIsHydrated(true));
+    return () => {
+      unsubFinish();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isHydrated) return; // Wait for hydration before opening modal
+
+    if (pathname === '/login' || pathname === '/onboarding') {
+      setIsOpen(false);
+    } else if (currentUser || hasDismissedUserModal) {
+      setIsOpen(false);
+    } else {
       setIsOpen(true);
     }
     
     const handleOpenModal = () => setIsOpen(true);
     window.addEventListener('open-user-modal', handleOpenModal);
     return () => window.removeEventListener('open-user-modal', handleOpenModal);
-  }, [currentUser, pathname]);
+  }, [currentUser, pathname, hasDismissedUserModal, isHydrated]);
 
   const fetchMembers = async () => {
     setIsLoading(true);

@@ -23,6 +23,8 @@ export default function ProposalsSection() {
   const [membersCount, setMembersCount] = useState(0);
   const [categories, setCategories] = useState<string[]>([]);
   const [existingEmojis, setExistingEmojis] = useState<string[]>([]);
+  const [chores, setChores] = useState<Chore[]>([]);
+  const [proposalMode, setProposalMode] = useState<'new_chore' | 'update_points'>('new_chore');
   
   const [isAdding, setIsAdding] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -33,7 +35,9 @@ export default function ProposalsSection() {
     emoji: '',
     category: '',
     newCategory: '',
-    threshold: '3'
+    threshold: '3',
+    targetChoreId: '',
+    proposedPoints: '1'
   });
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -55,6 +59,7 @@ export default function ProposalsSection() {
       if (choreData) {
         setExistingEmojis(choreData.map(c => c.emoji));
         setCategories(Array.from(new Set(choreData.map(c => c.category).filter((c): c is string => !!c))));
+        setChores(choreData);
       }
 
       // 2. Fetch active proposals and their votes
@@ -126,31 +131,53 @@ export default function ProposalsSection() {
     if (!currentUser || isSubmitting) return;
     setError('');
 
-    const { name, emoji, category, newCategory, threshold } = formData;
+    const { name, emoji, category, newCategory, threshold, targetChoreId, proposedPoints } = formData;
 
-    if (!name || !emoji || (!category && !newCategory)) {
-      setError('Completa todos los campos');
-      return;
-    }
-
-    if (existingEmojis.includes(emoji)) {
-      setError('Este emoji ya está en uso');
-      return;
+    if (proposalMode === 'new_chore') {
+      if (!name || !emoji || (!category && !newCategory)) {
+        setError('Completa todos los campos');
+        return;
+      }
+      if (existingEmojis.includes(emoji)) {
+        setError('Este emoji ya está en uso');
+        return;
+      }
+    } else {
+      if (!targetChoreId || !proposedPoints) {
+        setError('Selecciona la tarea y los puntos');
+        return;
+      }
     }
 
     setIsSubmitting(true);
     try {
-      const finalCategory = category === 'new' ? newCategory : category;
-      await proposalService.createProposal({
-        name,
-        emoji,
-        category: finalCategory,
-        threshold_days: parseInt(threshold),
-        created_by: currentUser.id,
-        home_id: currentUser.home_id
-      });
+      if (proposalMode === 'new_chore') {
+        const finalCategory = category === 'new' ? newCategory : category;
+        await proposalService.createProposal({
+          name,
+          emoji,
+          category: finalCategory,
+          threshold_days: parseInt(threshold),
+          created_by: currentUser.id,
+          home_id: currentUser.home_id,
+          type: 'new_chore'
+        });
+      } else {
+        const targetChore = chores.find(c => c.id === targetChoreId);
+        await proposalService.createProposal({
+          name: `Cambiar valor de ${targetChore?.name}`,
+          emoji: '⭐',
+          category: targetChore?.category || 'General',
+          threshold_days: 0,
+          created_by: currentUser.id,
+          home_id: currentUser.home_id,
+          type: 'update_chore_points',
+          target_chore_id: targetChoreId,
+          proposed_points: parseInt(proposedPoints)
+        });
+      }
       
-      setFormData({ name: '', emoji: '', category: '', newCategory: '', threshold: '3' });
+      setFormData({ name: '', emoji: '', category: '', newCategory: '', threshold: '3', targetChoreId: '', proposedPoints: '1' });
       setIsAdding(false);
       fetchData();
 
@@ -188,79 +215,129 @@ export default function ProposalsSection() {
 
       {isAdding && (
         <form onSubmit={handleSubmit} className="bg-white dark:bg-[#303030] p-6 rounded-3xl shadow-xl border border-[#E5E6E6] dark:border-[#3D3D3D] mb-8 space-y-5 animate-in zoom-in-95 duration-200">
-          <div className="grid grid-cols-[90px_1fr] gap-4">
-            <div className="space-y-2 relative">
-              <label className="text-[10px] font-black uppercase text-[#1E1E1E]/30 dark:text-white/30 px-1 tracking-widest">Emoji</label>
-              <button
-                type="button"
-                onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                className="w-full text-3xl bg-[#F5F5F7] dark:bg-[#242424] border border-[#E5E6E6] dark:border-[#3D3D3D] rounded-2xl h-14 flex items-center justify-center hover:scale-105 transition-transform shadow-sm"
-              >
-                {formData.emoji || <Smile className="w-7 h-7 text-[#1E1E1E]/10" />}
-              </button>
-              
-              {showEmojiPicker && (
-                <div className="absolute top-full left-0 z-[70] mt-3 animate-in fade-in zoom-in-95 duration-200">
-                  <div className="fixed inset-0" onClick={() => setShowEmojiPicker(false)} />
-                  <div className="relative shadow-2xl rounded-3xl overflow-hidden border border-[#E5E6E6] dark:border-[#3D3D3D]">
-                    <EmojiPicker 
-                      onEmojiClick={(e) => {
-                        setFormData(prev => ({ ...prev, emoji: e.emoji }));
-                        setShowEmojiPicker(false);
-                      }}
-                      theme={resolvedTheme === 'dark' ? EmojiTheme.DARK : EmojiTheme.LIGHT}
-                      width={320}
-                      height={400}
-                    />
-                  </div>
+          
+          <div className="flex bg-[#F5F5F7] dark:bg-[#2A2A2A] p-1 rounded-xl mb-4">
+            <button
+              type="button"
+              onClick={() => setProposalMode('new_chore')}
+              className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${
+                proposalMode === 'new_chore' ? 'bg-white dark:bg-[#3D3D3D] shadow-sm text-[#1E1E1E] dark:text-white' : 'text-[#1E1E1E]/50 dark:text-white/50 hover:text-[#1E1E1E] dark:hover:text-white'
+              }`}
+            >
+              Nueva Tarea
+            </button>
+            <button
+              type="button"
+              onClick={() => setProposalMode('update_points')}
+              className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${
+                proposalMode === 'update_points' ? 'bg-white dark:bg-[#3D3D3D] shadow-sm text-[#1E1E1E] dark:text-white' : 'text-[#1E1E1E]/50 dark:text-white/50 hover:text-[#1E1E1E] dark:hover:text-white'
+              }`}
+            >
+              Cambiar Puntos
+            </button>
+          </div>
+
+          {proposalMode === 'new_chore' ? (
+            <>
+              <div className="grid grid-cols-[90px_1fr] gap-4">
+                <div className="space-y-2 relative">
+                  <label className="text-[10px] font-black uppercase text-[#1E1E1E]/30 dark:text-white/30 px-1 tracking-widest">Emoji</label>
+                  <button
+                    type="button"
+                    onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                    className="w-full text-3xl bg-[#F5F5F7] dark:bg-[#242424] border border-[#E5E6E6] dark:border-[#3D3D3D] rounded-2xl h-14 flex items-center justify-center hover:scale-105 transition-transform shadow-sm"
+                  >
+                    {formData.emoji || <Smile className="w-7 h-7 text-[#1E1E1E]/10" />}
+                  </button>
+                  
+                  {showEmojiPicker && (
+                    <div className="absolute top-full left-0 z-[70] mt-3 animate-in fade-in zoom-in-95 duration-200">
+                      <div className="fixed inset-0" onClick={() => setShowEmojiPicker(false)} />
+                      <div className="relative shadow-2xl rounded-3xl overflow-hidden border border-[#E5E6E6] dark:border-[#3D3D3D]">
+                        <EmojiPicker 
+                          onEmojiClick={(e) => {
+                            setFormData(prev => ({ ...prev, emoji: e.emoji }));
+                            setShowEmojiPicker(false);
+                          }}
+                          theme={resolvedTheme === 'dark' ? EmojiTheme.DARK : EmojiTheme.LIGHT}
+                          width={320}
+                          height={400}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase text-[#1E1E1E]/30 dark:text-white/30 px-1 tracking-widest">Nombre de la tarea</label>
+                  <input 
+                    value={formData.name}
+                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                    placeholder="Ej: Limpiar el horno"
+                    className="w-full bg-[#F5F5F7] dark:bg-[#242424] border border-[#E5E6E6] dark:border-[#3D3D3D] rounded-2xl h-14 px-5 focus:outline-none focus:ring-2 focus:ring-[#3584E4] text-[#1E1E1E] dark:text-white font-medium"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase text-[#1E1E1E]/30 dark:text-white/30 px-1 tracking-widest">Categoría</label>
+                  <select 
+                    value={formData.category}
+                    onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
+                    className="w-full bg-[#F5F5F7] dark:bg-[#242424] border border-[#E5E6E6] dark:border-[#3D3D3D] rounded-2xl h-14 px-4 focus:outline-none focus:ring-2 focus:ring-[#3584E4] text-[#1E1E1E] dark:text-white font-medium"
+                  >
+                    <option value="">Seleccionar...</option>
+                    {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                    <option value="new">+ Nueva categoría</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase text-[#1E1E1E]/30 dark:text-white/30 px-1 tracking-widest">Frecuencia (días)</label>
+                  <input 
+                    type="number"
+                    value={formData.threshold}
+                    onChange={(e) => setFormData(prev => ({ ...prev, threshold: e.target.value }))}
+                    className="w-full bg-[#F5F5F7] dark:bg-[#242424] border border-[#E5E6E6] dark:border-[#3D3D3D] rounded-2xl h-14 px-5 focus:outline-none focus:ring-2 focus:ring-[#3584E4] text-[#1E1E1E] dark:text-white font-medium"
+                    min="1"
+                  />
+                </div>
+              </div>
+
+              {formData.category === 'new' && (
+                <div className="space-y-2 animate-in slide-in-from-top-2">
+                  <label className="text-[10px] font-black uppercase text-[#1E1E1E]/30 dark:text-white/30 px-1 tracking-widest">Nueva categoría</label>
+                  <input 
+                    value={formData.newCategory}
+                    onChange={(e) => setFormData(prev => ({ ...prev, newCategory: e.target.value }))}
+                    placeholder="Ej: Mantenimiento"
+                    className="w-full bg-[#F5F5F7] dark:bg-[#242424] border border-[#E5E6E6] dark:border-[#3D3D3D] rounded-2xl h-14 px-5 focus:outline-none focus:ring-2 focus:ring-[#3584E4] text-[#1E1E1E] dark:text-white"
+                  />
                 </div>
               )}
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase text-[#1E1E1E]/30 dark:text-white/30 px-1 tracking-widest">Nombre de la tarea</label>
-              <input 
-                value={formData.name}
-                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                placeholder="Ej: Limpiar el horno"
-                className="w-full bg-[#F5F5F7] dark:bg-[#242424] border border-[#E5E6E6] dark:border-[#3D3D3D] rounded-2xl h-14 px-5 focus:outline-none focus:ring-2 focus:ring-[#3584E4] text-[#1E1E1E] dark:text-white font-medium"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase text-[#1E1E1E]/30 dark:text-white/30 px-1 tracking-widest">Categoría</label>
-              <select 
-                value={formData.category}
-                onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
-                className="w-full bg-[#F5F5F7] dark:bg-[#242424] border border-[#E5E6E6] dark:border-[#3D3D3D] rounded-2xl h-14 px-4 focus:outline-none focus:ring-2 focus:ring-[#3584E4] text-[#1E1E1E] dark:text-white font-medium"
-              >
-                <option value="">Seleccionar...</option>
-                {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
-                <option value="new">+ Nueva categoría</option>
-              </select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase text-[#1E1E1E]/30 dark:text-white/30 px-1 tracking-widest">Frecuencia (días)</label>
-              <input 
-                type="number"
-                value={formData.threshold}
-                onChange={(e) => setFormData(prev => ({ ...prev, threshold: e.target.value }))}
-                className="w-full bg-[#F5F5F7] dark:bg-[#242424] border border-[#E5E6E6] dark:border-[#3D3D3D] rounded-2xl h-14 px-5 focus:outline-none focus:ring-2 focus:ring-[#3584E4] text-[#1E1E1E] dark:text-white font-medium"
-                min="1"
-              />
-            </div>
-          </div>
-
-          {formData.category === 'new' && (
-            <div className="space-y-2 animate-in slide-in-from-top-2">
-              <label className="text-[10px] font-black uppercase text-[#1E1E1E]/30 dark:text-white/30 px-1 tracking-widest">Nueva categoría</label>
-              <input 
-                value={formData.newCategory}
-                onChange={(e) => setFormData(prev => ({ ...prev, newCategory: e.target.value }))}
-                placeholder="Ej: Mantenimiento"
-                className="w-full bg-[#F5F5F7] dark:bg-[#242424] border border-[#E5E6E6] dark:border-[#3D3D3D] rounded-2xl h-14 px-5 focus:outline-none focus:ring-2 focus:ring-[#3584E4] text-[#1E1E1E] dark:text-white"
-              />
+            </>
+          ) : (
+            <div className="grid grid-cols-[1fr_100px] gap-4">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase text-[#1E1E1E]/30 dark:text-white/30 px-1 tracking-widest">Tarea Existente</label>
+                <select 
+                  value={formData.targetChoreId}
+                  onChange={(e) => setFormData(prev => ({ ...prev, targetChoreId: e.target.value }))}
+                  className="w-full bg-[#F5F5F7] dark:bg-[#242424] border border-[#E5E6E6] dark:border-[#3D3D3D] rounded-2xl h-14 px-4 focus:outline-none focus:ring-2 focus:ring-[#3584E4] text-[#1E1E1E] dark:text-white font-medium"
+                >
+                  <option value="">Selecciona...</option>
+                  {chores.map(chore => <option key={chore.id} value={chore.id}>{chore.emoji} {chore.name} (Actual: {chore.points} pts)</option>)}
+                </select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase text-[#1E1E1E]/30 dark:text-white/30 px-1 tracking-widest">Nuevos Pts</label>
+                <select 
+                  value={formData.proposedPoints}
+                  onChange={(e) => setFormData(prev => ({ ...prev, proposedPoints: e.target.value }))}
+                  className="w-full bg-[#F5F5F7] dark:bg-[#242424] border border-[#E5E6E6] dark:border-[#3D3D3D] rounded-2xl h-14 px-4 focus:outline-none focus:ring-2 focus:ring-[#3584E4] text-[#1E1E1E] dark:text-white font-medium"
+                >
+                  {[1, 2, 3, 4, 5].map(p => <option key={p} value={p}>{p}</option>)}
+                </select>
+              </div>
             </div>
           )}
 
@@ -295,16 +372,24 @@ export default function ProposalsSection() {
               </div>
               
               <div className="flex-1 min-w-0">
-                <h4 className="font-bold text-[#1E1E1E] dark:text-white text-base truncate">{proposal.title || proposal.name}</h4>
+                <h4 className="font-bold text-[#1E1E1E] dark:text-white text-base truncate">
+                  {proposal.type === 'update_chore_points' ? (
+                    <span>Cambiar puntos: {proposal.proposed_points} pts</span>
+                  ) : (
+                    proposal.title || proposal.name
+                  )}
+                </h4>
                 <div className="flex items-center gap-3 mt-1.5 flex-wrap">
                   <span className="flex items-center gap-1 text-[10px] font-black text-[#1E1E1E]/30 dark:text-white/30 uppercase tracking-tighter">
                     <Tag className="w-3 h-3" />
                     {proposal.category || 'General'}
                   </span>
-                  <span className="flex items-center gap-1 text-[10px] font-black text-[#1E1E1E]/30 dark:text-white/30 uppercase tracking-tighter">
-                    <Clock className="w-3 h-3" />
-                    {daysLeft}d restantes
-                  </span>
+                  {proposal.type !== 'update_chore_points' && (
+                    <span className="flex items-center gap-1 text-[10px] font-black text-[#1E1E1E]/30 dark:text-white/30 uppercase tracking-tighter">
+                      <Clock className="w-3 h-3" />
+                      {daysLeft}d restantes
+                    </span>
+                  )}
                 </div>
               </div>
 

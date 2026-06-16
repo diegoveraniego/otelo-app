@@ -84,19 +84,30 @@ export const proposalService = {
    * Creates a new proposal
    */
   async createProposal(payload: {
-    name: string;
-    emoji: string;
-    category: string;
-    threshold_days: number;
+    name?: string;
+    emoji?: string;
+    category?: string;
+    threshold_days?: number;
     created_by: string;
     home_id: string;
+    type?: 'new_chore' | 'update_chore_points';
+    target_chore_id?: string;
+    proposed_points?: number;
   }) {
     const { data, error } = await supabase
       .from('proposals')
       .insert({
-        ...payload,
-        status: 'pending'
-      })
+        name: payload.name || '',
+        emoji: payload.emoji || '',
+        category: payload.category || '',
+        threshold_days: payload.threshold_days || 3,
+        created_by: payload.created_by,
+        home_id: payload.home_id,
+        status: 'pending',
+        type: payload.type || 'new_chore',
+        target_chore_id: payload.target_chore_id || null,
+        proposed_points: payload.proposed_points || null,
+      } as any)
       .select()
       .single();
 
