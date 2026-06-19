@@ -4,19 +4,21 @@ import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import { Member } from '@/lib/types';
 import { startOfWeek, endOfWeek } from 'date-fns';
-import { Heart } from 'lucide-react';
+import { Heart, Star } from 'lucide-react';
 import Avatar from './Avatar';
 import { useUserStore } from '@/lib/store';
 
 type MemberStat = {
   member: Member;
   tasks: number;
+  points: number;
   thanks: number;
 };
 
 export default function DesktopSidebarStats() {
   const { currentUser } = useUserStore();
   const [stats, setStats] = useState<MemberStat[]>([]);
+  const [viewMode, setViewMode] = useState<'points' | 'tasks'>('points');
 
   const fetchStats = useCallback(async () => {
     if (!currentUser?.home_id) return;
@@ -33,7 +35,7 @@ export default function DesktopSidebarStats() {
 
     const [{ data: logs }, { data: thanks }] = await Promise.all([
       supabase.from('logs')
-        .select('member_id')
+        .select('member_id, chores(points)')
         .eq('home_id', currentUser.home_id)
         .gte('done_at', start)
         .lte('done_at', end),
@@ -45,12 +47,16 @@ export default function DesktopSidebarStats() {
     ]);
 
     const result: MemberStat[] = (members as any[])
-      .map((m: any) => ({
-        member: m as Member,
-        tasks: logs?.filter((l) => l.member_id === m.id).length ?? 0,
-        thanks: thanks?.filter((t) => t.to_member_id === m.id).length ?? 0,
-      }))
-      .sort((a, b) => b.tasks - a.tasks || b.thanks - a.thanks);
+      .map((m: any) => {
+        const memberLogs = logs?.filter((l) => l.member_id === m.id) || [];
+        const points = memberLogs.reduce((acc, l: any) => acc + (l.chores?.points || 0), 0);
+        return {
+          member: m as Member,
+          tasks: memberLogs.length,
+          points,
+          thanks: thanks?.filter((t) => t.to_member_id === m.id).length ?? 0,
+        };
+      });
 
     setStats(result);
   }, [currentUser?.home_id]);
@@ -71,13 +77,37 @@ export default function DesktopSidebarStats() {
 
   if (stats.length === 0) return null;
 
+  const sortedStats = [...stats].sort((a, b) => {
+    if (viewMode === 'points') {
+      return b.points - a.points || b.tasks - a.tasks;
+    }
+    return b.tasks - a.tasks || b.points - a.points;
+  });
+
   return (
     <div className="bg-white dark:bg-[#303030] rounded-xl p-4 shadow-sm border border-[#E5E6E6] dark:border-[#3D3D3D] transition-colors">
-      <h3 className="text-sm font-semibold text-[#1E1E1E]/60 dark:text-white/60 mb-4">Ranking semanal</h3>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-sm font-semibold text-[#1E1E1E]/60 dark:text-white/60">Ranking semanal</h3>
+        <div className="flex bg-[#E5E6E6] dark:bg-[#242424] p-0.5 rounded-lg text-xs font-medium">
+          <button 
+            onClick={() => setViewMode('points')}
+            className={`px-2 py-1 rounded-md transition-colors ${viewMode === 'points' ? 'bg-white dark:bg-[#3D3D3D] text-[#1E1E1E] dark:text-white shadow-sm' : 'text-[#1E1E1E]/50 dark:text-white/50 hover:text-[#1E1E1E] dark:hover:text-white'}`}
+          >
+            Puntos
+          </button>
+          <button 
+            onClick={() => setViewMode('tasks')}
+            className={`px-2 py-1 rounded-md transition-colors ${viewMode === 'tasks' ? 'bg-white dark:bg-[#3D3D3D] text-[#1E1E1E] dark:text-white shadow-sm' : 'text-[#1E1E1E]/50 dark:text-white/50 hover:text-[#1E1E1E] dark:hover:text-white'}`}
+          >
+            Tareas
+          </button>
+        </div>
+      </div>
       <div className="space-y-3">
-        {stats.map((item, index) => {
-          const maxTasks = stats[0]?.tasks || 1;
-          const pct = maxTasks > 0 ? Math.max(4, Math.round((item.tasks / maxTasks) * 100)) : 4;
+        {sortedStats.map((item, index) => {
+          const maxValue = viewMode === 'points' ? Math.max(1, sortedStats[0]?.points || 1) : Math.max(1, sortedStats[0]?.tasks || 1);
+          const value = viewMode === 'points' ? item.points : item.tasks;
+          const pct = maxValue > 0 ? Math.max(4, Math.round((value / maxValue) * 100)) : 4;
 
           return (
             <div key={item.member.id} className="flex items-center gap-2">
@@ -98,7 +128,10 @@ export default function DesktopSidebarStats() {
                     )}
                   </div>
                   <div className="flex items-center gap-2 shrink-0 ml-2">
-                    <span className="text-sm font-bold text-[#1E1E1E] dark:text-white">{item.tasks}</span>
+                    <span className="text-sm font-bold text-[#1E1E1E] dark:text-white flex items-center gap-1">
+                      {viewMode === 'points' && <Star className="w-3 h-3 text-amber-500 fill-amber-500" />}
+                      {value}
+                    </span>
                     {item.thanks > 0 && (
                       <span className="flex items-center gap-0.5 text-xs text-[#E01B24] dark:text-[#FF6B6B]">
                         <Heart className="w-3 h-3" fill="currentColor" />
