@@ -211,7 +211,7 @@ export default function FeedingSlotModal({ slot, isOpen, onClose, onRefresh }: P
               <button
                 key={m.id}
                 onClick={() => handleRequestTrade(m)}
-                className="flex flex-col items-center justify-center p-4 rounded-xl border border-[#E5E6E6] dark:border-[#3D3D3D] hover:bg-[#FAFAFA] dark:hover:bg-[#3D3D3D] transition-colors"
+                className="flex flex-col items-center justify-center p-4 rounded-xl border border-[#E5E6E6] dark:border-[#2C2C30] hover:bg-[#FAFAFA] dark:hover:bg-[#3D3D3D] transition-colors"
                 style={{ borderBottomColor: m.color, borderBottomWidth: 3 }}
               >
                 <Avatar member={m} className="w-10 h-10 text-base mb-2" />
@@ -251,7 +251,7 @@ export default function FeedingSlotModal({ slot, isOpen, onClose, onRefresh }: P
             ? isReplacement
               ? 'bg-amber-50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-800/30'
               : 'bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-800/30'
-            : 'bg-[#FAFAFA] dark:bg-[#2A2A2A] border-[#E5E6E6] dark:border-[#3D3D3D]'
+            : 'bg-[#FAFAFA] dark:bg-[#2A2A2A] border-[#E5E6E6] dark:border-[#2C2C30]'
         }`}>
           {slot.fed_at ? (
             <div className="space-y-3">
@@ -274,7 +274,7 @@ export default function FeedingSlotModal({ slot, isOpen, onClose, onRefresh }: P
                 );
               })}
               {isReplacement && slot.assigned_member && (
-                <div className="pt-2 border-t border-[#E5E6E6]/60 dark:border-[#3D3D3D]/60 text-xs text-amber-600 dark:text-amber-400 font-medium">
+                <div className="pt-2 border-t border-[#E5E6E6]/60 dark:border-[#2C2C30]/60 text-xs text-amber-600 dark:text-amber-400 font-medium">
                   Turno asignado originalmente a {slot.assigned_member.name}
                 </div>
               )}
@@ -367,7 +367,7 @@ function ModalWrapper({ children, onClose }: { children: React.ReactNode; onClos
   return (
     <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/60 p-4 backdrop-blur-sm animate-in fade-in duration-200" onClick={onClose}>
       <div
-        className="w-full max-w-sm bg-white dark:bg-[#303030] rounded-3xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-8 duration-300"
+        className="w-full max-w-sm bg-white dark:bg-[#1A1A1E] rounded-3xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-8 duration-300"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-end p-4 pb-0">

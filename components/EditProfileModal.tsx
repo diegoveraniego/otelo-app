@@ -8,7 +8,6 @@ import Avatar from './Avatar';
 import { useTheme } from 'next-themes';
 import { Member, ColorTrade } from '@/lib/types';
 import { triggerPushNotification } from '@/lib/pushUtils';
-import { ACHIEVEMENTS } from '@/lib/achievements/data';
 
 interface EditProfileModalProps {
   isOpen: boolean;
@@ -73,48 +72,13 @@ export default function EditProfileModal({ isOpen, onClose, onUpdated }: EditPro
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
-  const [unlockedAchievements, setUnlockedAchievements] = useState<any[]>([]);
-
   useEffect(() => {
     setMounted(true);
     if (isOpen) {
       fetchUsedColors();
       checkPushSubscription();
-      fetchUnlockedAchievements();
     }
   }, [isOpen]);
-
-  const fetchUnlockedAchievements = async () => {
-    if (!currentUser?.id) return;
-    const { data } = await supabase
-      .from('member_achievements')
-      .select('achievement_id')
-      .eq('member_id', currentUser.id);
-    
-    if (data) {
-      const unlocked = data.map(d => {
-        const ach = ACHIEVEMENTS.find(a => a.id === d.achievement_id);
-        return ach ? { ...ach } : null;
-      }).filter(Boolean);
-      setUnlockedAchievements(unlocked);
-    }
-  };
-
-  const handleTitleChange = async (title: string | null) => {
-    if (!currentUser) return;
-    try {
-      const { error } = await supabase
-        .from('members')
-        .update({ selected_title: title })
-        .eq('id', currentUser.id);
-      if (error) throw error;
-      setCurrentUser({ ...currentUser, selected_title: title });
-      onUpdated();
-    } catch (e) {
-      console.error(e);
-      setError('Error al actualizar el título');
-    }
-  };
 
   const checkPushSubscription = async () => {
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
@@ -402,8 +366,8 @@ export default function EditProfileModal({ isOpen, onClose, onUpdated }: EditPro
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-sm bg-white dark:bg-[#303030] rounded-xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden animate-in fade-in zoom-in duration-200 border border-[#E5E6E6] dark:border-[#3D3D3D] transition-colors">
-        <div className="flex items-center justify-between p-4 border-b border-[#E5E6E6] dark:border-[#3D3D3D] bg-[#FAFAFA] dark:bg-[#2A2A2A] transition-colors shrink-0">
+      <div className="w-full max-w-sm bg-white dark:bg-[#1A1A1E] rounded-xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden animate-in fade-in zoom-in duration-200 border border-[#E5E6E6] dark:border-[#2C2C30] transition-colors">
+        <div className="flex items-center justify-between p-4 border-b border-[#E5E6E6] dark:border-[#2C2C30] bg-[#FAFAFA] dark:bg-[#2A2A2A] transition-colors shrink-0">
           <h2 className="text-lg font-bold text-[#1E1E1E] dark:text-white">Editar Perfil</h2>
           <button 
             onClick={onClose}
@@ -416,7 +380,7 @@ export default function EditProfileModal({ isOpen, onClose, onUpdated }: EditPro
         <div className="p-6 flex flex-col gap-6 overflow-y-auto">
           <div className="flex flex-col items-center gap-4">
             {isCameraOpen ? (
-              <div className="relative w-full max-w-[200px] aspect-square rounded-full overflow-hidden bg-black border border-[#E5E6E6] dark:border-[#3D3D3D]">
+              <div className="relative w-full max-w-[200px] aspect-square rounded-full overflow-hidden bg-black border border-[#E5E6E6] dark:border-[#2C2C30]">
                 <video 
                   ref={videoRef} 
                   autoPlay 
@@ -427,11 +391,6 @@ export default function EditProfileModal({ isOpen, onClose, onUpdated }: EditPro
             ) : (
               <div className="flex flex-col items-center">
                 <Avatar member={currentUser} className="w-24 h-24 text-4xl" />
-                {currentUser.selected_title && (
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#1E1E1E]/50 dark:text-white/50 mt-2 bg-[#FAFAFA] dark:bg-[#242424] border border-[#E5E6E6]/60 dark:border-[#3D3D3D]/60 px-2.5 py-0.5 rounded-full">
-                    {currentUser.selected_title}
-                  </span>
-                )}
               </div>
             )}
             
@@ -488,27 +447,9 @@ export default function EditProfileModal({ isOpen, onClose, onUpdated }: EditPro
             <canvas ref={canvasRef} className="hidden" />
           </div>
 
-          {/* Selected Title Section */}
-          <div className="border-t border-[#E5E6E6] dark:border-[#3D3D3D] pt-6 transition-colors">
-            <h3 className="text-sm font-semibold text-[#1E1E1E] dark:text-white mb-3 flex items-center gap-2">
-              <Trophy className="w-4 h-4 text-yellow-500" /> Título Seleccionado
-            </h3>
-            <select
-              value={currentUser.selected_title || ''}
-              onChange={(e) => handleTitleChange(e.target.value || null)}
-              className="w-full bg-[#FAFAFA] dark:bg-[#242424] border border-[#E5E6E6] dark:border-[#3D3D3D] rounded-lg px-3 py-2 text-sm text-[#1E1E1E] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#3584E4]"
-            >
-              <option value="">Ninguno</option>
-              {unlockedAchievements.map(ach => (
-                <option key={ach.id} value={ach.name}>{ach.name}</option>
-              ))}
-            </select>
-            <p className="text-[10px] text-[#1E1E1E]/50 dark:text-white/50 mt-2">
-              Selecciona un título de tus trofeos desbloqueados para mostrarlo bajo tu avatar.
-            </p>
-          </div>
 
-          <div className="border-t border-[#E5E6E6] dark:border-[#3D3D3D] pt-6 transition-colors">
+
+          <div className="border-t border-[#E5E6E6] dark:border-[#2C2C30] pt-6 transition-colors">
             <h3 className="text-sm font-semibold text-[#1E1E1E] dark:text-white mb-3">Cambiar PIN</h3>
             <div className="flex flex-col gap-2">
               <input
@@ -519,7 +460,7 @@ export default function EditProfileModal({ isOpen, onClose, onUpdated }: EditPro
                 pattern="[0-9]*"
                 inputMode="numeric"
                 placeholder="Nuevo PIN"
-                className="w-full text-center tracking-widest text-lg text-[#1E1E1E] dark:text-white dark:bg-[#242424] px-4 py-2 rounded-lg border border-[#E5E6E6] dark:border-[#3D3D3D] focus:outline-none focus:border-[#3584E4] focus:ring-1 focus:ring-[#3584E4] transition-colors"
+                className="w-full text-center tracking-widest text-lg text-[#1E1E1E] dark:text-white dark:bg-[#151518] px-4 py-2 rounded-lg border border-[#E5E6E6] dark:border-[#2C2C30] focus:outline-none focus:border-[#3584E4] focus:ring-1 focus:ring-[#3584E4] transition-colors"
               />
               <button
                 onClick={handlePinChange}
@@ -532,7 +473,7 @@ export default function EditProfileModal({ isOpen, onClose, onUpdated }: EditPro
             {pinMessage && <p className="text-xs text-[#2EC27E] dark:text-[#57E389] text-center mt-2">{pinMessage}</p>}
           </div>
 
-          <div className="border-t border-[#E5E6E6] dark:border-[#3D3D3D] pt-6 transition-colors">
+          <div className="border-t border-[#E5E6E6] dark:border-[#2C2C30] pt-6 transition-colors">
             <h3 className="text-sm font-semibold text-[#1E1E1E] dark:text-white mb-3 flex items-center justify-between">
               Color de Perfil
               {pendingTrade && (
@@ -578,7 +519,7 @@ export default function EditProfileModal({ isOpen, onClose, onUpdated }: EditPro
                         </div>
                       )}
                       {isUsed && (
-                        <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full border border-white dark:border-[#303030] overflow-hidden bg-white dark:bg-[#303030]">
+                        <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full border border-white dark:border-[#303030] overflow-hidden bg-white dark:bg-[#1A1A1E]">
                           <Avatar member={owner} className="w-full h-full text-[6px]" />
                         </div>
                       )}
@@ -589,11 +530,11 @@ export default function EditProfileModal({ isOpen, onClose, onUpdated }: EditPro
                         <button
                           type="button"
                           onClick={() => handleRequestTrade(owner)}
-                          className="w-full bg-white dark:bg-[#242424] border border-[#E5E6E6] dark:border-[#3D3D3D] rounded-lg py-1 px-2 text-[10px] font-bold text-[#3584E4] shadow-xl hover:bg-[#F5F5F7] dark:hover:bg-[#333333]"
+                          className="w-full bg-white dark:bg-[#151518] border border-[#E5E6E6] dark:border-[#2C2C30] rounded-lg py-1 px-2 text-[10px] font-bold text-[#3584E4] shadow-xl hover:bg-[#F5F5F7] dark:hover:bg-[#333333]"
                         >
                           Solicitar color
                         </button>
-                        <div className="w-2 h-2 bg-white dark:bg-[#242424] border-r border-b border-[#E5E6E6] dark:border-[#3D3D3D] rotate-45 mx-auto -mt-1" />
+                        <div className="w-2 h-2 bg-white dark:bg-[#151518] border-r border-b border-[#E5E6E6] dark:border-[#2C2C30] rotate-45 mx-auto -mt-1" />
                       </div>
                     )}
                   </div>
@@ -604,9 +545,9 @@ export default function EditProfileModal({ isOpen, onClose, onUpdated }: EditPro
 
           {/* Theme Toggle */}
           {mounted && (
-            <div className="border-t border-[#E5E6E6] dark:border-[#3D3D3D] pt-6 transition-colors">
+            <div className="border-t border-[#E5E6E6] dark:border-[#2C2C30] pt-6 transition-colors">
               <h3 className="text-sm font-semibold text-[#1E1E1E] dark:text-white mb-3">Apariencia</h3>
-              <div className="flex bg-[#E5E6E6] dark:bg-[#242424] p-1 rounded-lg">
+              <div className="flex bg-[#E5E6E6] dark:bg-[#151518] p-1 rounded-lg">
                 <button
                   onClick={() => setTheme('light')}
                   className={`flex-1 flex justify-center items-center gap-2 py-2 text-sm font-medium rounded-md transition-colors ${theme === 'light' ? 'bg-white dark:bg-[#3D3D3D] text-[#1E1E1E] dark:text-white shadow-sm' : 'text-[#1E1E1E]/70 dark:text-white/50 hover:text-[#1E1E1E] dark:hover:text-white'}`}
@@ -633,7 +574,7 @@ export default function EditProfileModal({ isOpen, onClose, onUpdated }: EditPro
           )}
 
           {hasPushSubscription && (
-            <div className="border-t border-[#E5E6E6] dark:border-[#3D3D3D] pt-6 transition-colors">
+            <div className="border-t border-[#E5E6E6] dark:border-[#2C2C30] pt-6 transition-colors">
               <h3 className="text-sm font-semibold text-[#1E1E1E] dark:text-white mb-3">Notificaciones Push</h3>
               
               <div className="flex flex-col gap-3 mb-4">

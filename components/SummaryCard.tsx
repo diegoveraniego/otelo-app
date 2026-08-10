@@ -76,29 +76,26 @@ export default function SummaryCard() {
   if (!currentUser) return null;
 
   return (
-    <div className="bg-[#3584E4] dark:bg-[#303030] rounded-xl p-6 text-white shadow-md mb-8 overflow-hidden relative border border-[#1C71D8] dark:border-[#3D3D3D] transition-colors">
-      <div className="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-2xl" />
-      <div className="absolute -left-10 -bottom-10 w-40 h-40 bg-black/10 rounded-full blur-2xl" />
-
+    <div className="bg-white dark:bg-[#1A1A1E] rounded-xl p-6 text-[#1E1E1E] dark:text-white shadow-sm mb-8 overflow-hidden relative border border-[#E5E6E6] dark:border-[#2C2C30] transition-colors">
       <div className="relative z-10">
-        <h2 className="text-white/80 font-medium mb-1">Esta semana</h2>
+        <h2 className="text-[#1E1E1E]/60 dark:text-white/60 font-medium mb-1">Esta semana</h2>
         <div className="flex items-end gap-4 mb-2 flex-wrap">
           <div className="flex items-end gap-2">
-            <span className="text-5xl font-bold tracking-tight">{userPoints}</span>
-            <span className="text-white/80 pb-1.5 flex items-center gap-1">
+            <span className="text-5xl font-bold tracking-tight text-[#3584E4]">{userPoints}</span>
+            <span className="text-[#1E1E1E]/60 dark:text-white/60 pb-1.5 flex items-center gap-1">
               <Star className="w-4 h-4 fill-current opacity-80" /> {pluralize(userPoints, 'punto', 'puntos')}
             </span>
           </div>
-          <div className="flex items-end gap-2 mb-1 border-l border-white/20 pl-4">
+          <div className="flex items-end gap-2 mb-1 border-l border-[#E5E6E6] dark:border-[#2C2C30] pl-4">
             <span className="text-2xl font-bold tracking-tight">{userCount}</span>
-            <span className="text-white/80 pb-0.5 text-sm">{pluralize(userCount, 'tarea', 'tareas')}</span>
+            <span className="text-[#1E1E1E]/60 dark:text-white/60 pb-0.5 text-sm">{pluralize(userCount, 'tarea', 'tareas')}</span>
           </div>
         </div>
 
         {streak >= 2 ? (
           <div className="flex items-center gap-1.5 mb-4 mt-2">
-            <Flame className="w-4 h-4 text-orange-300" />
-            <span className="text-sm text-white/90 font-medium">
+            <Flame className="w-4 h-4 text-orange-400" />
+            <span className="text-sm text-[#1E1E1E] dark:text-white font-medium">
               {streak} {pluralize(streak, 'día seguido', 'días seguidos')} aportando
             </span>
           </div>
@@ -106,16 +103,16 @@ export default function SummaryCard() {
           <div className="mb-4 mt-2" />
         )}
 
-        <div className="bg-black/10 dark:bg-black/20 rounded-lg p-4 backdrop-blur-sm border border-white/10">
+        <div className="bg-[#FAFAFA] dark:bg-[#151518] rounded-lg p-4 border border-[#E5E6E6] dark:border-[#2C2C30]">
           <div className="flex justify-between items-center text-sm">
-            <span className="text-zinc-300">Promedio familiar (tareas)</span>
-            <span className="font-semibold text-white">
+            <span className="text-[#1E1E1E]/60 dark:text-white/60">Promedio familiar</span>
+            <span className="font-semibold text-[#1E1E1E] dark:text-white">
               {familyAvg} {pluralize(familyAvg, 'tarea', 'tareas')}
             </span>
           </div>
-          <div className="h-2 w-full bg-white/10 rounded-full mt-3 overflow-hidden">
+          <div className="h-2 w-full bg-[#E5E6E6] dark:bg-[#3D3D3D] rounded-full mt-3 overflow-hidden">
             <div
-              className="h-full bg-white rounded-full transition-all duration-1000 ease-out"
+              className="h-full bg-[#3584E4] rounded-full transition-all duration-1000 ease-out"
               style={{ width: `${Math.min(100, (userCount / Math.max(1, familyAvg * 2)) * 100)}%` }}
             />
           </div>

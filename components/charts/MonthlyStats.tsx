@@ -119,7 +119,7 @@ export default function MonthlyStats({ currentDate }: { currentDate: Date }) {
 
   return (
     <div className="space-y-6 animate-in fade-in zoom-in duration-300">
-      <div className="bg-white dark:bg-[#303030] p-6 rounded-xl shadow-sm border border-[#E5E6E6] dark:border-[#3D3D3D] overflow-hidden text-xs transition-colors">
+      <div className="bg-white dark:bg-[#1A1A1E] p-6 rounded-xl shadow-sm border border-[#E5E6E6] dark:border-[#2C2C30] overflow-hidden text-xs transition-colors">
         <div className="mb-6">
           <h3 className="text-sm font-semibold text-[#1E1E1E]/60 dark:text-white/60 capitalize">
             Mapa de calor ({format(currentDate, 'MMMM yyyy', { locale: es })})
@@ -165,7 +165,7 @@ export default function MonthlyStats({ currentDate }: { currentDate: Date }) {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-[#303030] p-6 rounded-xl shadow-sm border border-[#E5E6E6] dark:border-[#3D3D3D] transition-colors">
+      <div className="bg-white dark:bg-[#1A1A1E] p-6 rounded-xl shadow-sm border border-[#E5E6E6] dark:border-[#2C2C30] transition-colors">
         <h3 className="text-sm font-semibold text-[#1E1E1E]/60 dark:text-white/60 mb-6">Tendencia Diaria</h3>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
@@ -190,7 +190,7 @@ export default function MonthlyStats({ currentDate }: { currentDate: Date }) {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-[#303030] p-6 rounded-xl shadow-sm border border-[#E5E6E6] dark:border-[#3D3D3D] transition-colors">
+      <div className="bg-white dark:bg-[#1A1A1E] p-6 rounded-xl shadow-sm border border-[#E5E6E6] dark:border-[#2C2C30] transition-colors">
         <h3 className="text-sm font-semibold text-[#1E1E1E]/60 dark:text-white/60 mb-6">Top Tareas por Persona</h3>
         <div className="h-72">
           <ResponsiveContainer width="100%" height="100%">

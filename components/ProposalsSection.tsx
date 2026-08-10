@@ -214,7 +214,7 @@ export default function ProposalsSection() {
       </div>
 
       {isAdding && (
-        <form onSubmit={handleSubmit} className="bg-white dark:bg-[#303030] p-6 rounded-3xl shadow-xl border border-[#E5E6E6] dark:border-[#3D3D3D] mb-8 space-y-5 animate-in zoom-in-95 duration-200">
+        <form onSubmit={handleSubmit} className="bg-white dark:bg-[#1A1A1E] p-6 rounded-3xl shadow-xl border border-[#E5E6E6] dark:border-[#2C2C30] mb-8 space-y-5 animate-in zoom-in-95 duration-200">
           
           <div className="flex bg-[#F5F5F7] dark:bg-[#2A2A2A] p-1 rounded-xl mb-4">
             <button
@@ -245,7 +245,7 @@ export default function ProposalsSection() {
                   <button
                     type="button"
                     onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                    className="w-full text-3xl bg-[#F5F5F7] dark:bg-[#242424] border border-[#E5E6E6] dark:border-[#3D3D3D] rounded-2xl h-14 flex items-center justify-center hover:scale-105 transition-transform shadow-sm"
+                    className="w-full text-3xl bg-[#F5F5F7] dark:bg-[#151518] border border-[#E5E6E6] dark:border-[#2C2C30] rounded-2xl h-14 flex items-center justify-center hover:scale-105 transition-transform shadow-sm"
                   >
                     {formData.emoji || <Smile className="w-7 h-7 text-[#1E1E1E]/10" />}
                   </button>
@@ -253,7 +253,7 @@ export default function ProposalsSection() {
                   {showEmojiPicker && (
                     <div className="absolute top-full left-0 z-[70] mt-3 animate-in fade-in zoom-in-95 duration-200">
                       <div className="fixed inset-0" onClick={() => setShowEmojiPicker(false)} />
-                      <div className="relative shadow-2xl rounded-3xl overflow-hidden border border-[#E5E6E6] dark:border-[#3D3D3D]">
+                      <div className="relative shadow-2xl rounded-3xl overflow-hidden border border-[#E5E6E6] dark:border-[#2C2C30]">
                         <EmojiPicker 
                           onEmojiClick={(e) => {
                             setFormData(prev => ({ ...prev, emoji: e.emoji }));
@@ -273,7 +273,7 @@ export default function ProposalsSection() {
                     value={formData.name}
                     onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                     placeholder="Ej: Limpiar el horno"
-                    className="w-full bg-[#F5F5F7] dark:bg-[#242424] border border-[#E5E6E6] dark:border-[#3D3D3D] rounded-2xl h-14 px-5 focus:outline-none focus:ring-2 focus:ring-[#3584E4] text-[#1E1E1E] dark:text-white font-medium"
+                    className="w-full bg-[#F5F5F7] dark:bg-[#151518] border border-[#E5E6E6] dark:border-[#2C2C30] rounded-2xl h-14 px-5 focus:outline-none focus:ring-2 focus:ring-[#3584E4] text-[#1E1E1E] dark:text-white font-medium"
                   />
                 </div>
               </div>
@@ -284,7 +284,7 @@ export default function ProposalsSection() {
                   <select 
                     value={formData.category}
                     onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
-                    className="w-full bg-[#F5F5F7] dark:bg-[#242424] border border-[#E5E6E6] dark:border-[#3D3D3D] rounded-2xl h-14 px-4 focus:outline-none focus:ring-2 focus:ring-[#3584E4] text-[#1E1E1E] dark:text-white font-medium"
+                    className="w-full bg-[#F5F5F7] dark:bg-[#151518] border border-[#E5E6E6] dark:border-[#2C2C30] rounded-2xl h-14 px-4 focus:outline-none focus:ring-2 focus:ring-[#3584E4] text-[#1E1E1E] dark:text-white font-medium"
                   >
                     <option value="">Seleccionar...</option>
                     {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
@@ -297,7 +297,7 @@ export default function ProposalsSection() {
                     type="number"
                     value={formData.threshold}
                     onChange={(e) => setFormData(prev => ({ ...prev, threshold: e.target.value }))}
-                    className="w-full bg-[#F5F5F7] dark:bg-[#242424] border border-[#E5E6E6] dark:border-[#3D3D3D] rounded-2xl h-14 px-5 focus:outline-none focus:ring-2 focus:ring-[#3584E4] text-[#1E1E1E] dark:text-white font-medium"
+                    className="w-full bg-[#F5F5F7] dark:bg-[#151518] border border-[#E5E6E6] dark:border-[#2C2C30] rounded-2xl h-14 px-5 focus:outline-none focus:ring-2 focus:ring-[#3584E4] text-[#1E1E1E] dark:text-white font-medium"
                     min="1"
                   />
                 </div>
@@ -310,7 +310,7 @@ export default function ProposalsSection() {
                     value={formData.newCategory}
                     onChange={(e) => setFormData(prev => ({ ...prev, newCategory: e.target.value }))}
                     placeholder="Ej: Mantenimiento"
-                    className="w-full bg-[#F5F5F7] dark:bg-[#242424] border border-[#E5E6E6] dark:border-[#3D3D3D] rounded-2xl h-14 px-5 focus:outline-none focus:ring-2 focus:ring-[#3584E4] text-[#1E1E1E] dark:text-white"
+                    className="w-full bg-[#F5F5F7] dark:bg-[#151518] border border-[#E5E6E6] dark:border-[#2C2C30] rounded-2xl h-14 px-5 focus:outline-none focus:ring-2 focus:ring-[#3584E4] text-[#1E1E1E] dark:text-white"
                   />
                 </div>
               )}
@@ -322,7 +322,7 @@ export default function ProposalsSection() {
                 <select 
                   value={formData.targetChoreId}
                   onChange={(e) => setFormData(prev => ({ ...prev, targetChoreId: e.target.value }))}
-                  className="w-full bg-[#F5F5F7] dark:bg-[#242424] border border-[#E5E6E6] dark:border-[#3D3D3D] rounded-2xl h-14 px-4 focus:outline-none focus:ring-2 focus:ring-[#3584E4] text-[#1E1E1E] dark:text-white font-medium"
+                  className="w-full bg-[#F5F5F7] dark:bg-[#151518] border border-[#E5E6E6] dark:border-[#2C2C30] rounded-2xl h-14 px-4 focus:outline-none focus:ring-2 focus:ring-[#3584E4] text-[#1E1E1E] dark:text-white font-medium"
                 >
                   <option value="">Selecciona...</option>
                   {chores.map(chore => <option key={chore.id} value={chore.id}>{chore.emoji} {chore.name} (Actual: {chore.points} pts)</option>)}
@@ -333,7 +333,7 @@ export default function ProposalsSection() {
                 <select 
                   value={formData.proposedPoints}
                   onChange={(e) => setFormData(prev => ({ ...prev, proposedPoints: e.target.value }))}
-                  className="w-full bg-[#F5F5F7] dark:bg-[#242424] border border-[#E5E6E6] dark:border-[#3D3D3D] rounded-2xl h-14 px-4 focus:outline-none focus:ring-2 focus:ring-[#3584E4] text-[#1E1E1E] dark:text-white font-medium"
+                  className="w-full bg-[#F5F5F7] dark:bg-[#151518] border border-[#E5E6E6] dark:border-[#2C2C30] rounded-2xl h-14 px-4 focus:outline-none focus:ring-2 focus:ring-[#3584E4] text-[#1E1E1E] dark:text-white font-medium"
                 >
                   {[1, 2, 3, 4, 5].map(p => <option key={p} value={p}>{p}</option>)}
                 </select>
@@ -355,7 +355,7 @@ export default function ProposalsSection() {
 
       <div className="space-y-4">
         {proposals.length === 0 && !isAdding && !isLoading && (
-          <div className="bg-white dark:bg-[#303030] p-10 rounded-3xl border-2 border-dashed border-[#E5E6E6] dark:border-[#3D3D3D] text-center transition-colors">
+          <div className="bg-white dark:bg-[#1A1A1E] p-10 rounded-3xl border-2 border-dashed border-[#E5E6E6] dark:border-[#2C2C30] text-center transition-colors">
             <p className="text-[#1E1E1E]/30 dark:text-white/30 text-sm font-medium">No hay propuestas activas ahora mismo.</p>
           </div>
         )}
@@ -366,8 +366,8 @@ export default function ProposalsSection() {
           const daysLeft = 7 - differenceInDays(new Date(), new Date(proposal.created_at));
           
           return (
-            <div key={proposal.id} className="bg-white dark:bg-[#303030] p-5 rounded-3xl shadow-sm border border-[#E5E6E6] dark:border-[#3D3D3D] flex items-center gap-5 hover:border-[#3584E4]/30 transition-all group">
-              <div className="text-3xl bg-[#F5F5F7] dark:bg-[#242424] w-16 h-16 rounded-2xl flex items-center justify-center border border-[#E5E6E6] dark:border-[#3D3D3D] group-hover:scale-105 transition-transform">
+            <div key={proposal.id} className="bg-white dark:bg-[#1A1A1E] p-5 rounded-3xl shadow-sm border border-[#E5E6E6] dark:border-[#2C2C30] flex items-center gap-5 hover:border-[#3584E4]/30 transition-all group">
+              <div className="text-3xl bg-[#F5F5F7] dark:bg-[#151518] w-16 h-16 rounded-2xl flex items-center justify-center border border-[#E5E6E6] dark:border-[#2C2C30] group-hover:scale-105 transition-transform">
                 {proposal.emoji || '📋'}
               </div>
               
@@ -396,7 +396,7 @@ export default function ProposalsSection() {
               <div className="flex flex-col items-center gap-1.5">
                 <button 
                   onClick={() => handleVote(proposal.id)}
-                  className={`p-3.5 rounded-2xl transition-all ${hasVoted ? 'bg-[#3584E4] text-white shadow-lg scale-110' : 'bg-[#F5F5F7] dark:bg-[#242424] text-[#1E1E1E]/30 dark:text-white/20 hover:text-[#3584E4] hover:bg-[#3584E4]/10'}`}
+                  className={`p-3.5 rounded-2xl transition-all ${hasVoted ? 'bg-[#3584E4] text-white shadow-lg scale-110' : 'bg-[#F5F5F7] dark:bg-[#151518] text-[#1E1E1E]/30 dark:text-white/20 hover:text-[#3584E4] hover:bg-[#3584E4]/10'}`}
                 >
                   <ThumbsUp className={`w-6 h-6 ${hasVoted ? 'fill-current' : ''}`} />
                 </button>

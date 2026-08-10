@@ -11,7 +11,7 @@ export default function ThanksRankingCard({ data }: { data: ThanksRankingEntry[]
   const sorted = [...data].sort((a, b) => b.count - a.count).filter((d) => d.count > 0);
 
   return (
-    <div className="bg-white dark:bg-[#303030] p-6 rounded-xl shadow-sm border border-[#E5E6E6] dark:border-[#3D3D3D] transition-colors">
+    <div className="bg-white dark:bg-[#1A1A1E] p-6 rounded-xl shadow-sm border border-[#E5E6E6] dark:border-[#2C2C30] transition-colors">
       <div className="flex items-center gap-2 mb-4">
         <Heart className="w-4 h-4 text-[#E01B24] dark:text-[#FF6B6B]" fill="currentColor" />
         <h3 className="text-sm font-semibold text-[#1E1E1E]/60 dark:text-white/60">

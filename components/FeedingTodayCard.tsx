@@ -45,7 +45,7 @@ export default function FeedingTodayCard({ slot, onOpenModal }: Props) {
   return (
     <button
       onClick={handleClick}
-      className={`group relative flex-1 min-w-0 flex flex-col items-center justify-between p-4 bg-white dark:bg-[#303030] rounded-2xl border border-[#E5E6E6] dark:border-[#3D3D3D] shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-95 transition-all duration-200 text-left ${getCardStyle()}`}
+      className={`group relative flex-1 min-w-0 flex flex-col items-center justify-between p-4 bg-white dark:bg-[#1A1A1E] rounded-2xl border border-[#E5E6E6] dark:border-[#2C2C30] shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-95 transition-all duration-200 text-left ${getCardStyle()}`}
     >
       {/* Status badge */}
       {slot?.fed_at ? (
@@ -111,7 +111,7 @@ export default function FeedingTodayCard({ slot, onOpenModal }: Props) {
           </div>
         ) : (
           <div className="flex flex-col items-center gap-1">
-            <div className="w-9 h-9 rounded-full border-2 border-dashed border-[#E5E6E6] dark:border-[#3D3D3D] flex items-center justify-center">
+            <div className="w-9 h-9 rounded-full border-2 border-dashed border-[#E5E6E6] dark:border-[#2C2C30] flex items-center justify-center">
               <Plus className="w-4 h-4 text-[#1E1E1E]/30 dark:text-white/30" />
             </div>
             <span className="text-[10px] text-[#1E1E1E]/40 dark:text-white/40">Sin encargado</span>

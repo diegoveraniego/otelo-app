@@ -126,7 +126,7 @@ export default function ConfirmChoreModal({ chore, isOpen, onClose }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-sm bg-white dark:bg-[#303030] rounded-xl shadow-lg border border-[#E5E6E6] dark:border-[#3D3D3D] overflow-hidden animate-in fade-in zoom-in duration-200 transition-colors">
+      <div className="w-full max-w-sm bg-white dark:bg-[#1A1A1E] rounded-xl shadow-lg border border-[#E5E6E6] dark:border-[#2C2C30] overflow-hidden animate-in fade-in zoom-in duration-200 transition-colors">
         
         {success ? (
           <div className="p-8 flex flex-col items-center justify-center text-center">
@@ -137,7 +137,7 @@ export default function ConfirmChoreModal({ chore, isOpen, onClose }: Props) {
         ) : (
           <div className="p-6">
             <div className="flex flex-col items-center text-center gap-4">
-              <div className="text-5xl bg-[#FAFAFA] dark:bg-[#2A2A2A] w-20 h-20 rounded-2xl flex items-center justify-center border border-[#E5E6E6] dark:border-[#3D3D3D]">
+              <div className="text-5xl bg-[#FAFAFA] dark:bg-[#2A2A2A] w-20 h-20 rounded-2xl flex items-center justify-center border border-[#E5E6E6] dark:border-[#2C2C30]">
                 {chore.emoji}
               </div>
               <div>
@@ -163,7 +163,7 @@ export default function ConfirmChoreModal({ chore, isOpen, onClose }: Props) {
                     <button
                       key={opt}
                       onClick={() => setSelectedVariant(opt)}
-                      className={`py-2 px-1 text-xs font-bold rounded-xl transition-all border ${selectedVariant === opt ? 'bg-[#3584E4] text-white border-[#3584E4] shadow-sm scale-105' : 'bg-[#F5F5F7] dark:bg-[#2A2A2A] border-[#E5E6E6] dark:border-[#3D3D3D] text-[#1E1E1E]/70 dark:text-white/70 hover:bg-[#E5E6E6] dark:hover:bg-[#3D3D3D]'}`}
+                      className={`py-2 px-1 text-xs font-bold rounded-xl transition-all border ${selectedVariant === opt ? 'bg-[#3584E4] text-white border-[#3584E4] shadow-sm scale-105' : 'bg-[#F5F5F7] dark:bg-[#2A2A2A] border-[#E5E6E6] dark:border-[#2C2C30] text-[#1E1E1E]/70 dark:text-white/70 hover:bg-[#E5E6E6] dark:hover:bg-[#3D3D3D]'}`}
                     >
                       {opt}
                     </button>
@@ -198,7 +198,7 @@ export default function ConfirmChoreModal({ chore, isOpen, onClose }: Props) {
               </>
             ) : (
               <div className="mt-8 space-y-4">
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 p-1 bg-[#F4F4F4] dark:bg-[#2A2A2A] rounded-xl border border-[#E5E6E6] dark:border-[#3D3D3D]">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 p-1 bg-[#F4F4F4] dark:bg-[#2A2A2A] rounded-xl border border-[#E5E6E6] dark:border-[#2C2C30]">
                   {[
                     { label: 'Hoy', offset: 0 },
                     { label: 'Ayer', offset: 1 },
@@ -219,7 +219,7 @@ export default function ConfirmChoreModal({ chore, isOpen, onClose }: Props) {
                   ))}
                 </div>
                 
-                <div className="flex items-center justify-between p-3 bg-[#F4F4F4] dark:bg-[#2A2A2A] rounded-xl border border-[#E5E6E6] dark:border-[#3D3D3D]">
+                <div className="flex items-center justify-between p-3 bg-[#F4F4F4] dark:bg-[#2A2A2A] rounded-xl border border-[#E5E6E6] dark:border-[#2C2C30]">
                   <span className="text-sm font-medium text-[#1E1E1E] dark:text-white">Hora</span>
                   <input
                     type="time"

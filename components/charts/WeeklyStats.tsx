@@ -25,7 +25,6 @@ export default function WeeklyStats() {
   const { currentUser } = useUserStore();
   const [data, setData] = useState<StatsData[]>([]);
   const [thanksRanking, setThanksRanking] = useState<ThanksRankingEntry[]>([]);
-  const [viewMode, setViewMode] = useState<'points' | 'tasks'>('points');
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
 
@@ -87,38 +86,21 @@ export default function WeeklyStats() {
     }
   };
 
-  const sortedData = [...data].sort((a, b) => {
-    if (viewMode === 'points') return b.points - a.points || b.total - a.total;
-    return b.total - a.total || b.points - a.points;
-  });
+  const sortedData = [...data].sort((a, b) => b.points - a.points || b.total - a.total);
 
   return (
     <div className="space-y-6 animate-in fade-in zoom-in duration-300">
-      <div className="bg-white dark:bg-[#303030] p-6 rounded-xl shadow-sm border border-[#E5E6E6] dark:border-[#3D3D3D] transition-colors">
+      <div className="bg-white dark:bg-[#1A1A1E] p-6 rounded-xl shadow-sm border border-[#E5E6E6] dark:border-[#2C2C30] transition-colors">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-sm font-semibold text-[#1E1E1E]/60 dark:text-white/60">Rendimiento esta semana</h3>
-          <div className="flex bg-[#E5E6E6] dark:bg-[#242424] p-0.5 rounded-lg text-xs font-medium">
-            <button 
-              onClick={() => setViewMode('points')}
-              className={`px-3 py-1.5 rounded-md transition-colors ${viewMode === 'points' ? 'bg-white dark:bg-[#3D3D3D] text-[#1E1E1E] dark:text-white shadow-sm' : 'text-[#1E1E1E]/50 dark:text-white/50 hover:text-[#1E1E1E] dark:hover:text-white'}`}
-            >
-              Puntos
-            </button>
-            <button 
-              onClick={() => setViewMode('tasks')}
-              className={`px-3 py-1.5 rounded-md transition-colors ${viewMode === 'tasks' ? 'bg-white dark:bg-[#3D3D3D] text-[#1E1E1E] dark:text-white shadow-sm' : 'text-[#1E1E1E]/50 dark:text-white/50 hover:text-[#1E1E1E] dark:hover:text-white'}`}
-            >
-              Tareas
-            </button>
-          </div>
         </div>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={sortedData} layout="vertical" margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
               <XAxis type="number" hide />
               <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fill: '#71717a', fontSize: 12 }} />
-              <Tooltip content={<ChartTooltip label={viewMode === 'points' ? 'Puntos' : 'Tareas'} />} cursor={{ fill: isDark ? '#3D3D3D40' : '#E5E6E640' }} />
-              <Bar dataKey={viewMode === 'points' ? 'points' : 'total'} radius={[0, 4, 4, 0]} barSize={20}>
+              <Tooltip content={<ChartTooltip label={'Puntos'} />} cursor={{ fill: isDark ? '#3D3D3D40' : '#E5E6E640' }} />
+              <Bar dataKey={'points'} radius={[0, 4, 4, 0]} barSize={20}>
                 {sortedData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
@@ -128,7 +110,7 @@ export default function WeeklyStats() {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-[#303030] p-6 rounded-xl shadow-sm border border-[#E5E6E6] dark:border-[#3D3D3D] transition-colors">
+      <div className="bg-white dark:bg-[#1A1A1E] p-6 rounded-xl shadow-sm border border-[#E5E6E6] dark:border-[#2C2C30] transition-colors">
         <h3 className="text-sm font-semibold text-[#1E1E1E]/60 dark:text-white/60 mb-4">Ranking de la semana</h3>
         <div className="space-y-4">
           {sortedData.slice(0, 3).map((item, index) => (
@@ -152,11 +134,11 @@ export default function WeeklyStats() {
                 )}
                 <div className="flex flex-col items-end">
                   <div className="font-bold text-lg text-[#1E1E1E] dark:text-white leading-none flex items-center gap-1">
-                    {viewMode === 'points' && <Star className="w-4 h-4 text-amber-500 fill-amber-500" />}
-                    {viewMode === 'points' ? item.points : item.total}
+                    <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+                    {item.points}
                   </div>
                   <div className="text-xs text-[#1E1E1E]/50 dark:text-white/50">
-                    {viewMode === 'points' ? `${item.total} tareas` : `${item.points} pts`}
+                    {item.total} tareas
                   </div>
                 </div>
               </div>

@@ -71,9 +71,9 @@ export default function FeedingWeekGrid({ slots, weekStart, petId, onOpenModal }
     } else if (now) {
       cellClass += 'bg-cyan-50 dark:bg-cyan-900/15 border-cyan-300 dark:border-cyan-500/40 animate-pulse ';
     } else if (slot.assigned_to) {
-      cellClass += 'bg-white dark:bg-[#303030] border-[#E5E6E6] dark:border-[#3D3D3D] hover:bg-[#FAFAFA] dark:hover:bg-[#3A3A3A] ';
+      cellClass += 'bg-white dark:bg-[#1A1A1E] border-[#E5E6E6] dark:border-[#2C2C30] hover:bg-[#FAFAFA] dark:hover:bg-[#3A3A3A] ';
     } else {
-      cellClass += 'bg-white dark:bg-[#303030] border-dashed border-[#E5E6E6] dark:border-[#3D3D3D] hover:bg-[#FAFAFA] dark:hover:bg-[#3A3A3A] ';
+      cellClass += 'bg-white dark:bg-[#1A1A1E] border-dashed border-[#E5E6E6] dark:border-[#2C2C30] hover:bg-[#FAFAFA] dark:hover:bg-[#3A3A3A] ';
     }
 
     if (isMine && !slot.fed_at) {

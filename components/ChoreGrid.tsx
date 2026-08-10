@@ -17,6 +17,7 @@ export default function ChoreGrid() {
   const [selectedChore, setSelectedChore] = useState<Chore | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [successAnimationId, setSuccessAnimationId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
   
   const { currentUser } = useUserStore();
   const timerRef = useRef<any>(null);
@@ -121,32 +122,51 @@ export default function ChoreGrid() {
     setSelectedChore(chore);
   };
 
-  // Performance: Memoize categories
+  // Performance: Memoize categories and search
+  const filteredChores = useMemo(() => {
+    if (!searchQuery.trim()) return chores;
+    const q = searchQuery.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    return chores.filter(c => {
+      const name = c.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      return name.includes(q);
+    });
+  }, [chores, searchQuery]);
+
   const categories = useMemo(() => 
-    Array.from(new Set(chores.map(c => c.category || 'Otros'))),
-    [chores]
+    Array.from(new Set(filteredChores.map(c => c.category || 'Otros'))),
+    [filteredChores]
   );
 
   if (isLoading && chores.length === 0) {
     return (
-      <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {Array.from({ length: 8 }).map((_, i) => (
-          <div key={i} className="aspect-square bg-[#E5E6E6] dark:bg-[#3D3D3D] animate-pulse rounded-xl" />
+      <div className="mt-8 flex flex-col gap-3">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div key={i} className="h-16 w-full bg-[#E5E6E6] dark:bg-[#1A1A1E] animate-pulse rounded-xl" />
         ))}
       </div>
     );
   }
   
   return (
-    <div className="mt-8 space-y-8">
+    <div className="mt-8 space-y-6">
+      <div className="sticky top-[60px] z-10 bg-[#FAFAFA] dark:bg-[#101013] py-2 mb-2 transition-colors">
+        <input 
+          type="text"
+          placeholder="Buscar tarea..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full px-4 py-3 bg-white dark:bg-[#1A1A1E] border border-[#E5E6E6] dark:border-[#2C2C30] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#3584E4] dark:text-white transition-all shadow-sm"
+        />
+      </div>
+
       {categories.map(category => (
         <div key={category} className="animate-in fade-in slide-in-from-bottom-4 duration-500">
           <h3 className="text-sm font-semibold text-[#1E1E1E]/50 dark:text-white/50 mb-3 px-1 flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-[#3584E4]" />
             {category}
           </h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-            {chores
+          <div className="flex flex-col gap-2">
+            {filteredChores
               .filter(c => (c.category || 'Otros') === category)
               .map((chore) => {
                 const lastDone = lastDoneMap.get(chore.id);
@@ -164,38 +184,41 @@ export default function ChoreGrid() {
                     onTouchStart={() => startLongPress(chore)}
                     onTouchEnd={cancelLongPress}
                     onTouchMove={cancelLongPress}
-                    className="group relative flex flex-col items-center justify-center p-3 sm:p-4 bg-white dark:bg-[#303030] rounded-xl shadow-sm border border-[#E5E6E6] dark:border-[#3D3D3D] hover:bg-[#FAFAFA] dark:hover:bg-[#3D3D3D] transition-all hover:scale-[1.02] active:scale-95 aspect-square w-full min-w-0 overflow-hidden"
+                    className="group relative flex items-center gap-4 p-3 bg-white dark:bg-[#1A1A1E] rounded-xl border border-[#E5E6E6] dark:border-[#2C2C30] hover:bg-[#FAFAFA] dark:hover:bg-[#222226] transition-all active:scale-[0.98] w-full text-left overflow-hidden"
                   >
                     {/* Success animation overlay */}
                     {successAnimationId === chore.id && (
-                      <div className="absolute inset-0 bg-[#26A269]/95 dark:bg-[#1E8254]/95 rounded-xl flex flex-col items-center justify-center text-white z-10 animate-in fade-in duration-200">
-                        <CheckCircle2 className="w-8 h-8 animate-bounce" />
-                        <span className="text-[10px] font-bold mt-1">¡Listo!</span>
+                      <div className="absolute inset-0 bg-[#26A269]/95 dark:bg-[#1E8254]/95 flex items-center justify-center text-white z-10 animate-in fade-in duration-200 gap-2">
+                        <CheckCircle2 className="w-5 h-5 animate-bounce" />
+                        <span className="text-sm font-bold">¡Listo!</span>
                       </div>
                     )}
 
-                    {isOverdue && (
-                      <div className="absolute top-2 right-2 flex items-center gap-1 px-1.5 py-0.5 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-full text-[10px] font-bold animate-pulse">
-                        <Clock className="w-3 h-3" />
-                        <span>Pte.</span>
-                      </div>
-                    )}
-                    <div className="absolute top-2 left-2 flex items-center gap-1 px-1.5 py-0.5 bg-[#3584E4]/10 text-[#3584E4] rounded-full text-[10px] font-bold">
-                      <span>{chore.points || 1} pts</span>
+                    <div className="flex-shrink-0 text-3xl group-hover:scale-110 transition-transform w-12 flex justify-center">
+                      {chore.emoji}
                     </div>
-                    <span className="text-3xl sm:text-4xl mb-2 sm:mb-3 group-hover:scale-110 transition-transform">{chore.emoji}</span>
-                    <span className={`font-medium text-center leading-tight w-full line-clamp-2 px-1 transition-all ${
-                      chore.name.length > 16 
-                        ? 'text-[10px] sm:text-xs' 
-                        : 'text-xs sm:text-sm'
-                    } text-[#1E1E1E] dark:text-white`}>
-                      {chore.name}
-                    </span>
-                    {lastDone && (
-                      <span className="text-[10px] text-[#1E1E1E]/40 dark:text-white/40 mt-1">
-                        hace {daysSince === 0 ? 'hoy' : `${daysSince} ${daysSince === 1 ? 'día' : 'días'}`}
-                      </span>
-                    )}
+                    
+                    <div className="flex-1 min-w-0 flex flex-col justify-center">
+                      <h4 className="font-medium text-sm text-[#1E1E1E] dark:text-white truncate leading-tight">
+                        {chore.name}
+                      </h4>
+                      {lastDone && (
+                        <span className="text-xs text-[#1E1E1E]/40 dark:text-white/40 mt-0.5">
+                          hace {daysSince === 0 ? 'hoy' : `${daysSince} ${daysSince === 1 ? 'día' : 'días'}`}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                      <div className="flex items-center gap-1 px-2 py-1 bg-[#3584E4]/10 text-[#3584E4] rounded-md text-[10px] font-bold">
+                        {chore.points || 1} pts
+                      </div>
+                      {isOverdue && (
+                        <div className="flex items-center gap-1 px-2 py-0.5 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-md text-[10px] font-bold animate-pulse">
+                          <Clock className="w-3 h-3" /> Pte.
+                        </div>
+                      )}
+                    </div>
                   </button>
                 );
               })}

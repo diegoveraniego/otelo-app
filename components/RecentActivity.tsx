@@ -110,7 +110,7 @@ export default function RecentActivity() {
         <h2 className="text-lg font-bold text-[#1E1E1E] dark:text-white mb-4 px-1">
           Actividad Reciente
         </h2>
-        <div className="bg-white dark:bg-[#303030] rounded-2xl p-8 text-center border border-[#E5E6E6] dark:border-[#3D3D3D] transition-colors shadow-sm">
+        <div className="bg-white dark:bg-[#1A1A1E] rounded-2xl p-8 text-center border border-[#E5E6E6] dark:border-[#2C2C30] transition-colors shadow-sm">
           <div className="text-3xl mb-2">✨</div>
           <p className="text-sm font-medium text-[#1E1E1E] dark:text-white mb-1">
             Sin actividad reciente
@@ -130,7 +130,7 @@ export default function RecentActivity() {
         {isLoading && <span className="w-4 h-4 rounded-full border-2 border-[#3584E4] border-t-transparent animate-spin" />}
       </h2>
       
-      <div className="bg-white dark:bg-[#303030] rounded-2xl shadow-sm border border-[#E5E6E6] dark:border-[#3D3D3D] transition-colors">
+      <div className="bg-white dark:bg-[#1A1A1E] rounded-2xl shadow-sm border border-[#E5E6E6] dark:border-[#2C2C30] transition-colors">
         <div className="flex flex-col">
           {logs.map((log, i) => {
             const isOwnLog = currentUser?.id === log.member_id;
@@ -140,7 +140,7 @@ export default function RecentActivity() {
               <div
                 key={log.id}
                 className={`flex items-center gap-4 p-4 ${
-                  i !== logs.length - 1 ? 'border-b border-[#E5E6E6] dark:border-[#3D3D3D]' : ''
+                  i !== logs.length - 1 ? 'border-b border-[#E5E6E6] dark:border-[#2C2C30]' : ''
                 } ${
                   i === 0 ? 'rounded-t-2xl' : ''
                 } ${
@@ -237,7 +237,7 @@ export default function RecentActivity() {
                         {activePickerLogId === log.id && (
                           <>
                             <div className="fixed inset-0 z-30" onClick={() => setActivePickerLogId(null)} />
-                            <div className="absolute right-0 bottom-full mb-2 z-40 bg-white dark:bg-[#303030] border border-[#E5E6E6] dark:border-[#3D3D3D] rounded-2xl p-1.5 shadow-xl flex gap-1 animate-in fade-in slide-in-from-bottom-2 duration-150">
+                            <div className="absolute right-0 bottom-full mb-2 z-40 bg-white dark:bg-[#1A1A1E] border border-[#E5E6E6] dark:border-[#2C2C30] rounded-2xl p-1.5 shadow-xl flex gap-1 animate-in fade-in slide-in-from-bottom-2 duration-150">
                               {[
                                 { name: 'heart', emoji: '❤️', label: 'Amor' },
                                 { name: 'sparkle', emoji: '🧼', label: 'Limpieza' },

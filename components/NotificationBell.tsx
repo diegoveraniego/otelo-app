@@ -95,7 +95,7 @@ export default function NotificationBell() {
       <button
         id="notification-bell-button"
         onClick={handleOpen}
-        className="relative flex items-center justify-center w-10 h-10 rounded-full bg-white dark:bg-[#303030] shadow-sm border border-[#E5E6E6] dark:border-[#3D3D3D] hover:bg-[#FAFAFA] dark:hover:bg-[#3D3D3D] transition-colors"
+        className="relative flex items-center justify-center w-10 h-10 rounded-full bg-white dark:bg-[#1A1A1E] shadow-sm border border-[#E5E6E6] dark:border-[#2C2C30] hover:bg-[#FAFAFA] dark:hover:bg-[#3D3D3D] transition-colors"
       >
         <Bell className="w-5 h-5 text-[#1E1E1E] dark:text-white" />
         {unreadCount > 0 && (
@@ -108,9 +108,9 @@ export default function NotificationBell() {
       {isOpen && (
         <div
           id="notification-dropdown"
-          className="absolute right-0 top-12 w-80 bg-white dark:bg-[#303030] rounded-2xl shadow-2xl border border-[#E5E6E6] dark:border-[#3D3D3D] overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-300"
+          className="absolute right-0 top-12 w-80 bg-white dark:bg-[#1A1A1E] rounded-2xl shadow-2xl border border-[#E5E6E6] dark:border-[#2C2C30] overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-300"
         >
-          <div className="px-5 py-4 border-b border-[#E5E6E6] dark:border-[#3D3D3D] flex items-center justify-between bg-[#FAFAFA] dark:bg-[#2A2A2A]">
+          <div className="px-5 py-4 border-b border-[#E5E6E6] dark:border-[#2C2C30] flex items-center justify-between bg-[#FAFAFA] dark:bg-[#2A2A2A]">
             <h3 className="font-bold text-sm text-[#1E1E1E] dark:text-white">Notificaciones</h3>
             {isLoading && <span className="w-3 h-3 rounded-full border-2 border-[#3584E4] border-t-transparent animate-spin" />}
           </div>
@@ -133,7 +133,7 @@ export default function NotificationBell() {
                   <div
                     key={isThanks ? (data as ThanksWithDetails).id : (data as ColorTradeWithDetails).id}
                     className={`flex flex-col px-5 py-4 ${
-                      i !== notifications.length - 1 ? 'border-b border-[#E5E6E6] dark:border-[#3D3D3D]' : ''
+                      i !== notifications.length - 1 ? 'border-b border-[#E5E6E6] dark:border-[#2C2C30]' : ''
                     } ${isNew ? 'bg-[#3584E4]/5 dark:bg-[#3584E4]/10' : ''} hover:bg-[#FAFAFA] dark:hover:bg-[#353535] transition-colors`}
                   >
                     <div className="flex items-start gap-4">

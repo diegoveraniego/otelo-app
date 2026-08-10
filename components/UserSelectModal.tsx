@@ -100,8 +100,8 @@ export default function UserSelectModal() {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-sm max-h-[90vh] flex flex-col bg-white dark:bg-[#303030] rounded-xl shadow-lg border border-[#E5E6E6] dark:border-[#3D3D3D] overflow-hidden animate-in fade-in zoom-in duration-200 transition-colors">
-        <div className="p-6 text-center border-b border-[#E5E6E6] dark:border-[#3D3D3D] bg-[#FAFAFA] dark:bg-[#2A2A2A] transition-colors">
+      <div className="w-full max-w-sm max-h-[90vh] flex flex-col bg-white dark:bg-[#1A1A1E] rounded-xl shadow-lg border border-[#E5E6E6] dark:border-[#2C2C30] overflow-hidden animate-in fade-in zoom-in duration-200 transition-colors">
+        <div className="p-6 text-center border-b border-[#E5E6E6] dark:border-[#2C2C30] bg-[#FAFAFA] dark:bg-[#2A2A2A] transition-colors">
           <h2 className="text-xl font-bold text-[#1E1E1E] dark:text-white">
             {selectedMember ? 'Ingresa tu PIN' : '¿Quién eres?'}
           </h2>
@@ -152,16 +152,11 @@ export default function UserSelectModal() {
                   <button
                     key={member.id}
                     onClick={() => handleMemberSelect(member)}
-                    className="flex flex-col items-center justify-center p-4 rounded-xl hover:bg-[#FAFAFA] dark:hover:bg-[#3D3D3D] active:bg-[#E5E6E6] dark:active:bg-[#474747] transition-colors border border-[#E5E6E6] dark:border-[#3D3D3D]"
+                    className="flex flex-col items-center justify-center p-4 rounded-xl hover:bg-[#FAFAFA] dark:hover:bg-[#3D3D3D] active:bg-[#E5E6E6] dark:active:bg-[#474747] transition-colors border border-[#E5E6E6] dark:border-[#2C2C30]"
                     style={{ borderBottomColor: member.color, borderBottomWidth: 4 }}
                   >
                     <Avatar member={member} className="w-12 h-12 mb-2 text-lg" />
                     <span className="font-medium text-[#1E1E1E] dark:text-white leading-tight">{member.name}</span>
-                    {member.selected_title && (
-                      <span className="text-[9px] font-bold uppercase tracking-wider text-[#1E1E1E]/40 dark:text-white/40 mt-1 line-clamp-1">
-                        {member.selected_title}
-                      </span>
-                    )}
                   </button>
                 ))}
               </div>
@@ -171,11 +166,6 @@ export default function UserSelectModal() {
               <div className="flex flex-col items-center mb-6">
                 <Avatar member={selectedMember} className="w-16 h-16 mb-3 text-2xl" />
                 <span className="font-semibold text-base text-[#1E1E1E] dark:text-white leading-tight">{selectedMember.name}</span>
-                {selectedMember.selected_title && (
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#1E1E1E]/50 dark:text-white/50 mt-1 bg-[#FAFAFA] dark:bg-[#242424] border border-[#E5E6E6]/60 dark:border-[#3D3D3D]/60 px-2 py-0.5 rounded-full">
-                    {selectedMember.selected_title}
-                  </span>
-                )}
               </div>
               
               <div>
@@ -188,7 +178,7 @@ export default function UserSelectModal() {
                   inputMode="numeric"
                   autoFocus
                   placeholder="PIN"
-                  className="w-full text-center tracking-[0.5em] text-2xl text-[#1E1E1E] dark:text-white dark:bg-[#242424] px-4 py-3 rounded-lg border border-[#E5E6E6] dark:border-[#3D3D3D] focus:outline-none focus:border-[#3584E4] focus:ring-1 focus:ring-[#3584E4] transition-colors"
+                  className="w-full text-center tracking-[0.5em] text-2xl text-[#1E1E1E] dark:text-white dark:bg-[#151518] px-4 py-3 rounded-lg border border-[#E5E6E6] dark:border-[#2C2C30] focus:outline-none focus:border-[#3584E4] focus:ring-1 focus:ring-[#3584E4] transition-colors"
                 />
               </div>
 
@@ -243,7 +233,7 @@ export function OpenUserModalButton() {
       onClick={() => {
         window.dispatchEvent(new CustomEvent('open-user-modal'));
       }}
-      className="flex items-center gap-2 bg-white dark:bg-[#303030] rounded-full p-1 shadow-sm border border-[#E5E6E6] dark:border-[#3D3D3D] hover:bg-[#FAFAFA] dark:hover:bg-[#3D3D3D] transition-colors"
+      className="flex items-center gap-2 bg-white dark:bg-[#1A1A1E] rounded-full p-1 shadow-sm border border-[#E5E6E6] dark:border-[#2C2C30] hover:bg-[#FAFAFA] dark:hover:bg-[#3D3D3D] transition-colors"
       style={currentUser ? { paddingRight: '0.75rem' } : { paddingRight: '0.25rem', paddingLeft: '0.75rem', padding: '0.5rem 1rem' }}
     >
       {currentUser ? (
@@ -253,11 +243,6 @@ export function OpenUserModalButton() {
             <span className="font-semibold text-xs text-[#1E1E1E] dark:text-white leading-tight">
               {currentUser.name}
             </span>
-            {currentUser.selected_title && (
-              <span className="text-[8px] font-bold uppercase tracking-wider text-[#1E1E1E]/55 dark:text-white/55 leading-none mt-0.5">
-                {currentUser.selected_title}
-              </span>
-            )}
           </div>
         </>
       ) : (
