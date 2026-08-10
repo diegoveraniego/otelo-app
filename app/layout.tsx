@@ -1,3 +1,4 @@
+import type { Metadata, Viewport } from "next";
 import { Chelsea_Market, Inter } from "next/font/google";
 import "./globals.css";
 import UserSelectModal, { OpenUserModalButton } from "@/components/UserSelectModal";
