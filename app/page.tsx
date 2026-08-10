@@ -17,9 +17,10 @@ export default function Home() {
           <WeeklySummaryBanner />
           <GamificationBanner />
           <HomeWarnings />
-          {/* SummaryCard solo en móvil — en desktop va en la sidebar */}
-          <div className="md:hidden">
+          {/* Widgets de la sidebar en móvil */}
+          <div className="md:hidden flex flex-col gap-6 mb-6">
             <SummaryCard />
+            <DesktopSidebarStats />
           </div>
           <ChoreGrid />
           <RecentActivity />
