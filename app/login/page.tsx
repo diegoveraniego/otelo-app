@@ -14,8 +14,8 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-transparent p-4">
-      <div className="w-full max-w-sm bg-white dark:bg-[#303030] rounded-xl shadow-lg overflow-hidden border border-[#E5E6E6] dark:border-[#3D3D3D] transition-colors">
-        <div className="p-8 text-center border-b border-[#E5E6E6] dark:border-[#3D3D3D] bg-[#FAFAFA] dark:bg-[#2A2A2A] transition-colors">
+      <div className="w-full max-w-sm bg-white dark:bg-[#1A1A1E] rounded-xl shadow-lg overflow-hidden border border-[#E5E6E6] dark:border-[#2C2C30] transition-colors">
+        <div className="p-8 text-center border-b border-[#E5E6E6] dark:border-[#2C2C30] bg-[#FAFAFA] dark:bg-[#151518] transition-colors">
           <div className="mx-auto w-16 h-16 bg-[#E5E6E6] dark:bg-[#3D3D3D] rounded-full flex items-center justify-center mb-4 transition-colors">
             <KeyRound className="w-8 h-8 text-[#1E1E1E] dark:text-white" />
           </div>
@@ -33,7 +33,7 @@ export default function LoginPage() {
               name="password"
               required
               autoFocus
-              className="w-full px-4 py-3 rounded-lg border border-[#E5E6E6] dark:border-[#3D3D3D] dark:bg-[#242424] focus:outline-none focus:ring-1 focus:ring-[#3584E4] focus:border-[#3584E4] transition-all text-[#1E1E1E] dark:text-white"
+              className="w-full px-4 py-3 rounded-lg border border-[#E5E6E6] dark:border-[#2C2C30] dark:bg-[#151518] focus:outline-none focus:ring-1 focus:ring-[#3584E4] focus:border-[#3584E4] transition-all text-[#1E1E1E] dark:text-white"
               placeholder="••••••••"
             />
           </div>

@@ -77,7 +77,7 @@ export default function MembersStep({ data, onNext, onBack }: Props) {
 
       <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 scrollbar-thin">
         {members.map((member, index) => (
-          <div key={index} className="p-4 rounded-2xl border border-[#E5E6E6] dark:border-[#3D3D3D] bg-[#FAFAFA] dark:bg-[#2A2A2A] space-y-4 relative">
+          <div key={index} className="p-4 rounded-2xl border border-[#E5E6E6] dark:border-[#2C2C30] bg-[#FAFAFA] dark:bg-[#151518] space-y-4 relative">
             <div className="flex items-center gap-3">
               <div 
                 className="w-10 h-10 rounded-full flex items-center justify-center text-white"
@@ -159,7 +159,7 @@ export default function MembersStep({ data, onNext, onBack }: Props) {
 
         <button
           onClick={addMember}
-          className="w-full py-3 border-2 border-dashed border-[#E5E6E6] dark:border-[#3D3D3D] rounded-2xl text-[#1E1E1E]/50 dark:text-white/40 flex items-center justify-center gap-2 hover:bg-[#FAFAFA] dark:hover:bg-[#2A2A2A] transition-colors"
+          className="w-full py-3 border-2 border-dashed border-[#E5E6E6] dark:border-[#2C2C30] rounded-2xl text-[#1E1E1E]/50 dark:text-white/40 flex items-center justify-center gap-2 hover:bg-[#FAFAFA] dark:hover:bg-[#2A2A2A] transition-colors"
         >
           <Plus className="w-5 h-5" /> Añadir otro miembro
         </button>

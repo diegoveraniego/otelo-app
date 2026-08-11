@@ -75,7 +75,7 @@ export default function OnboardingPage() {
 
   return (
     <div className="min-h-screen bg-[#F7F7F7] dark:bg-[#1E1E1E] flex flex-col items-center justify-center p-4 transition-colors">
-      <div className="w-full max-w-md bg-white dark:bg-[#303030] rounded-[32px] shadow-xl overflow-hidden border border-[#E5E6E6] dark:border-[#3D3D3D]">
+      <div className="w-full max-w-md bg-white dark:bg-[#1A1A1E] rounded-[32px] shadow-xl overflow-hidden border border-[#E5E6E6] dark:border-[#2C2C30]">
         {/* Progress Bar */}
         <div className="h-1.5 w-full bg-[#E5E6E6] dark:bg-[#3D3D3D]">
           <div 

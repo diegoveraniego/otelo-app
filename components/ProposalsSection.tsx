@@ -216,7 +216,7 @@ export default function ProposalsSection() {
       {isAdding && (
         <form onSubmit={handleSubmit} className="bg-white dark:bg-[#1A1A1E] p-6 rounded-3xl shadow-xl border border-[#E5E6E6] dark:border-[#2C2C30] mb-8 space-y-5 animate-in zoom-in-95 duration-200">
           
-          <div className="flex bg-[#F5F5F7] dark:bg-[#2A2A2A] p-1 rounded-xl mb-4">
+          <div className="flex bg-[#F5F5F7] dark:bg-[#151518] p-1 rounded-xl mb-4">
             <button
               type="button"
               onClick={() => setProposalMode('new_chore')}

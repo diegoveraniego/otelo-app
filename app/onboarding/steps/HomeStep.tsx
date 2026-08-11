@@ -47,7 +47,7 @@ export default function HomeStep({ data, onNext }: Props) {
               setError('');
             }}
             placeholder="Ej: Los Pinos, Casa Central"
-            className="w-full px-4 py-3 rounded-xl border border-[#E5E6E6] dark:border-[#3D3D3D] bg-white dark:bg-[#2A2A2A] text-[#1E1E1E] dark:text-white focus:ring-2 focus:ring-[#3584E4] outline-none transition-all"
+            className="w-full px-4 py-3 rounded-xl border border-[#E5E6E6] dark:border-[#2C2C30] bg-white dark:bg-[#151518] text-[#1E1E1E] dark:text-white focus:ring-2 focus:ring-[#3584E4] outline-none transition-all"
           />
           {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
         </div>

@@ -367,7 +367,7 @@ export default function EditProfileModal({ isOpen, onClose, onUpdated }: EditPro
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
       <div className="w-full max-w-sm bg-white dark:bg-[#1A1A1E] rounded-xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden animate-in fade-in zoom-in duration-200 border border-[#E5E6E6] dark:border-[#2C2C30] transition-colors">
-        <div className="flex items-center justify-between p-4 border-b border-[#E5E6E6] dark:border-[#2C2C30] bg-[#FAFAFA] dark:bg-[#2A2A2A] transition-colors shrink-0">
+        <div className="flex items-center justify-between p-4 border-b border-[#E5E6E6] dark:border-[#2C2C30] bg-[#FAFAFA] dark:bg-[#151518] transition-colors shrink-0">
           <h2 className="text-lg font-bold text-[#1E1E1E] dark:text-white">Editar Perfil</h2>
           <button 
             onClick={onClose}

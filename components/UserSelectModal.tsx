@@ -101,7 +101,7 @@ export default function UserSelectModal() {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
       <div className="w-full max-w-sm max-h-[90vh] flex flex-col bg-white dark:bg-[#1A1A1E] rounded-xl shadow-lg border border-[#E5E6E6] dark:border-[#2C2C30] overflow-hidden animate-in fade-in zoom-in duration-200 transition-colors">
-        <div className="p-6 text-center border-b border-[#E5E6E6] dark:border-[#2C2C30] bg-[#FAFAFA] dark:bg-[#2A2A2A] transition-colors">
+        <div className="p-6 text-center border-b border-[#E5E6E6] dark:border-[#2C2C30] bg-[#FAFAFA] dark:bg-[#151518] transition-colors">
           <h2 className="text-xl font-bold text-[#1E1E1E] dark:text-white">
             {selectedMember ? 'Ingresa tu PIN' : '¿Quién eres?'}
           </h2>

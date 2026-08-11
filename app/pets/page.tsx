@@ -142,7 +142,7 @@ export default function PetsPage() {
                 }}
                 className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all border ${selectedPetId === pet.id
                     ? 'bg-[#3584E4] text-white border-[#3584E4] shadow-sm'
-                    : 'bg-white dark:bg-[#303030] text-[#1E1E1E]/60 dark:text-white/60 border-[#E5E6E6] dark:border-[#3D3D3D] hover:border-[#3584E4]'
+                    : 'bg-white dark:bg-[#1A1A1E] text-[#1E1E1E]/60 dark:text-white/60 border-[#E5E6E6] dark:border-[#2C2C30] hover:border-[#3584E4]'
                   }`}
               >
                 {pet.name}
@@ -253,7 +253,7 @@ export default function PetsPage() {
         {isLoading && slots.length === 0 ? (
           <div className="h-40 rounded-2xl bg-[#E5E6E6] dark:bg-[#3D3D3D] animate-pulse" />
         ) : (
-          <div className="bg-white dark:bg-[#303030] rounded-2xl border border-[#E5E6E6] dark:border-[#3D3D3D] p-4 shadow-sm transition-opacity duration-200">
+          <div className="bg-white dark:bg-[#1A1A1E] rounded-2xl border border-[#E5E6E6] dark:border-[#2C2C30] p-4 shadow-sm transition-opacity duration-200">
             <FeedingWeekGrid
               slots={slots}
               weekStart={viewedWeekStart}

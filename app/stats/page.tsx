@@ -16,7 +16,7 @@ export default function StatsPage() {
     <div className="animate-in fade-in duration-500 pb-8">
       <h1 className="text-2xl font-bold text-[#1E1E1E] dark:text-white mb-6">Estadísticas</h1>
       
-      <div className="bg-[#E5E6E6] dark:bg-[#242424] p-1 rounded-xl flex mb-8 transition-colors">
+      <div className="bg-[#E5E6E6] dark:bg-[#151518] p-1 rounded-xl flex mb-8 transition-colors">
         {(['semana', 'mes', 'año'] as Tab[]).map((tab) => {
           if (tab === 'mes' && activeTab === 'mes') {
             return (

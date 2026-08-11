@@ -110,7 +110,7 @@ export default function NotificationBell() {
           id="notification-dropdown"
           className="absolute right-0 top-12 w-80 bg-white dark:bg-[#1A1A1E] rounded-2xl shadow-2xl border border-[#E5E6E6] dark:border-[#2C2C30] overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-300"
         >
-          <div className="px-5 py-4 border-b border-[#E5E6E6] dark:border-[#2C2C30] flex items-center justify-between bg-[#FAFAFA] dark:bg-[#2A2A2A]">
+          <div className="px-5 py-4 border-b border-[#E5E6E6] dark:border-[#2C2C30] flex items-center justify-between bg-[#FAFAFA] dark:bg-[#151518]">
             <h3 className="font-bold text-sm text-[#1E1E1E] dark:text-white">Notificaciones</h3>
             {isLoading && <span className="w-3 h-3 rounded-full border-2 border-[#3584E4] border-t-transparent animate-spin" />}
           </div>

@@ -204,7 +204,7 @@ export default function HistoryPage() {
       </div>
 
       {/* Filters Box */}
-      <div className="bg-white dark:bg-[#303030] rounded-2xl p-5 shadow-sm border border-[#E5E6E6] dark:border-[#3D3D3D] mb-6 transition-colors">
+      <div className="bg-white dark:bg-[#1A1A1E] rounded-2xl p-5 shadow-sm border border-[#E5E6E6] dark:border-[#2C2C30] mb-6 transition-colors">
         <h2 className="text-sm font-bold text-[#1E1E1E]/80 dark:text-white/80 mb-4 flex items-center gap-2">
           Filtrar y Buscar Registros
         </h2>
@@ -278,7 +278,7 @@ export default function HistoryPage() {
         </div>
 
         {/* Filter controls */}
-        <div className="flex flex-wrap items-center justify-between gap-3 mt-5 pt-4 border-t border-[#E5E6E6]/60 dark:border-[#3D3D3D]/60">
+        <div className="flex flex-wrap items-center justify-between gap-3 mt-5 pt-4 border-t border-[#E5E6E6]/60 dark:border-[#2C2C30]/60">
           <div className="flex items-center gap-2">
             <button
               onClick={() => setSortOrder(prev => prev === 'desc' ? 'asc' : 'desc')}
@@ -304,7 +304,7 @@ export default function HistoryPage() {
       </div>
 
       {/* Audit List Container */}
-      <div className="bg-white dark:bg-[#303030] rounded-2xl overflow-hidden shadow-sm border border-[#E5E6E6] dark:border-[#3D3D3D] transition-colors mb-6">
+      <div className="bg-white dark:bg-[#1A1A1E] rounded-2xl overflow-hidden shadow-sm border border-[#E5E6E6] dark:border-[#2C2C30] transition-colors mb-6">
         {logs.length > 0 ? (
           <div className="flex flex-col">
             {logs.map((log, index) => {
@@ -318,7 +318,7 @@ export default function HistoryPage() {
                 <div
                   key={log.id}
                   className={`flex items-center gap-4 p-4 ${
-                    index !== logs.length - 1 ? 'border-b border-[#E5E6E6] dark:border-[#3D3D3D]' : ''
+                    index !== logs.length - 1 ? 'border-b border-[#E5E6E6] dark:border-[#2C2C30]' : ''
                   } hover:bg-[#FAFAFA] dark:hover:bg-[#353535] transition-colors group`}
                 >
                   <Avatar member={log.member} className="w-11 h-11 text-base shrink-0 border border-white/10" />

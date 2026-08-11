@@ -97,7 +97,7 @@ export default function ChoresStep({ data, pets, onFinish, onBack, isSubmitting 
             <div 
               key={index}
               onClick={() => toggleChore(chore)}
-              className={`p-4 rounded-2xl border transition-all cursor-pointer flex items-center gap-4 ${isSelected ? 'bg-blue-50 dark:bg-blue-900/10 border-[#3584E4]' : 'bg-white dark:bg-[#2A2A2A] border-[#E5E6E6] dark:border-[#3D3D3D]'}`}
+              className={`p-4 rounded-2xl border transition-all cursor-pointer flex items-center gap-4 ${isSelected ? 'bg-blue-50 dark:bg-blue-900/10 border-[#3584E4]' : 'bg-white dark:bg-[#151518] border-[#E5E6E6] dark:border-[#2C2C30]'}`}
             >
               <div className="text-3xl">{chore.emoji}</div>
               <div className="flex-1">

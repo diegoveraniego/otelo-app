@@ -251,7 +251,7 @@ export default function FeedingSlotModal({ slot, isOpen, onClose, onRefresh }: P
             ? isReplacement
               ? 'bg-amber-50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-800/30'
               : 'bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-800/30'
-            : 'bg-[#FAFAFA] dark:bg-[#2A2A2A] border-[#E5E6E6] dark:border-[#2C2C30]'
+            : 'bg-[#FAFAFA] dark:bg-[#151518] border-[#E5E6E6] dark:border-[#2C2C30]'
         }`}>
           {slot.fed_at ? (
             <div className="space-y-3">
