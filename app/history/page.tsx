@@ -189,7 +189,7 @@ export default function HistoryPage() {
   const isAdmin = currentUser.role === 'admin';
 
   return (
-    <div className="animate-in fade-in duration-500 pb-8 mt-2 max-w-4xl mx-auto px-2">
+    <div className="animate-in fade-in duration-500 pb-8 mt-2 px-2">
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <div className="bg-[#3584E4]/10 dark:bg-[#3584E4]/20 p-2.5 rounded-xl text-[#3584E4]">

@@ -69,7 +69,7 @@ export default function RootLayout({
             </div>
           </header>
 
-          <main className="w-full px-2 py-2 md:p-4 max-w-[1024px] mx-auto text-sm">
+          <main className="w-full px-2 py-2 md:px-6 md:py-4 text-sm">
             {children}
           </main>
 
