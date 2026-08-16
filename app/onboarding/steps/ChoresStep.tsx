@@ -30,7 +30,7 @@ const CHORE_TEMPLATES: ChoreTemplate[] = [
   { name: 'Lavar Ropa', emoji: '👕', category: 'Limpieza', threshold_days: 7 },
   { name: 'Colgar Ropa', emoji: '🪢', category: 'Limpieza', threshold_days: 7 },
   { name: 'Destender la ropa', emoji: '👚', category: 'Limpieza', threshold_days: 7 },
-  { name: 'Limpiar Living', emoji: '🧹', category: 'Limpieza', threshold_days: 7, points: 9 },
+  { name: 'Limpiar Living', emoji: '🧹', category: 'Limpieza', threshold_days: 7, points: 10 },
   { name: 'Sacar la basura', emoji: '🗑️', category: 'Limpieza', threshold_days: 3 },
   { name: 'Limpiar vidrios y ventanas', emoji: '🪟', category: 'Limpieza', threshold_days: 15 },
   { name: 'Cortar Pasto', emoji: '🌿', category: 'Jardín', threshold_days: 30 },
