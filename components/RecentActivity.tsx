@@ -7,7 +7,7 @@ import { LogWithDetails } from '@/lib/types';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { useUserStore } from '@/lib/store';
-import { Trash2, Smile, Heart } from 'lucide-react';
+import { Trash2, Heart } from 'lucide-react';
 import Avatar from './Avatar';
 import { triggerPushNotification } from '@/lib/pushUtils';
 
@@ -16,7 +16,6 @@ export default function RecentActivity() {
   const [logs, setLogs] = useState<LogWithDetails[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [activePickerLogId, setActivePickerLogId] = useState<string | null>(null);
   const { currentUser } = useUserStore();
 
   const fetchLogs = useCallback(async (reset = false) => {
@@ -152,6 +151,7 @@ export default function RecentActivity() {
                   <p className="text-sm text-[#1E1E1E] dark:text-white truncate">
                     <span className="font-semibold">{log.member.name}</span> hizo{' '}
                     <span className="font-medium">{log.chore.name}</span> {log.chore.emoji}
+                    <span className="ml-1.5 font-black text-[#3584E4] dark:text-[#5B9DF5]">+{log.chore.points} pts</span>
                     {(log.metadata as any)?.variant && (
                       <span className="text-[#1E1E1E]/50 dark:text-white/50 text-xs ml-1 font-medium">({(log.metadata as any).variant})</span>
                     )}
@@ -221,51 +221,6 @@ export default function RecentActivity() {
                           }`}
                         />
                       </button>
-
-                      {/* Selector de Reacciones (Smile) */}
-                      <div className="relative">
-                        <button
-                          onClick={() => setActivePickerLogId(activePickerLogId === log.id ? null : log.id)}
-                          className={`p-2.5 rounded-xl transition-all duration-300 ${
-                            activePickerLogId === log.id
-                              ? 'text-[#3584E4] bg-[#3584E4]/10'
-                              : 'text-[#1E1E1E]/30 dark:text-white/20 hover:text-[#3584E4] hover:bg-[#3584E4]/10 hover:scale-105'
-                          }`}
-                        >
-                          <Smile className="w-4 h-4" />
-                        </button>
-                        {activePickerLogId === log.id && (
-                          <>
-                            <div className="fixed inset-0 z-30" onClick={() => setActivePickerLogId(null)} />
-                            <div className="absolute right-0 bottom-full mb-2 z-40 bg-white dark:bg-[#1A1A1E] border border-[#E5E6E6] dark:border-[#2C2C30] rounded-2xl p-1.5 shadow-xl flex gap-1 animate-in fade-in slide-in-from-bottom-2 duration-150">
-                              {[
-                                { name: 'heart', emoji: '❤️', label: 'Amor' },
-                                { name: 'sparkle', emoji: '🧼', label: 'Limpieza' },
-                                { name: 'cook', emoji: '🍳', label: 'Sabroso' },
-                                { name: 'paw', emoji: '🐾', label: 'Mascota' },
-                                { name: 'speed', emoji: '⚡', label: 'Rayo' },
-                              ].map((r) => {
-                                const alreadyHasThis = log.thanks?.some(t => t.from_member_id === currentUser?.id && t.reaction_type === r.name);
-                                return (
-                                  <button
-                                    key={r.name}
-                                    title={r.label}
-                                    onClick={() => {
-                                      handleToggleReaction(log, r.name);
-                                      setActivePickerLogId(null);
-                                    }}
-                                    className={`text-xl p-1.5 hover:scale-125 active:scale-95 rounded-lg transition-all ${
-                                      alreadyHasThis ? 'bg-blue-50 dark:bg-blue-900/30' : ''
-                                    }`}
-                                  >
-                                    {r.emoji}
-                                  </button>
-                                );
-                              })}
-                            </div>
-                          </>
-                        )}
-                      </div>
                     </>
                   )}
 
