@@ -162,11 +162,18 @@ export default function GamificationBanner() {
       </div>
 
       <div className="relative z-10 flex flex-col sm:flex-row items-center gap-5">
-        {/* Left: Mascot Container */}
+        {/* Left: Avatar Container */}
         <div className="relative shrink-0 flex items-center justify-center bg-[#FAFAFA] dark:bg-[#151518] w-20 h-20 sm:w-24 sm:h-24 rounded-full border border-[#E5E6E6] dark:border-[#2C2C30]">
-          <span className={`text-4xl sm:text-5xl ${mascotClass}`}>
-            {currentTier.mascot}
-          </span>
+          <Avatar member={currentUser} className="w-full h-full" />
+          
+          {/* Mascot Badge */}
+          <div className="absolute -top-1 -right-1 bg-white dark:bg-[#242424] w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-white dark:border-[#1A1A1E] shadow-sm z-20 flex items-center justify-center">
+            <span className={`text-sm sm:text-lg ${mascotClass}`}>
+              {currentTier.mascot}
+            </span>
+          </div>
+
+          {/* Tier Name */}
           <div className="absolute -bottom-1 bg-white dark:bg-[#3D3D3D] text-[10px] font-bold uppercase tracking-wider text-neutral-800 dark:text-white px-2 py-0.5 rounded-full border border-[#E5E6E6] dark:border-[#2C2C30] z-20">
             {currentTier.name}
           </div>
@@ -176,7 +183,6 @@ export default function GamificationBanner() {
         <div className="flex-1 w-full text-center sm:text-left">
           <div className="flex flex-col sm:flex-row sm:items-center gap-2 justify-center sm:justify-start">
             <h3 className="text-xl font-black tracking-tight leading-none flex items-center gap-2 justify-center sm:justify-start">
-              <Avatar member={currentUser} className="w-6 h-6 sm:w-8 sm:h-8 shadow-sm border border-[#E5E6E6] dark:border-[#2C2C30]" />
               {currentTier.title}
               {currentTier.name === 'Leyenda' && <Zap className="w-5 h-5 text-amber-500 fill-amber-500 animate-pulse" />}
             </h3>
