@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase/client';
 import { useUserStore } from '@/lib/store';
 import { startOfWeek, endOfWeek, subDays, format } from 'date-fns';
 import { Flame, Trophy, Sparkles, Star, Zap } from 'lucide-react';
+import Avatar from './Avatar';
 
 type Tier = {
   name: string;
@@ -166,7 +167,11 @@ export default function GamificationBanner() {
           <span className={`text-4xl sm:text-5xl ${mascotClass}`}>
             {currentTier.mascot}
           </span>
-          <div className="absolute -bottom-1 bg-white dark:bg-[#3D3D3D] text-[10px] font-bold uppercase tracking-wider text-neutral-800 dark:text-white px-2 py-0.5 rounded-full border border-[#E5E6E6] dark:border-[#2C2C30]">
+          <Avatar 
+            member={currentUser} 
+            className="absolute top-0 right-0 -mr-1 -mt-1 w-7 h-7 sm:w-9 sm:h-9 border-2 border-white dark:border-[#1A1A1E] shadow-sm z-20" 
+          />
+          <div className="absolute -bottom-1 bg-white dark:bg-[#3D3D3D] text-[10px] font-bold uppercase tracking-wider text-neutral-800 dark:text-white px-2 py-0.5 rounded-full border border-[#E5E6E6] dark:border-[#2C2C30] z-20">
             {currentTier.name}
           </div>
         </div>
