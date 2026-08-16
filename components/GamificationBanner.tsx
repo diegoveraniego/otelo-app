@@ -167,10 +167,6 @@ export default function GamificationBanner() {
           <span className={`text-4xl sm:text-5xl ${mascotClass}`}>
             {currentTier.mascot}
           </span>
-          <Avatar 
-            member={currentUser} 
-            className="absolute top-0 right-0 -mr-1 -mt-1 w-7 h-7 sm:w-9 sm:h-9 border-2 border-white dark:border-[#1A1A1E] shadow-sm z-20" 
-          />
           <div className="absolute -bottom-1 bg-white dark:bg-[#3D3D3D] text-[10px] font-bold uppercase tracking-wider text-neutral-800 dark:text-white px-2 py-0.5 rounded-full border border-[#E5E6E6] dark:border-[#2C2C30] z-20">
             {currentTier.name}
           </div>
@@ -180,6 +176,7 @@ export default function GamificationBanner() {
         <div className="flex-1 w-full text-center sm:text-left">
           <div className="flex flex-col sm:flex-row sm:items-center gap-2 justify-center sm:justify-start">
             <h3 className="text-xl font-black tracking-tight leading-none flex items-center gap-2 justify-center sm:justify-start">
+              <Avatar member={currentUser} className="w-6 h-6 sm:w-8 sm:h-8 shadow-sm border border-[#E5E6E6] dark:border-[#2C2C30]" />
               {currentTier.title}
               {currentTier.name === 'Leyenda' && <Zap className="w-5 h-5 text-amber-500 fill-amber-500 animate-pulse" />}
             </h3>
