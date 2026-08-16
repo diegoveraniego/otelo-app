@@ -333,9 +333,9 @@ export default function ProposalsSection() {
                 <select 
                   value={formData.proposedPoints}
                   onChange={(e) => setFormData(prev => ({ ...prev, proposedPoints: e.target.value }))}
-                  className="w-full bg-[#F5F5F7] dark:bg-[#151518] border border-[#E5E6E6] dark:border-[#2C2C30] rounded-2xl h-14 px-4 focus:outline-none focus:ring-2 focus:ring-[#3584E4] text-[#1E1E1E] dark:text-white font-medium"
+                  className="w-full bg-[#F5F5F7] dark:bg-[#242424] border border-[#E5E6E6] dark:border-[#3D3D3D] rounded-2xl h-14 px-4 focus:outline-none focus:ring-2 focus:ring-[#3584E4] text-[#1E1E1E] dark:text-white font-medium"
                 >
-                  {[1, 2, 3, 4, 5].map(p => <option key={p} value={p}>{p}</option>)}
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 20].map(p => <option key={p} value={p}>{p}</option>)}
                 </select>
               </div>
             </div>
