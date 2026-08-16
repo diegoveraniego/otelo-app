@@ -21,7 +21,8 @@ const onboardingSchema = z.object({
     name: z.string().min(1, 'Nombre requerido'),
     emoji: z.string(),
     category: z.string(),
-    threshold_days: z.number().min(1)
+    threshold_days: z.number().min(1),
+    points: z.number().optional()
   })).min(1, 'Debe haber al menos una tarea')
 });
 
