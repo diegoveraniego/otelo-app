@@ -127,7 +127,10 @@ export default function DesktopSidebarStats() {
                     <div className="flex items-center gap-2 shrink-0 ml-2">
                       <span className="text-sm font-bold text-[#1E1E1E] dark:text-white flex items-center gap-1">
                         <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
-                        {value} <span className="text-xs font-normal text-[#1E1E1E]/50 dark:text-white/50">({item.tasks})</span>
+                        {value} <span className="text-xs font-bold text-[#1E1E1E]/50 dark:text-white/50">pts</span>
+                      </span>
+                      <span className="text-[10px] font-medium text-[#1E1E1E]/30 dark:text-white/30">
+                        {item.tasks} {item.tasks === 1 ? 'tarea' : 'tareas'}
                       </span>
                     </div>
                   </div>
