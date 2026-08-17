@@ -51,21 +51,22 @@ export default function WeeklySummaryBanner() {
 
       const { data: logs } = await supabase
         .from('logs')
-        .select('member_id')
+        .select('member_id, chore:chores(points)')
         .eq('home_id', currentUser.home_id)
         .gte('done_at', start)
         .lte('done_at', end);
 
       const logsList = logs ?? [];
-      const counts: Record<string, number> = {};
+      const points: Record<string, number> = {};
       logsList.forEach(l => {
-        counts[l.member_id] = (counts[l.member_id] || 0) + 1;
+        const pts = (l.chore as any)?.points ?? 1;
+        points[l.member_id] = (points[l.member_id] || 0) + pts;
       });
 
       const sortedCandidates = (members as Member[])
-        .map(m => ({ member: m, count: counts[m.id] || 0 }))
-        .filter(x => x.count > 0)
-        .sort((a, b) => b.count - a.count);
+        .map(m => ({ member: m, pts: points[m.id] || 0 }))
+        .filter(x => x.pts > 0)
+        .sort((a, b) => b.pts - a.pts);
 
       const topCandidates = sortedCandidates.slice(0, 3).map(x => x.member);
 
@@ -82,26 +83,29 @@ export default function WeeklySummaryBanner() {
 
       const { data: logs } = await supabase
         .from('logs')
-        .select('member_id')
+        .select('member_id, chore:chores(points)')
         .eq('home_id', currentUser.home_id)
         .gte('done_at', start)
         .lte('done_at', end);
 
       const logsList = logs ?? [];
       if (logsList.length > 0) {
-        const counts: Record<string, number> = {};
+        const points: Record<string, number> = {};
+        const taskCounts: Record<string, number> = {};
         logsList.forEach(l => {
-          counts[l.member_id] = (counts[l.member_id] || 0) + 1;
+          const pts = (l.chore as any)?.points ?? 1;
+          points[l.member_id] = (points[l.member_id] || 0) + pts;
+          taskCounts[l.member_id] = (taskCounts[l.member_id] || 0) + 1;
         });
 
-        const topMemberId = Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
+        const topMemberId = Object.keys(points).reduce((a, b) => points[a] > points[b] ? a : b);
         const topMember = (members as Member[]).find(m => m.id === topMemberId);
 
         setData({
           mode: 'monday',
           topMember: topMember || null,
           totalChores: logsList.length,
-          topCount: counts[topMemberId]
+          topCount: taskCounts[topMemberId]
         });
       }
     }
