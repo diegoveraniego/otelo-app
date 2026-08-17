@@ -14,6 +14,7 @@ type BannerData = {
   candidates?: Member[];
   totalChores: number;
   topCount?: number;
+  topPoints?: number;
 };
 
 const joinNames = (names: string[]) => {
@@ -105,7 +106,8 @@ export default function WeeklySummaryBanner() {
           mode: 'monday',
           topMember: topMember || null,
           totalChores: logsList.length,
-          topCount: taskCounts[topMemberId]
+          topCount: taskCounts[topMemberId],
+          topPoints: points[topMemberId]
         });
       }
     }
@@ -210,12 +212,16 @@ export default function WeeklySummaryBanner() {
             </p>
             <div className="flex gap-4 mt-2 text-xs font-bold bg-[#FAFAFA] dark:bg-[#151518] rounded-lg p-2 w-fit border border-[#E5E6E6] dark:border-[#2C2C30] mx-auto sm:mx-0">
               <div className="flex items-center gap-1">
+                <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+                <span>{data.topPoints} pts</span>
+              </div>
+              <div className="flex items-center gap-1">
                 <Crown className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
                 <span>{data.topCount} tareas</span>
               </div>
               <div className="flex items-center gap-1">
                 <Flame className="w-3.5 h-3.5 text-[#E01B24] dark:text-[#FF6B6B]" />
-                <span>{data.totalChores} totales en familia</span>
+                <span>{data.totalChores} en familia</span>
               </div>
             </div>
           </div>
