@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Chelsea_Market, Patrick_Hand } from "next/font/google";
+import { Chelsea_Market, Comic_Neue } from "next/font/google";
 import "./globals.css";
 import UserSelectModal, { OpenUserModalButton } from "@/components/UserSelectModal";
 import BottomNav from "@/components/BottomNav";
@@ -9,7 +9,7 @@ import AchievementToast from "@/components/AchievementToast";
 import Image from "next/image";
 
 const chelseaMarket = Chelsea_Market({ weight: "400", subsets: ["latin"], variable: "--font-chelsea" });
-const patrickHand = Patrick_Hand({ weight: "400", subsets: ["latin"], variable: "--font-sketch" });
+const comicNeue = Comic_Neue({ weight: ["400", "700"], subsets: ["latin"], variable: "--font-sketch" });
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -40,7 +40,7 @@ export default function RootLayout({
       </head>
       <body
         suppressHydrationWarning
-        className={`${patrickHand.className} sketchy-bg text-[#2D2D2D] pb-[4rem] min-h-screen`}
+        className={`${comicNeue.className} sketchy-bg text-[#2D2D2D] pb-[4rem] min-h-screen`}
       >
         <ThemeProvider attribute="class" defaultTheme="light" forcedTheme="light">
           <header
