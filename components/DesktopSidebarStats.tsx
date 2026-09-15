@@ -14,6 +14,8 @@ type MemberStat = {
   member: Member;
   tasks: number;
   points: number;
+  basePoints: number;
+  streakMultiplier: number;
   thanks: number;
 };
 
@@ -37,7 +39,7 @@ export default function DesktopSidebarStats() {
 
     const [{ data: logs }, { data: thanks }, { data: allLogs }] = await Promise.all([
       supabase.from('logs')
-        .select('member_id, chores(points)')
+        .select('member_id, done_at, metadata, chores(points)')
         .eq('home_id', currentUser.home_id)
         .gte('done_at', start)
         .lte('done_at', end),
@@ -47,18 +49,34 @@ export default function DesktopSidebarStats() {
         .gte('created_at', start)
         .lte('created_at', end),
       supabase.from('logs')
-        .select('member_id, chores(points)')
+        .select('member_id, metadata, chores(points)')
         .eq('home_id', currentUser.home_id)
     ]);
+
+    const getStreakMultiplier = (distinctDays: number) => {
+      if (distinctDays >= 6) return 1.30;
+      if (distinctDays >= 4) return 1.20;
+      if (distinctDays >= 2) return 1.10;
+      return 1.0;
+    };
 
     const result: MemberStat[] = (members as any[])
       .map((m: any) => {
         const memberLogs = logs?.filter((l) => l.member_id === m.id) || [];
-        const points = memberLogs.reduce((acc, l: any) => acc + (l.chores?.points || 0), 0);
+        const basePoints = memberLogs.reduce((acc, l: any) => {
+          const earned = (l.metadata as any)?.points_earned;
+          return acc + (earned != null ? earned : (l.chores?.points || 0));
+        }, 0);
+        const distinctDays = new Set(
+          memberLogs.map((l: any) => new Date(l.done_at).toDateString())
+        ).size;
+        const multiplier = getStreakMultiplier(distinctDays);
         return {
           member: m as Member,
           tasks: memberLogs.length,
-          points,
+          basePoints,
+          points: Math.round(basePoints * multiplier),
+          streakMultiplier: multiplier,
           thanks: thanks?.filter((t) => t.to_member_id === m.id).length ?? 0,
         };
       });
@@ -66,11 +84,16 @@ export default function DesktopSidebarStats() {
     const histResult: MemberStat[] = (members as any[])
       .map((m: any) => {
         const mLogs = allLogs?.filter((l) => l.member_id === m.id) || [];
-        const pts = mLogs.reduce((acc, l: any) => acc + (l.chores?.points || 0), 0);
+        const pts = mLogs.reduce((acc, l: any) => {
+          const earned = (l.metadata as any)?.points_earned;
+          return acc + (earned != null ? earned : (l.chores?.points || 0));
+        }, 0);
         return {
           member: m as Member,
           tasks: mLogs.length,
+          basePoints: pts,
           points: pts,
+          streakMultiplier: 1.0,
           thanks: 0,
         };
       });
@@ -129,6 +152,11 @@ export default function DesktopSidebarStats() {
                         <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
                         {value} <span className="text-xs font-bold text-[#1E1E1E]/50 dark:text-white/50">pts</span>
                       </span>
+                      {item.streakMultiplier > 1.0 && (
+                        <span className="text-[10px] font-black text-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 px-1.5 py-0.5 rounded-full">
+                          ⚡×{item.streakMultiplier.toFixed(2).replace('.00', '')}
+                        </span>
+                      )}
                       <span className="text-[10px] font-medium text-[#1E1E1E]/30 dark:text-white/30">
                         {item.tasks} {item.tasks === 1 ? 'tarea' : 'tareas'}
                       </span>

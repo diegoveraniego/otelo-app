@@ -42,17 +42,29 @@ function buildResults(members: Member[], logs: any[]): MemberResult[] {
 
   logs.forEach(l => {
     const chore = l.chore as any;
-    const pts = chore?.points ?? 1;
+    const meta = l.metadata as any;
     const name = chore?.name ?? 'Tarea';
     const emoji = chore?.emoji ?? '✅';
     const mid = l.member_id;
 
-    pointsMap[mid] = (pointsMap[mid] || 0) + pts;
     taskMap[mid] = (taskMap[mid] || 0) + 1;
 
-    if (!breakdownMap[mid]) breakdownMap[mid] = {};
-    if (!breakdownMap[mid][name]) breakdownMap[mid][name] = { emoji, pointsEach: pts, count: 0 };
-    breakdownMap[mid][name].count += 1;
+    if (meta?.subtasks && Array.isArray(meta.subtasks)) {
+      const subList = meta.subtasks as { name: string; points: number }[];
+      subList.forEach(sub => {
+        const key = `${name} › ${sub.name}`;
+        if (!breakdownMap[mid]) breakdownMap[mid] = {};
+        if (!breakdownMap[mid][key]) breakdownMap[mid][key] = { emoji, pointsEach: sub.points, count: 0 };
+        breakdownMap[mid][key].count += 1;
+        pointsMap[mid] = (pointsMap[mid] || 0) + sub.points;
+      });
+    } else {
+      const pts = meta?.points_earned ?? chore?.points ?? 1;
+      pointsMap[mid] = (pointsMap[mid] || 0) + pts;
+      if (!breakdownMap[mid]) breakdownMap[mid] = {};
+      if (!breakdownMap[mid][name]) breakdownMap[mid][name] = { emoji, pointsEach: pts, count: 0 };
+      breakdownMap[mid][name].count += 1;
+    }
   });
 
   return members
@@ -254,7 +266,7 @@ export default function LeaderboardPage() {
 
         const { data: logs } = await supabase
           .from('logs')
-          .select('member_id, chore:chores(points, name, emoji)')
+          .select('member_id, metadata, chore:chores(points, name, emoji)')
           .eq('home_id', currentUser.home_id)
           .gte('done_at', start.toISOString())
           .lte('done_at', end.toISOString());
