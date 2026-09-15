@@ -10,8 +10,8 @@ export default function BottomNav() {
   if (pathname === '/login') return null;
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-[#1A1A1E] border-t border-[#E5E6E6] dark:border-[#2C2C30] pb-safe z-40 md:sticky md:bottom-4 md:border-t-0 md:bg-transparent md:dark:bg-transparent md:max-w-2xl md:mx-auto mt-4 transition-colors">
-      <div className="flex justify-around items-center h-16 md:bg-white md:dark:bg-[#1A1A1E] md:rounded-xl md:shadow-lg md:border md:border-[#E5E6E6] md:dark:border-[#2C2C30] px-4 transition-colors">
+    <nav className="fixed bottom-0 left-0 right-0 sketchy-border-alt pb-safe z-40 md:sticky md:bottom-4 md:border-t-0 md:max-w-2xl md:mx-auto mt-4 transition-colors">
+      <div className="flex justify-around items-center h-16 md:sketchy-border-alt px-4 transition-colors">
         <Link 
           href="/" 
           className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${pathname === '/' ? 'text-[#3584E4] dark:text-[#3584E4]' : 'text-[#1E1E1E]/50 dark:text-white/50 hover:text-[#1E1E1E] dark:hover:text-white'}`}

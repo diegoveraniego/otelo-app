@@ -173,7 +173,7 @@ function WeekCard({ week, defaultOpen = false }: { week: WeekRecord; defaultOpen
   const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <div className="bg-white dark:bg-[#1A1A1E] rounded-2xl shadow-sm border border-[#E5E6E6] dark:border-[#2C2C30] overflow-hidden transition-colors">
+    <div className="sketchy-border overflow-hidden transition-colors">
       {/* Header */}
       <button
         onClick={() => setOpen(v => !v)}
@@ -312,7 +312,7 @@ export default function LeaderboardPage() {
           <Trophy className="w-6 h-6" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-[#1E1E1E] dark:text-white">Leaderboard</h1>
+          <h1 className="text-2xl font-bold text-[#1E1E1E] dark:text-white"><span className="highlighter-yellow">Leaderboard</span></h1>
           <p className="text-sm text-[#1E1E1E]/60 dark:text-white/60">
             Historial de ganadores semanales por puntos
           </p>

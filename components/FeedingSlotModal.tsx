@@ -211,7 +211,7 @@ export default function FeedingSlotModal({ slot, isOpen, onClose, onRefresh }: P
               <button
                 key={m.id}
                 onClick={() => handleRequestTrade(m)}
-                className="flex flex-col items-center justify-center p-4 rounded-xl border border-[#E5E6E6] dark:border-[#2C2C30] hover:bg-[#FAFAFA] dark:hover:bg-[#3D3D3D] transition-colors"
+                className="flex flex-col items-center justify-center p-4 sketchy-border transition-colors"
                 style={{ borderBottomColor: m.color, borderBottomWidth: 3 }}
               >
                 <Avatar member={m} className="w-10 h-10 text-base mb-2" />
@@ -246,12 +246,12 @@ export default function FeedingSlotModal({ slot, isOpen, onClose, onRefresh }: P
         </div>
 
         {/* Status Card */}
-        <div className={`p-4 rounded-2xl border transition-colors ${
+        <div className={`p-4 sketchy-border-alt transition-colors ${
           slot.fed_at 
             ? isReplacement
-              ? 'bg-amber-50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-800/30'
-              : 'bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-800/30'
-            : 'bg-[#FAFAFA] dark:bg-[#151518] border-[#E5E6E6] dark:border-[#2C2C30]'
+              ? 'highlighter-yellow'
+              : 'highlighter-green'
+            : ''
         }`}>
           {slot.fed_at ? (
             <div className="space-y-3">
@@ -300,7 +300,7 @@ export default function FeedingSlotModal({ slot, isOpen, onClose, onRefresh }: P
           {isToday && (
             <>
               {slot.fed_at ? (
-                <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/40 rounded-xl flex items-start gap-2 mb-1 mt-2">
+                <div className="p-3 sketchy-border-alt flex items-start gap-2 mb-1 mt-2">
                   <AlertTriangle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
                   <p className="text-[11px] text-red-700 dark:text-red-400 font-medium">
                     Esta mascota ya fue alimentada en este turno. Darle comida doble puede hacerle mal a su salud.
@@ -309,7 +309,7 @@ export default function FeedingSlotModal({ slot, isOpen, onClose, onRefresh }: P
               ) : (
                 <>
                   {isEarly && (
-                    <div className="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40 rounded-xl flex items-start gap-2 mb-1 mt-2">
+                    <div className="p-3 highlighter-yellow sketchy-border-alt flex items-start gap-2 mb-1 mt-2">
                       <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
                       <p className="text-[11px] text-amber-700 dark:text-amber-400 font-medium">
                         Aún es temprano para el turno de la {slotLabel.toLowerCase()}. 
@@ -320,7 +320,7 @@ export default function FeedingSlotModal({ slot, isOpen, onClose, onRefresh }: P
                   <button
                     onClick={handleMarkFed}
                     disabled={isSubmitting}
-                    className="w-full mt-2 flex items-center justify-center gap-2 py-3.5 bg-[#26A269] hover:bg-[#1E8254] text-white font-bold rounded-xl transition-all active:scale-[0.98] disabled:opacity-50"
+                    className="w-full mt-2 flex items-center justify-center gap-2 py-3.5 sketchy-border highlighter-green text-[#1E1E1E] font-bold transition-all active:scale-[0.98] disabled:opacity-50"
                   >
                     <CheckCircle2 className="w-5 h-5" />
                     {isSubmitting ? 'Guardando...' : 'Marcar como alimentado'}
@@ -334,7 +334,7 @@ export default function FeedingSlotModal({ slot, isOpen, onClose, onRefresh }: P
             <button
               onClick={handleSignUp}
               disabled={isSubmitting}
-              className="w-full flex items-center justify-center gap-2 py-3.5 bg-[#3584E4] hover:bg-[#1C71D8] text-white font-bold rounded-xl transition-all active:scale-[0.98] disabled:opacity-50"
+              className="w-full flex items-center justify-center gap-2 py-3.5 sketchy-border text-[#1E1E1E] font-bold transition-all active:scale-[0.98] disabled:opacity-50"
             >
               <UserPlus className="w-5 h-5" />
               Anotarme para este turno
@@ -345,7 +345,7 @@ export default function FeedingSlotModal({ slot, isOpen, onClose, onRefresh }: P
             <button
               onClick={handleSendNudge}
               disabled={isSubmitting}
-              className="w-full flex items-center justify-center gap-2 py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl transition-all active:scale-[0.98] disabled:opacity-50"
+              className="w-full flex items-center justify-center gap-2 py-3 sketchy-border highlighter-yellow text-[#1E1E1E] font-bold transition-all active:scale-[0.98] disabled:opacity-50"
             >
               <Bell className="w-4 h-4 animate-bounce" />
               {isSubmitting ? 'Enviando...' : 'Enviar Recordatorio (Nudge)'}
@@ -356,13 +356,13 @@ export default function FeedingSlotModal({ slot, isOpen, onClose, onRefresh }: P
             <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => setView('trade-pick')}
-                className="flex items-center justify-center gap-2 py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl transition-all"
+                className="flex items-center justify-center gap-2 py-3 sketchy-border highlighter-yellow text-[#1E1E1E] font-bold transition-all"
               >
                 <ArrowLeftRight className="w-4 h-4" /> Trueque
               </button>
               <button
                 onClick={handleUnassign}
-                className="flex items-center justify-center gap-2 py-3 bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-400 font-bold rounded-xl hover:bg-red-100 dark:hover:bg-red-900/20 transition-all"
+                className="flex items-center justify-center gap-2 py-3 sketchy-border text-red-600 font-bold transition-all"
               >
                 <Trash2 className="w-4 h-4" /> Salir
               </button>
@@ -378,7 +378,7 @@ function ModalWrapper({ children, onClose }: { children: React.ReactNode; onClos
   return (
     <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/60 p-4 backdrop-blur-sm animate-in fade-in duration-200" onClick={onClose}>
       <div
-        className="w-full max-w-sm bg-white dark:bg-[#1A1A1E] rounded-3xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-8 duration-300"
+        className="w-full max-w-sm sketchy-border-alt overflow-hidden animate-in slide-in-from-bottom-8 duration-300"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-end p-4 pb-0">

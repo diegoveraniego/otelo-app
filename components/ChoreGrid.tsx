@@ -141,7 +141,7 @@ export default function ChoreGrid() {
     return (
       <div className="mt-8 flex flex-col gap-3">
         {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="h-16 w-full bg-[#E5E6E6] dark:bg-[#1A1A1E] animate-pulse rounded-xl" />
+          <div key={i} className="h-16 w-full sketchy-border-alt animate-pulse" />
         ))}
       </div>
     );
@@ -149,13 +149,13 @@ export default function ChoreGrid() {
   
   return (
     <div className="mt-8 space-y-6">
-      <div className="sticky top-[60px] z-10 bg-[#FAFAFA] dark:bg-[#101013] py-2 mb-2 transition-colors">
+      <div className="sticky top-[60px] z-10 py-2 mb-2 transition-colors">
         <input 
           type="text"
           placeholder="Buscar tarea..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full px-4 py-3 bg-white dark:bg-[#1A1A1E] border border-[#E5E6E6] dark:border-[#2C2C30] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#3584E4] dark:text-white transition-all shadow-sm"
+          className="w-full px-4 py-3 sketchy-border-alt text-sm focus:outline-none transition-all shadow-sm"
         />
       </div>
 
@@ -184,11 +184,11 @@ export default function ChoreGrid() {
                     onTouchStart={() => startLongPress(chore)}
                     onTouchEnd={cancelLongPress}
                     onTouchMove={cancelLongPress}
-                    className="group relative flex items-center gap-4 p-3 bg-white dark:bg-[#1A1A1E] rounded-xl border border-[#E5E6E6] dark:border-[#2C2C30] hover:bg-[#FAFAFA] dark:hover:bg-[#222226] transition-all active:scale-[0.98] w-full text-left overflow-hidden"
+                    className="group relative flex items-center gap-4 p-3 sketchy-border transition-all active:scale-[0.98] w-full text-left overflow-hidden"
                   >
                     {/* Success animation overlay */}
                     {successAnimationId === chore.id && (
-                      <div className="absolute inset-0 bg-[#26A269]/95 dark:bg-[#1E8254]/95 flex items-center justify-center text-white z-10 animate-in fade-in duration-200 gap-2">
+                      <div className="absolute inset-0 highlighter-green flex items-center justify-center text-[#1E1E1E] z-10 animate-in fade-in duration-200 gap-2">
                         <CheckCircle2 className="w-5 h-5 animate-bounce" />
                         <span className="text-sm font-bold">¡Listo!</span>
                       </div>
@@ -210,7 +210,7 @@ export default function ChoreGrid() {
                     </div>
 
                     <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                      <div className="flex items-center gap-1 px-2 py-1 bg-[#3584E4]/10 text-[#3584E4] rounded-md text-[10px] font-bold">
+                      <div className="flex items-center gap-1 px-2 py-1 highlighter-yellow sketchy-border text-[#1E1E1E] text-[10px] font-bold">
                         {chore.points || 1} pts
                       </div>
                       {isOverdue && (

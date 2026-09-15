@@ -175,7 +175,7 @@ export default function ConfirmChoreModal({ chore, isOpen, onClose }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-sm bg-white dark:bg-[#1A1A1E] rounded-xl shadow-lg border border-[#E5E6E6] dark:border-[#2C2C30] overflow-hidden animate-in fade-in zoom-in duration-200 transition-colors max-h-[90vh] overflow-y-auto">
+      <div className="w-full max-w-sm sketchy-border-alt overflow-hidden animate-in fade-in zoom-in duration-200 transition-colors max-h-[90vh] overflow-y-auto">
 
         {success ? (
           <div className="p-8 flex flex-col items-center justify-center text-center">
@@ -190,7 +190,7 @@ export default function ConfirmChoreModal({ chore, isOpen, onClose }: Props) {
           <div className="p-6">
             {/* Header */}
             <div className="flex flex-col items-center text-center gap-3">
-              <div className="text-5xl bg-[#FAFAFA] dark:bg-[#151518] w-20 h-20 rounded-2xl flex items-center justify-center border border-[#E5E6E6] dark:border-[#2C2C30]">
+              <div className="text-5xl sketchy-border-alt w-20 h-20 flex items-center justify-center">
                 {chore.emoji}
               </div>
               <div>
@@ -206,7 +206,7 @@ export default function ConfirmChoreModal({ chore, isOpen, onClose }: Props) {
 
             {/* Duplicate warning */}
             {showDuplicateWarning && (
-              <div className="mt-4 flex items-start gap-3 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40 rounded-xl">
+              <div className="mt-4 flex items-start gap-3 p-3 highlighter-yellow sketchy-border-alt">
                 <AlertCircle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
                 <p className="text-xs text-amber-700 dark:text-amber-400">
                   Ya registraste esta tarea hace menos de una hora.
@@ -225,10 +225,10 @@ export default function ConfirmChoreModal({ chore, isOpen, onClose }: Props) {
                       <button
                         key={sub.name}
                         onClick={() => toggleSubtask(sub.name)}
-                        className={`w-full flex items-center justify-between p-3 rounded-xl border transition-all text-left ${
+                        className={`w-full flex items-center justify-between p-3 sketchy-border transition-all text-left ${
                           checked
-                            ? 'bg-[#3584E4]/10 border-[#3584E4]/40 dark:bg-[#3584E4]/20'
-                            : 'bg-[#FAFAFA] dark:bg-[#151518] border-[#E5E6E6] dark:border-[#2C2C30] hover:border-[#3584E4]/30'
+                            ? 'highlighter-yellow'
+                            : ''
                         }`}
                       >
                         <span className={`text-sm font-medium ${checked ? 'text-[#3584E4] dark:text-[#5B9DF5]' : 'text-[#1E1E1E] dark:text-white'}`}>
@@ -236,8 +236,8 @@ export default function ConfirmChoreModal({ chore, isOpen, onClose }: Props) {
                         </span>
                         <div className="flex items-center gap-2 shrink-0">
                           <span className="text-xs font-black text-amber-500">+{sub.points} pts</span>
-                          <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${
-                            checked ? 'bg-[#3584E4] border-[#3584E4]' : 'border-[#E5E6E6] dark:border-[#2C2C30]'
+                          <div className={`w-5 h-5 sketchy-border flex items-center justify-center transition-all ${
+                            checked ? 'highlighter-green' : ''
                           }`}>
                             {checked && <Check className="w-3 h-3 text-white" />}
                           </div>
@@ -258,7 +258,7 @@ export default function ConfirmChoreModal({ chore, isOpen, onClose }: Props) {
                     <button
                       key={opt}
                       onClick={() => setSelectedVariant(opt)}
-                      className={`py-2 px-1 text-xs font-bold rounded-xl transition-all border ${selectedVariant === opt ? 'bg-[#3584E4] text-white border-[#3584E4] shadow-sm scale-105' : 'bg-[#F5F5F7] dark:bg-[#151518] border-[#E5E6E6] dark:border-[#2C2C30] text-[#1E1E1E]/70 dark:text-white/70 hover:bg-[#E5E6E6] dark:hover:bg-[#3D3D3D]'}`}
+                      className={`py-2 px-1 text-xs font-bold sketchy-border transition-all ${selectedVariant === opt ? 'highlighter-yellow scale-105' : ''}`}
                     >
                       {opt}
                     </button>
@@ -287,10 +287,10 @@ export default function ConfirmChoreModal({ chore, isOpen, onClose }: Props) {
                       <button
                         key={m.id}
                         onClick={() => toggleCoMember(m.id)}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border transition-all ${
+                        className={`flex items-center gap-1.5 px-3 py-1.5 sketchy-border text-xs font-bold transition-all ${
                           selected
-                            ? 'bg-[#3584E4] text-white border-[#3584E4]'
-                            : 'bg-[#FAFAFA] dark:bg-[#151518] border-[#E5E6E6] dark:border-[#2C2C30] text-[#1E1E1E] dark:text-white hover:border-[#3584E4]/40'
+                            ? 'highlighter-yellow text-[#1E1E1E]'
+                            : 'text-[#1E1E1E] dark:text-white'
                         }`}
                       >
                         <Avatar member={m} className="w-5 h-5" />
@@ -308,28 +308,28 @@ export default function ConfirmChoreModal({ chore, isOpen, onClose }: Props) {
                 <div className="grid grid-cols-2 gap-3 mt-6">
                   <button
                     onClick={onClose}
-                    className="px-4 py-3 bg-[#E5E6E6] dark:bg-[#3D3D3D] text-[#1E1E1E] dark:text-white font-bold rounded-xl hover:bg-[#D4D4D4] dark:hover:bg-[#474747] transition-all"
+                    className="px-4 py-3 sketchy-border font-bold transition-all"
                   >
                     Cancelar
                   </button>
                   <button
                     onClick={handleConfirm}
                     disabled={isSubmitting || !canConfirm}
-                    className="px-4 py-3 bg-[#3584E4] hover:bg-[#1C71D8] text-white font-bold rounded-xl transition-all shadow-sm active:scale-95 disabled:opacity-50"
+                    className="px-4 py-3 sketchy-border highlighter-green text-[#1E1E1E] font-bold transition-all shadow-sm active:scale-95 disabled:opacity-50"
                   >
                     {isSubmitting ? 'Guardando...' : showDuplicateWarning ? 'Registrar de nuevo' : 'Sí, lo hice'}
                   </button>
                 </div>
                 <button
                   onClick={handleShowCustomTime}
-                  className="w-full mt-3 px-4 py-3 text-[#3584E4] font-bold rounded-xl hover:bg-blue-50 dark:hover:bg-[#3D3D3D]/50 transition-all"
+                  className="w-full mt-3 px-4 py-3 sketchy-border text-[#1E1E1E] font-bold transition-all"
                 >
                   Lo hice en otro momento
                 </button>
               </>
             ) : (
               <div className="mt-6 space-y-4">
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 p-1 bg-[#F4F4F4] dark:bg-[#151518] rounded-xl border border-[#E5E6E6] dark:border-[#2C2C30]">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 p-1 sketchy-border-alt">
                   {[
                     { label: 'Hoy', offset: 0 },
                     { label: 'Ayer', offset: 1 },
@@ -339,10 +339,10 @@ export default function ConfirmChoreModal({ chore, isOpen, onClose }: Props) {
                     <button
                       key={d.offset}
                       onClick={() => setCustomDateOffset(d.offset)}
-                      className={`flex-1 py-2 text-xs sm:text-sm font-bold rounded-lg transition-all ${
+                      className={`flex-1 py-2 text-xs sm:text-sm font-bold sketchy-border transition-all ${
                         customDateOffset === d.offset
-                          ? 'bg-white dark:bg-[#3D3D3D] shadow-sm text-[#1E1E1E] dark:text-white'
-                          : 'text-[#1E1E1E]/50 dark:text-white/50 hover:text-[#1E1E1E] dark:hover:text-white'
+                          ? 'highlighter-yellow text-[#1E1E1E]'
+                          : 'text-[#1E1E1E]/50 hover:text-[#1E1E1E]'
                       }`}
                     >
                       {d.label}
@@ -350,7 +350,7 @@ export default function ConfirmChoreModal({ chore, isOpen, onClose }: Props) {
                   ))}
                 </div>
 
-                <div className="flex items-center justify-between p-3 bg-[#F4F4F4] dark:bg-[#151518] rounded-xl border border-[#E5E6E6] dark:border-[#2C2C30]">
+                <div className="flex items-center justify-between p-3 sketchy-border-alt">
                   <span className="text-sm font-medium text-[#1E1E1E] dark:text-white">Hora</span>
                   <input
                     type="time"
@@ -363,14 +363,14 @@ export default function ConfirmChoreModal({ chore, isOpen, onClose }: Props) {
                 <div className="grid grid-cols-2 gap-3 mt-4">
                   <button
                     onClick={() => setShowCustomTime(false)}
-                    className="px-4 py-3 bg-[#E5E6E6] dark:bg-[#3D3D3D] text-[#1E1E1E] dark:text-white font-bold rounded-xl hover:bg-[#D4D4D4] dark:hover:bg-[#474747] transition-all"
+                    className="px-4 py-3 sketchy-border font-bold transition-all"
                   >
                     Volver
                   </button>
                   <button
                     onClick={handleConfirm}
                     disabled={isSubmitting || !customTime || !canConfirm}
-                    className="px-4 py-3 bg-[#3584E4] hover:bg-[#1C71D8] text-white font-bold rounded-xl transition-all shadow-sm active:scale-95 disabled:opacity-50"
+                    className="px-4 py-3 sketchy-border highlighter-green text-[#1E1E1E] font-bold transition-all shadow-sm active:scale-95 disabled:opacity-50"
                   >
                     {isSubmitting ? 'Guardando...' : 'Confirmar'}
                   </button>

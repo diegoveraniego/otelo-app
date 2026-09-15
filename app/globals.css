@@ -38,3 +38,44 @@ body {
 .animate-shimmer {
   animation: shimmer 2.5s infinite linear;
 }
+
+/* Sketchy UI Styles */
+.sketchy-bg {
+  background-color: #fcf9e3; /* Amarillento de cuaderno */
+  background-image: 
+    linear-gradient(90deg, transparent 79px, #dcaab5 79px, #dcaab5 81px, transparent 81px),
+    linear-gradient(#e1d6cd .1em, transparent .1em);
+  background-size: 100% 1.8em;
+  background-attachment: local;
+}
+
+.sketchy-border {
+  border: 2.5px solid #2d2d2d;
+  border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
+  background: white;
+  box-shadow: 2px 3px 0 rgba(0,0,0,0.1);
+  transition: all 0.2s ease;
+}
+
+.sketchy-border:active {
+  transform: scale(0.97) rotate(-1deg);
+  border-radius: 15px 255px 15px 225px/225px 15px 255px 15px;
+}
+
+.sketchy-border-alt {
+  border: 2.5px solid #2d2d2d;
+  border-radius: 15px 255px 15px 225px/225px 15px 255px 15px;
+  background: white;
+  box-shadow: 2px 3px 0 rgba(0,0,0,0.1);
+}
+
+.highlighter-yellow {
+  background: rgba(255, 240, 100, 0.6);
+  border-radius: 4px 12px 4px 10px;
+  padding: 0 4px;
+}
+
+.highlighter-green {
+  background: rgba(140, 255, 140, 0.6);
+  border-radius: 8px 4px 12px 4px;
+}

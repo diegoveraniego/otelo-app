@@ -95,7 +95,7 @@ export default function DisputesPage() {
           <Flag className="w-6 h-6" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-[#1E1E1E] dark:text-white">Disputas</h1>
+          <h1 className="text-2xl font-bold text-[#1E1E1E] dark:text-white"><span className="highlighter-yellow">Disputas</span></h1>
           <p className="text-sm text-[#1E1E1E]/60 dark:text-white/60">
             Tribunal del hogar. Vota para resolver conflictos de tareas.
           </p>
@@ -107,7 +107,7 @@ export default function DisputesPage() {
           <span className="w-8 h-8 rounded-full border-4 border-amber-500 border-t-transparent animate-spin" />
         </div>
       ) : disputes.length === 0 ? (
-        <div className="flex flex-col items-center justify-center p-12 text-center text-[#1E1E1E]/50 dark:text-white/40 bg-white dark:bg-[#1A1A1E] rounded-3xl border border-[#E5E6E6] dark:border-[#2C2C30]">
+        <div className="flex flex-col items-center justify-center p-12 text-center text-[#1E1E1E]/50 dark:text-white/40 sketchy-border-alt">
           <Check className="w-12 h-12 mb-3 text-green-500" />
           <p className="text-sm font-semibold">No hay disputas activas</p>
           <p className="text-xs mt-1">El hogar está en paz.</p>
@@ -123,7 +123,7 @@ export default function DisputesPage() {
                             !(dispute.votes || {})[currentUser.id];
 
             return (
-              <div key={dispute.id} className="bg-white dark:bg-[#1A1A1E] rounded-3xl p-5 border border-[#E5E6E6] dark:border-[#2C2C30] shadow-sm">
+              <div key={dispute.id} className="sketchy-border p-5">
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <h3 className="font-bold text-[#1E1E1E] dark:text-white flex items-center gap-2">
@@ -143,7 +143,7 @@ export default function DisputesPage() {
                   </div>
                 </div>
 
-                <div className="bg-[#FAFAFA] dark:bg-[#252525] p-3 rounded-xl mb-4 border border-[#E5E6E6] dark:border-[#404040]">
+                <div className="sketchy-border-alt p-3 mb-4">
                   <p className="text-sm text-[#1E1E1E] dark:text-white italic">
                     "{dispute.reason}"
                   </p>

@@ -199,7 +199,7 @@ export default function HistoryPage() {
           <History className="w-6 h-6" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-[#1E1E1E] dark:text-white">Historial de Tareas</h1>
+          <h1 className="text-2xl font-bold text-[#1E1E1E] dark:text-white"><span className="highlighter-yellow">Historial de Tareas</span></h1>
           <p className="text-sm text-[#1E1E1E]/60 dark:text-white/60">
             Cronología completa de actividades y auditoría de registros del hogar.
           </p>
@@ -207,7 +207,7 @@ export default function HistoryPage() {
       </div>
 
       {/* Filters Box */}
-      <div className="bg-white dark:bg-[#1A1A1E] rounded-2xl p-5 shadow-sm border border-[#E5E6E6] dark:border-[#2C2C30] mb-6 transition-colors">
+      <div className="sketchy-border-alt p-5 mb-6 transition-colors">
         <h2 className="text-sm font-bold text-[#1E1E1E]/80 dark:text-white/80 mb-4 flex items-center gap-2">
           Filtrar y Buscar Registros
         </h2>
@@ -307,7 +307,7 @@ export default function HistoryPage() {
       </div>
 
       {/* Audit List Container */}
-      <div className="bg-white dark:bg-[#1A1A1E] rounded-2xl overflow-hidden shadow-sm border border-[#E5E6E6] dark:border-[#2C2C30] transition-colors mb-6">
+      <div className="sketchy-border-alt overflow-hidden transition-colors mb-6">
         {logs.length > 0 ? (
           <div className="flex flex-col">
             {logs.map((log, index) => {
