@@ -328,10 +328,15 @@ export default function HistoryPage() {
                       <span className="font-bold">{log.member.name}</span> hizo{' '}
                       <span className="font-semibold text-[#3584E4] dark:text-sky-400">{log.chore.name}</span> {log.chore.emoji}
                     </p>
-                    <p className="text-[11px] text-[#1E1E1E]/50 dark:text-white/40 mt-1 flex items-center gap-1">
-                      <Calendar className="w-3 h-3 shrink-0" />
-                      {capitalizedTime}
-                    </p>
+                    <div className="flex items-center gap-2 mt-1 flex-wrap">
+                      <p className="text-[11px] text-[#1E1E1E]/50 dark:text-white/40 flex items-center gap-1">
+                        <Calendar className="w-3 h-3 shrink-0" />
+                        {capitalizedTime}
+                      </p>
+                      <span className="text-[11px] font-black text-amber-600 dark:text-amber-400 flex items-center gap-0.5">
+                        +{log.chore.points} pts
+                      </span>
+                    </div>
                   </div>
 
                   {canDelete && (

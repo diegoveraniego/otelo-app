@@ -1,6 +1,6 @@
 'use client';
 
-import { Home, BarChart3, PawPrint, History, MessageSquare } from 'lucide-react';
+import { Home, BarChart3, PawPrint, History, MessageSquare, Trophy } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -18,6 +18,13 @@ export default function BottomNav() {
         >
           <Home className="w-6 h-6" strokeWidth={pathname === '/' ? 2.5 : 2} />
           <span className="text-[10px] font-medium">Inicio</span>
+        </Link>
+        <Link 
+          href="/leaderboard" 
+          className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${pathname === '/leaderboard' ? 'text-[#3584E4] dark:text-[#3584E4]' : 'text-[#1E1E1E]/50 dark:text-white/50 hover:text-[#1E1E1E] dark:hover:text-white'}`}
+        >
+          <Trophy className="w-6 h-6" strokeWidth={pathname === '/leaderboard' ? 2.5 : 2} />
+          <span className="text-[10px] font-medium">Ranking</span>
         </Link>
         <Link 
           href="/pets" 
