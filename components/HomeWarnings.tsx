@@ -58,7 +58,7 @@ export default function HomeWarnings() {
   return (
     <div className="space-y-3 mb-6 mt-2">
       {missingFeeding && (
-        <div className="sketchy-border highlighter-yellow p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-in slide-in-from-top-2">
+        <div className="sketchy-border bg-[#fff9c4] p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-in slide-in-from-top-2">
           <div className="flex items-center gap-3">
             <div className="p-2 text-amber-600 dark:text-amber-400">
               <Bone className="w-5 h-5" />
@@ -78,7 +78,7 @@ export default function HomeWarnings() {
       )}
 
       {missingVotes && (
-        <div className="sketchy-border-alt p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-in slide-in-from-top-2">
+        <div className="sketchy-border-alt p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-in slide-in-from-top-2">
           <div className="flex items-center gap-3">
             <div className="p-2 text-[#3584E4]">
               <Target className="w-5 h-5" />
