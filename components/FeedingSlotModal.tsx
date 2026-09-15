@@ -299,23 +299,34 @@ export default function FeedingSlotModal({ slot, isOpen, onClose, onRefresh }: P
         <div className="grid gap-2">
           {isToday && (
             <>
-              {isEarly && (
-                <div className="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40 rounded-xl flex items-start gap-2 mb-1">
-                  <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-                  <p className="text-[11px] text-amber-700 dark:text-amber-400 font-medium">
-                    Aún es temprano para el turno de la {slotLabel.toLowerCase()}. 
-                    Si le estás dando la comida que faltaba de la mañana, asegúrate de marcar el turno de la mañana en su lugar.
+              {slot.fed_at ? (
+                <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/40 rounded-xl flex items-start gap-2 mb-1 mt-2">
+                  <AlertTriangle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+                  <p className="text-[11px] text-red-700 dark:text-red-400 font-medium">
+                    Esta mascota ya fue alimentada en este turno. Darle comida doble puede hacerle mal a su salud.
                   </p>
                 </div>
+              ) : (
+                <>
+                  {isEarly && (
+                    <div className="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40 rounded-xl flex items-start gap-2 mb-1 mt-2">
+                      <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                      <p className="text-[11px] text-amber-700 dark:text-amber-400 font-medium">
+                        Aún es temprano para el turno de la {slotLabel.toLowerCase()}. 
+                        Si le estás dando la comida que faltaba de la mañana, asegúrate de marcar el turno de la mañana en su lugar.
+                      </p>
+                    </div>
+                  )}
+                  <button
+                    onClick={handleMarkFed}
+                    disabled={isSubmitting}
+                    className="w-full mt-2 flex items-center justify-center gap-2 py-3.5 bg-[#26A269] hover:bg-[#1E8254] text-white font-bold rounded-xl transition-all active:scale-[0.98] disabled:opacity-50"
+                  >
+                    <CheckCircle2 className="w-5 h-5" />
+                    {isSubmitting ? 'Guardando...' : 'Marcar como alimentado'}
+                  </button>
+                </>
               )}
-              <button
-                onClick={handleMarkFed}
-                disabled={isSubmitting}
-                className="w-full flex items-center justify-center gap-2 py-3.5 bg-[#26A269] hover:bg-[#1E8254] text-white font-bold rounded-xl transition-all active:scale-[0.98] disabled:opacity-50"
-              >
-                <CheckCircle2 className="w-5 h-5" />
-                {isSubmitting ? 'Guardando...' : slot.fed_at ? 'Alimentar otra vez' : 'Marcar como alimentado'}
-              </button>
             </>
           )}
 

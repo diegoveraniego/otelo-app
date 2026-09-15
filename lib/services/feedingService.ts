@@ -138,6 +138,11 @@ export const feedingService = {
         .eq('id', payload.id)
         .single();
 
+      // Block double feeding
+      if ((existingSlot?.feedings && existingSlot.feedings.length > 0) || existingSlot?.fed_by) {
+        throw new Error('Esta mascota ya fue alimentada en este turno.');
+      }
+
       let newFeedings: any[] = [];
       if (existingSlot?.feedings && Array.isArray(existingSlot.feedings)) {
         newFeedings = [...existingSlot.feedings, newFeedingObj];

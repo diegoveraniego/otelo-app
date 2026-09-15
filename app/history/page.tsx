@@ -15,9 +15,11 @@ import {
   ChevronDown, 
   RotateCcw, 
   ArrowUpDown,
-  FilterX
+  FilterX,
+  Flag
 } from 'lucide-react';
 import Avatar from '@/components/Avatar';
+import DisputeModal from '@/components/DisputeModal';
 
 const PAGE_SIZE = 20;
 
@@ -42,6 +44,7 @@ export default function HistoryPage() {
   const [page, setPage] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
+  const [disputeLog, setDisputeLog] = useState<LogWithDetails | null>(null);
 
   // Fetch initial helper data (members & chores list for dropdowns)
   const fetchFilterOptions = useCallback(async () => {
@@ -355,6 +358,20 @@ export default function HistoryPage() {
                       <Trash2 className="w-4.5 h-4.5" />
                     </button>
                   )}
+                  {!isOwnLog && !(log as any).has_dispute && (
+                    <button
+                      onClick={() => setDisputeLog(log)}
+                      className="p-2.5 rounded-xl border border-transparent text-amber-500 hover:text-amber-600 hover:bg-amber-500/10 transition-all opacity-0 group-hover:opacity-100 focus:opacity-100"
+                      title="Disputar tarea"
+                    >
+                      <Flag className="w-4.5 h-4.5" />
+                    </button>
+                  )}
+                  {(log as any).has_dispute && (
+                    <span className="text-xs font-bold text-amber-500 px-2 py-1 bg-amber-500/10 rounded-lg">
+                      Disputada
+                    </span>
+                  )}
                 </div>
               );
             })}
@@ -385,6 +402,17 @@ export default function HistoryPage() {
         <div className="flex justify-center p-4">
           <span className="w-6 h-6 rounded-full border-3 border-[#3584E4] border-t-transparent animate-spin" />
         </div>
+      )}
+
+      {disputeLog && (
+        <DisputeModal 
+          log={disputeLog} 
+          onClose={() => setDisputeLog(null)} 
+          onSuccess={() => {
+            setDisputeLog(null);
+            setLogs(logs.map(l => l.id === disputeLog.id ? { ...l, has_dispute: true } : l));
+          }}
+        />
       )}
     </div>
   );
