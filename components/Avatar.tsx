@@ -10,7 +10,7 @@ import Image from 'next/image';
 export default function Avatar({ member, className = '' }: AvatarProps) {
   const avatarContent = member.avatar_url ? (
     <div 
-      className={`relative rounded-full overflow-hidden shrink-0 shadow-sm border border-black/5 w-full h-full`}
+      className={`relative rounded-full overflow-hidden shrink-0 border-[2.5px] border-[#2d2d2d] w-full h-full`}
       style={{ backgroundColor: member.color }}
     >
       <Image
@@ -25,7 +25,7 @@ export default function Avatar({ member, className = '' }: AvatarProps) {
     </div>
   ) : (
     <div 
-      className={`rounded-full flex items-center justify-center text-white font-bold shrink-0 shadow-sm w-full h-full`}
+      className={`rounded-full flex items-center justify-center text-white font-bold shrink-0 border-[2.5px] border-[#2d2d2d] w-full h-full`}
       style={{ backgroundColor: member.color }}
     >
       {member.name.charAt(0)}

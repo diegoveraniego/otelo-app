@@ -95,7 +95,7 @@ export default function NotificationBell() {
       <button
         id="notification-bell-button"
         onClick={handleOpen}
-        className="relative flex items-center justify-center w-10 h-10 rounded-full bg-white dark:bg-[#1A1A1E] shadow-sm border border-[#E5E6E6] dark:border-[#2C2C30] hover:bg-[#FAFAFA] dark:hover:bg-[#3D3D3D] transition-colors"
+        className="relative flex items-center justify-center w-10 h-10 rounded-full sketchy-border transition-colors"
       >
         <Bell className="w-5 h-5 text-[#1E1E1E] dark:text-white" />
         {unreadCount > 0 && (

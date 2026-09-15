@@ -42,7 +42,7 @@ export default function RootLayout({
         suppressHydrationWarning
         className={`${patrickHand.className} sketchy-bg text-[#2D2D2D] pb-[4rem] min-h-screen`}
       >
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <ThemeProvider attribute="class" defaultTheme="light" forcedTheme="light">
           <header
             className="sticky top-0 z-40 bg-[#fcf9e3]/90 backdrop-blur-md border-b-2 border-[#2d2d2d] px-2 py-1 md:px-4 md:py-3 flex justify-between items-center w-screen"
           >
