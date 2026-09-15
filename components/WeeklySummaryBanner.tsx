@@ -270,7 +270,7 @@ export default function WeeklySummaryBanner() {
     const hasCandidates = candidateNames.length > 0;
 
     return (
-      <div className="bg-white dark:bg-[#1A1A1E] rounded-xl p-4 mb-6 text-[#1E1E1E] dark:text-white shadow-sm relative overflow-hidden animate-in fade-in slide-in-from-top-4 duration-700 border border-[#E5E6E6] dark:border-[#2C2C30]">
+      <div className="sketchy-border-alt rounded-xl p-4 mb-6 text-[#1E1E1E] dark:text-white shadow-sm relative overflow-hidden animate-in fade-in slide-in-from-top-4 duration-700">
         <div className="absolute top-0 right-0 p-2 opacity-[0.03] dark:opacity-10 pointer-events-none">
           <Sparkles className="w-24 h-24 rotate-12 text-[#1E1E1E] dark:text-white" />
         </div>
@@ -336,7 +336,7 @@ export default function WeeklySummaryBanner() {
 
   if (data.mode === 'monday' && data.topMember) {
     return (
-      <div className="bg-white dark:bg-[#1A1A1E] rounded-xl p-4 mb-6 text-[#1E1E1E] dark:text-white shadow-sm relative overflow-hidden animate-in fade-in slide-in-from-top-4 duration-700 border border-[#E5E6E6] dark:border-[#2C2C30]">
+      <div className="sketchy-border-alt rounded-xl p-4 mb-6 text-[#1E1E1E] dark:text-white shadow-sm relative overflow-hidden animate-in fade-in slide-in-from-top-4 duration-700">
         <div className="absolute top-0 right-0 p-2 opacity-[0.03] dark:opacity-10 pointer-events-none">
           <Trophy className="w-24 h-24 rotate-12 text-[#1E1E1E] dark:text-white" />
         </div>

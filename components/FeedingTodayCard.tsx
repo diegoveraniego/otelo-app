@@ -45,7 +45,7 @@ export default function FeedingTodayCard({ slot, onOpenModal }: Props) {
   return (
     <button
       onClick={handleClick}
-      className={`group relative flex-1 min-w-0 flex flex-col items-center justify-between p-4 bg-white dark:bg-[#1A1A1E] rounded-2xl border border-[#E5E6E6] dark:border-[#2C2C30] shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-95 transition-all duration-200 text-left ${getCardStyle()}`}
+      className={`group relative flex-1 min-w-0 flex flex-col items-center justify-between p-4 sketchy-border rounded-2xl shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-95 transition-all duration-200 text-left ${getCardStyle()}`}
     >
       {/* Status badge */}
       {slot?.fed_at ? (

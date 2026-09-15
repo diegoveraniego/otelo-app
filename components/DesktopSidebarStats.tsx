@@ -124,7 +124,7 @@ export default function DesktopSidebarStats() {
   return (
     <div className="flex flex-col gap-4 w-full">
       {/* Ranking Semanal */}
-      <div className="bg-white dark:bg-[#1A1A1E] rounded-xl p-4 shadow-sm border border-[#E5E6E6] dark:border-[#2C2C30] transition-colors">
+      <div className="sketchy-border-alt p-4 transition-colors">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-semibold text-[#1E1E1E]/60 dark:text-white/60">Ranking Semanal</h3>
         </div>
@@ -176,7 +176,7 @@ export default function DesktopSidebarStats() {
       </div>
 
       {/* Nivel Histórico */}
-      <div className="bg-white dark:bg-[#1A1A1E] rounded-xl p-4 shadow-sm border border-[#E5E6E6] dark:border-[#2C2C30] transition-colors">
+      <div className="sketchy-border-alt p-4 transition-colors">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-semibold text-[#1E1E1E]/60 dark:text-white/60">Nivel Histórico</h3>
         </div>

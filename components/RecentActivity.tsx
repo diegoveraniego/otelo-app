@@ -109,7 +109,7 @@ export default function RecentActivity() {
         <h2 className="text-lg font-bold text-[#1E1E1E] dark:text-white mb-4 px-1">
           Actividad Reciente
         </h2>
-        <div className="bg-white dark:bg-[#1A1A1E] rounded-2xl p-8 text-center border border-[#E5E6E6] dark:border-[#2C2C30] transition-colors shadow-sm">
+        <div className="sketchy-border-alt p-8 text-center transition-colors">
           <div className="text-3xl mb-2">✨</div>
           <p className="text-sm font-medium text-[#1E1E1E] dark:text-white mb-1">
             Sin actividad reciente
@@ -129,7 +129,7 @@ export default function RecentActivity() {
         {isLoading && <span className="w-4 h-4 rounded-full border-2 border-[#3584E4] border-t-transparent animate-spin" />}
       </h2>
       
-      <div className="bg-white dark:bg-[#1A1A1E] rounded-2xl shadow-sm border border-[#E5E6E6] dark:border-[#2C2C30] transition-colors">
+      <div className="sketchy-border-alt transition-colors">
         <div className="flex flex-col">
           {logs.map((log, i) => {
             const isOwnLog = currentUser?.id === log.member_id;
@@ -139,12 +139,8 @@ export default function RecentActivity() {
               <div
                 key={log.id}
                 className={`flex items-center gap-4 p-4 ${
-                  i !== logs.length - 1 ? 'border-b border-[#E5E6E6] dark:border-[#2C2C30]' : ''
-                } ${
-                  i === 0 ? 'rounded-t-2xl' : ''
-                } ${
-                  i === logs.length - 1 ? 'rounded-b-2xl' : ''
-                } hover:bg-[#FAFAFA] dark:hover:bg-[#353535] transition-colors group`}
+                  i !== logs.length - 1 ? 'border-b border-[#E5E6E6]' : ''
+                } hover:bg-[#FAFAFA] transition-colors group`}
               >
                 <Avatar member={log.member} className="w-10 h-10 text-base" />
                 <div className="flex-1 min-w-0">
@@ -186,10 +182,10 @@ export default function RecentActivity() {
                             key={reactionType}
                             title={listNames}
                             onClick={() => handleToggleReaction(log, reactionType)}
-                            className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold transition-all border ${
+                            className={`flex items-center gap-1 px-2 py-0.5 text-xs font-bold transition-all sketchy-border ${
                               hasUserReacted
-                                ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800/40 text-blue-600 dark:text-blue-400 scale-105 shadow-sm'
-                                : 'bg-zinc-50 dark:bg-zinc-800/40 border-zinc-200 dark:border-zinc-700/40 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-700'
+                                ? 'text-blue-600 dark:text-blue-400 scale-105'
+                                : 'text-zinc-500 dark:text-zinc-400'
                             }`}
                           >
                             <span>{emoji}</span>

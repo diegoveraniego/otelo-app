@@ -58,9 +58,9 @@ export default function HomeWarnings() {
   return (
     <div className="space-y-3 mb-6 mt-2">
       {missingFeeding && (
-        <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-in slide-in-from-top-2">
+        <div className="sketchy-border highlighter-yellow p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-in slide-in-from-top-2">
           <div className="flex items-center gap-3">
-            <div className="bg-amber-100 dark:bg-amber-900/40 p-2 rounded-xl text-amber-600 dark:text-amber-400">
+            <div className="p-2 text-amber-600 dark:text-amber-400">
               <Bone className="w-5 h-5" />
             </div>
             <div>
@@ -70,7 +70,7 @@ export default function HomeWarnings() {
           </div>
           <Link 
             href="/pets"
-            className="shrink-0 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors text-center shadow-sm"
+            className="shrink-0 sketchy-border bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold px-4 py-2 transition-colors text-center"
           >
             Anotarse
           </Link>
@@ -78,9 +78,9 @@ export default function HomeWarnings() {
       )}
 
       {missingVotes && (
-        <div className="bg-[#3584E4]/10 dark:bg-[#3584E4]/20 border border-[#3584E4]/20 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-in slide-in-from-top-2">
+        <div className="sketchy-border-alt p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-in slide-in-from-top-2">
           <div className="flex items-center gap-3">
-            <div className="bg-[#3584E4]/20 p-2 rounded-xl text-[#3584E4]">
+            <div className="p-2 text-[#3584E4]">
               <Target className="w-5 h-5" />
             </div>
             <div>
@@ -90,7 +90,7 @@ export default function HomeWarnings() {
           </div>
           <Link 
             href="/council"
-            className="shrink-0 bg-[#3584E4] hover:bg-[#1C71D8] text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors text-center shadow-sm"
+            className="shrink-0 sketchy-border bg-[#3584E4] hover:bg-[#1C71D8] text-white text-xs font-bold px-4 py-2 transition-colors text-center"
           >
             Votar ahora
           </Link>

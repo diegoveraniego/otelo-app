@@ -76,7 +76,7 @@ export default function SummaryCard() {
   if (!currentUser) return null;
 
   return (
-    <div className="bg-white dark:bg-[#1A1A1E] rounded-xl p-6 text-[#1E1E1E] dark:text-white shadow-sm mb-8 overflow-hidden relative border border-[#E5E6E6] dark:border-[#2C2C30] transition-colors">
+    <div className="sketchy-border-alt p-6 text-[#1E1E1E] dark:text-white mb-8 overflow-hidden relative transition-colors">
       <div className="relative z-10">
         <h2 className="text-[#1E1E1E]/60 dark:text-white/60 font-medium mb-1">Esta semana</h2>
         <div className="flex items-end gap-4 mb-2 flex-wrap">
@@ -86,7 +86,7 @@ export default function SummaryCard() {
               <Star className="w-4 h-4 fill-current opacity-80" /> {pluralize(userPoints, 'punto', 'puntos')}
             </span>
           </div>
-          <div className="flex items-end gap-2 mb-1 border-l border-[#E5E6E6] dark:border-[#2C2C30] pl-4">
+          <div className="flex items-end gap-2 mb-1 border-l border-[#E5E6E6] pl-4">
             <span className="text-2xl font-bold tracking-tight">{userCount}</span>
             <span className="text-[#1E1E1E]/60 dark:text-white/60 pb-0.5 text-sm">{pluralize(userCount, 'tarea', 'tareas')}</span>
           </div>
@@ -103,14 +103,14 @@ export default function SummaryCard() {
           <div className="mb-4 mt-2" />
         )}
 
-        <div className="bg-[#FAFAFA] dark:bg-[#151518] rounded-lg p-4 border border-[#E5E6E6] dark:border-[#2C2C30]">
+        <div className="sketchy-border-alt p-4">
           <div className="flex justify-between items-center text-sm">
             <span className="text-[#1E1E1E]/60 dark:text-white/60">Promedio familiar</span>
             <span className="font-semibold text-[#1E1E1E] dark:text-white">
               {familyAvg} {pluralize(familyAvg, 'tarea', 'tareas')}
             </span>
           </div>
-          <div className="h-2 w-full bg-[#E5E6E6] dark:bg-[#3D3D3D] rounded-full mt-3 overflow-hidden">
+          <div className="h-2 w-full bg-[#E5E6E6] rounded-full mt-3 overflow-hidden">
             <div
               className="h-full bg-[#3584E4] rounded-full transition-all duration-1000 ease-out"
               style={{ width: `${Math.min(100, (userCount / Math.max(1, familyAvg * 2)) * 100)}%` }}

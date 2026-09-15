@@ -151,7 +151,7 @@ export default function GamificationBanner() {
       : 'animate-bounce';
 
   return (
-    <div className={`bg-white dark:bg-[#1A1A1E] rounded-xl p-5 mb-6 text-[#1E1E1E] dark:text-white shadow-sm relative overflow-hidden transition-all border border-[#E5E6E6] dark:border-[#2C2C30]`}>
+    <div className={`sketchy-border-alt p-5 mb-6 text-[#1E1E1E] dark:text-white relative overflow-hidden transition-all`}>
       <div className="absolute top-0 right-0 p-4 opacity-[0.03] dark:opacity-10 pointer-events-none">
         {currentTier.name === 'Leyenda' ? (
           <Trophy className="w-32 h-32 rotate-12" />
@@ -162,12 +162,12 @@ export default function GamificationBanner() {
 
       <div className="relative z-10 flex flex-col sm:flex-row items-center gap-5">
         {/* Left: Mascot */}
-        <div className="relative shrink-0 flex items-center justify-center bg-[#FAFAFA] dark:bg-[#151518] w-20 h-20 sm:w-24 sm:h-24 rounded-full border border-[#E5E6E6] dark:border-[#2C2C30]">
+        <div className="relative shrink-0 flex items-center justify-center bg-[#FAFAFA] w-20 h-20 sm:w-24 sm:h-24 rounded-full border border-[#E5E6E6]">
           <span className={`text-4xl sm:text-5xl ${mascotClass}`}>
             {currentTier.mascot}
           </span>
           {/* Tier Name */}
-          <div className="absolute -bottom-1 bg-white dark:bg-[#3D3D3D] text-[10px] font-bold uppercase tracking-wider text-neutral-800 dark:text-white px-2 py-0.5 rounded-full border border-[#E5E6E6] dark:border-[#2C2C30] z-20">
+          <div className="absolute -bottom-1 bg-white text-[10px] font-bold uppercase tracking-wider text-neutral-800 dark:text-white px-2 py-0.5 rounded-full border border-[#E5E6E6] z-20">
             {currentTier.name}
           </div>
         </div>
@@ -196,7 +196,7 @@ export default function GamificationBanner() {
               </span>
             </div>
             
-            <div className="h-4 w-full bg-[#E5E6E6] dark:bg-[#151518] rounded-full p-0.5 border border-[#E5E6E6] dark:border-[#2C2C30]">
+            <div className="h-4 w-full bg-[#E5E6E6] rounded-full p-0.5 border border-[#E5E6E6]">
               <div
                 className={`h-full rounded-full transition-all duration-1000 ease-out relative ${currentTier.progressBarColor}`}
                 style={{ width: `${pct}%` }}
@@ -207,7 +207,7 @@ export default function GamificationBanner() {
 
         {/* Right: Streak status */}
         {streak >= 1 && (
-          <div className="shrink-0 flex sm:flex-col items-center gap-2 bg-[#FAFAFA] dark:bg-[#151518] rounded-xl px-4 py-3 border border-[#E5E6E6] dark:border-[#2C2C30]">
+          <div className="shrink-0 flex sm:flex-col items-center gap-2 sketchy-border-alt px-4 py-3">
             <div className="relative">
               <Flame className="w-8 h-8 text-amber-500 fill-amber-500" />
             </div>

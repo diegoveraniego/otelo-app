@@ -100,7 +100,7 @@ export default function UserSelectModal() {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-sm max-h-[90vh] flex flex-col bg-white dark:bg-[#1A1A1E] rounded-xl shadow-lg border border-[#E5E6E6] dark:border-[#2C2C30] overflow-hidden animate-in fade-in zoom-in duration-200 transition-colors">
+      <div className="w-full max-w-sm max-h-[90vh] flex flex-col sketchy-border-alt rounded-xl shadow-lg overflow-hidden animate-in fade-in zoom-in duration-200 transition-colors">
         <div className="p-6 text-center border-b border-[#E5E6E6] dark:border-[#2C2C30] bg-[#FAFAFA] dark:bg-[#151518] transition-colors">
           <h2 className="text-xl font-bold text-[#1E1E1E] dark:text-white">
             {selectedMember ? 'Ingresa tu PIN' : '¿Quién eres?'}
@@ -233,7 +233,7 @@ export function OpenUserModalButton() {
       onClick={() => {
         window.dispatchEvent(new CustomEvent('open-user-modal'));
       }}
-      className="flex items-center gap-2 bg-white dark:bg-[#1A1A1E] rounded-full p-1 shadow-sm border border-[#E5E6E6] dark:border-[#2C2C30] hover:bg-[#FAFAFA] dark:hover:bg-[#3D3D3D] transition-colors"
+      className="flex items-center gap-2 sketchy-border rounded-full p-1 shadow-sm hover:bg-[#FAFAFA] dark:hover:bg-[#3D3D3D] transition-colors"
       style={currentUser ? { paddingRight: '0.75rem' } : { paddingRight: '0.25rem', paddingLeft: '0.75rem', padding: '0.5rem 1rem' }}
     >
       {currentUser ? (
